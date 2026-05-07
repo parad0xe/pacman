@@ -1,9 +1,6 @@
 from enum import Enum
 from typing import Protocol
-
-from src.models.player import Direction
-from src.types import Position
-
+import pyray as rl
 
 class Direction(Enum):
     IDLE = -1
@@ -15,10 +12,12 @@ class Direction(Enum):
 
 class PlayerPort(Protocol):
     @property
-    def pos(self) -> Position: ...
+    def pos(self) -> rl.Vector2: ...
 
     @property
     def direction(self) -> Direction: ...
 
     @property
     def frame(self) -> int: ...
+
+    def update(self, maze: list[list[int]]) -> None: ...

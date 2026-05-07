@@ -1,16 +1,16 @@
 from enum import Enum, auto
 from typing import Protocol
 
-from src.types import Position
-
+import pyray as rl
 
 class GhostState(Enum):
+    IDLE = auto()
     FLEE = auto()
 
 
 class GhostPort(Protocol):
     @property
-    def pos(self) -> Position: ...
+    def pos(self) -> rl.Vector2: ...
 
     @property
     def state(self) -> GhostState: ...
