@@ -1,7 +1,8 @@
 from typing import Callable
 
 import pyray as pr
-from src.ui.core.items.base import ViewItemBase
+
+from src.ui.items.base import ViewItemBase
 
 
 class LabelButtonViewItem(ViewItemBase):

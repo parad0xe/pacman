@@ -1,7 +1,8 @@
 from typing import Generator, TypeVar
 
 import pyray as pr
-from src.ui.core.items.base import ViewItemBase
+
+from src.ui.items.base import ViewItemBase
 
 T = TypeVar("T", bound=ViewItemBase)
 
