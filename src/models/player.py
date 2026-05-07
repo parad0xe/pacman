@@ -1,7 +1,6 @@
 from enum import Enum
 from typing import Protocol
 
-from src.models.player import Direction
 from src.types import Position
 
 
@@ -14,11 +13,15 @@ class Direction(Enum):
 
 
 class PlayerPort(Protocol):
-    @property
-    def pos(self) -> Position: ...
 
     @property
-    def direction(self) -> Direction: ...
+    def pos(self) -> Position:
+        ...
 
     @property
-    def frame(self) -> int: ...
+    def direction(self) -> Direction:
+        ...
+
+    @property
+    def frame(self) -> int:
+        ...

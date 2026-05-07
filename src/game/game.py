@@ -1,4 +1,4 @@
-from src.ports.game import GamePort
+from src.models.game import GamePort
 
 
 class Game(GamePort):
