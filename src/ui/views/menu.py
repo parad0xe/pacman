@@ -1,13 +1,28 @@
 import pyray as pr
 
 from src.app import App
-from src.ui.items.elements.label_button import LabelButtonViewItem
-from src.ui.views.base import OverlayBase, ViewBase
+from src.ui.layouts.vbox import Vbox
+from src.ui.overlays.base import NoOverlayContext, OverlayRegistry
+from src.ui.views.base import (
+    OverlayBase,
+    ViewBase,
+)
+from src.ui.widgets.label_button import LabelButton
+from src.ui.widgets.text_view import TextView
 
 
 class MainMenuHelloOverlay(OverlayBase):
     name = "main_menu_overlay"
     padding = 10
+
+    def __init__(self, app: App) -> None:
+        super().__init__(app)
+
+        vbox = Vbox(pr.get_screen_width() // 2, pr.get_screen_height() // 2)
+        vbox.add(
+            TextView("Hello world from MainMenuOverlayView", size=30),
+        )
+        self.add(vbox)
 
     def render(self) -> None:
         pr.draw_rectangle(
@@ -15,15 +30,10 @@ class MainMenuHelloOverlay(OverlayBase):
             self.padding,
             pr.get_screen_width() - self.padding * 2,
             pr.get_screen_height() - self.padding * 2,
-            pr.Color(10, 10, 10, 200),
+            pr.Color(10, 10, 10, 230),
         )
-        pr.draw_text(
-            "Hello world from MainMenuOverlayView",
-            800 // 2 - 10 * 5,
-            400 // 2 - 3,
-            20,
-            pr.BLUE,
-        )
+
+        super().render()
 
 
 class MainMenuView(ViewBase):
@@ -32,59 +42,45 @@ class MainMenuView(ViewBase):
     def __init__(self, app: App) -> None:
         super().__init__(app)
 
-        self._menu_buttons: list[LabelButtonViewItem] = [
-            LabelButtonViewItem(
-                280,
-                50,
+        self._overlay_registry = OverlayRegistry(app)
+
+        vbox = Vbox(pr.get_screen_width() // 2, 50)
+        vbox.add(
+            TextView("Pac-Man", size=90, padding_bottom=100, color=pr.BLUE),
+            LabelButton(
                 "Play",
                 onclick=lambda: self._app.switch_to("game"),
             ),
-            LabelButtonViewItem(
-                280,
-                50,
+            LabelButton(
+                "Highscores",
+                onclick=lambda: self._app.switch_to("highscores"),
+            ),
+            LabelButton(
                 "Quit",
                 onclick=lambda: self._app.stop(),
             ),
-        ]
+        )
+        self.add(vbox)
 
     def update(self) -> None:
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
-            self._overlay_registry.toggle(MainMenuHelloOverlay)
-
         if pr.is_key_pressed(pr.KeyboardKey.KEY_Q):
             self._app.stop()
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+            self._overlay_registry.toggle(MainMenuHelloOverlay)
 
         super().update()
 
     def render(self) -> None:
         pr.clear_background(pr.BLACK)
 
-        text_title = "Pac-Man"
-
-        center_x = pr.get_screen_width() // 2
-        center_y = pr.get_screen_height() // 2
-
-        pr.draw_text(
-            text_title,
-            center_x - (len(text_title) // 2) * 52,
-            40,
-            72,
-            pr.BLUE,
+        pr.gui_set_style(
+            pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SIZE, 72
+        )
+        pr.gui_set_style(
+            pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SPACING, 10
         )
 
-        with self.no_overlay:
-            pr.gui_set_style(
-                pr.GuiControl.DEFAULT,
-                pr.GuiDefaultProperty.TEXT_SIZE,
-                60,
-            )
-            pr.gui_set_style(
-                pr.GuiControl.DEFAULT,
-                pr.GuiDefaultProperty.TEXT_SPACING,
-                10,
-            )
+        with NoOverlayContext(self._overlay_registry):
+            super().render()
 
-            for i, rect in v_stack(200, 200, self._menu_buttons, spacing=60):
-                self._menu_buttons[i].render(rect)
-
-        super().render()
+        self._overlay_registry.render_all()
