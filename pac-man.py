@@ -26,6 +26,7 @@ def main() -> None:
             "Hello world", 800 // 2 - 10 * 5, 450 // 2 - 3, 20, pr.BLUE
         )
         pr.end_drawing()
+    pr.close_window()
 
 
 if __name__ == "__main__":
