@@ -2,11 +2,11 @@ import pyray as pr
 
 from src.app import App
 from src.models.config import Config
-from src.ui.game import GameView
-from src.ui.menu import MainMenuView
+from src.ui.views.game import GameView
+from src.ui.views.menu import MainMenuView
 
-W_WIDTH = 800
-W_HEIGHT = 450
+W_WIDTH = 1200
+W_HEIGHT = 800
 
 
 def main() -> None:

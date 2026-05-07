@@ -1,7 +1,7 @@
 import pyray as pr
 
 from src.app import App
-from src.ui.base import ViewBase
+from src.ui.views.base import ViewBase
 
 RADIUS = 30
 

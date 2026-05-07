@@ -1,6 +1,8 @@
 import pyray as pr
 
-from src.ui.base import OverlayBase, ViewBase
+from src.app import App
+from src.ui.items.elements.label_button import LabelButtonViewItem
+from src.ui.views.base import OverlayBase, ViewBase
 
 
 class MainMenuHelloOverlay(OverlayBase):
@@ -27,6 +29,24 @@ class MainMenuHelloOverlay(OverlayBase):
 class MainMenuView(ViewBase):
     name = "main_menu"
 
+    def __init__(self, app: App) -> None:
+        super().__init__(app)
+
+        self._menu_buttons: list[LabelButtonViewItem] = [
+            LabelButtonViewItem(
+                280,
+                50,
+                "Play",
+                onclick=lambda: self._app.switch_to("game"),
+            ),
+            LabelButtonViewItem(
+                280,
+                50,
+                "Quit",
+                onclick=lambda: self._app.stop(),
+            ),
+        ]
+
     def update(self) -> None:
         if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
             self._overlay_registry.toggle(MainMenuHelloOverlay)
@@ -40,8 +60,6 @@ class MainMenuView(ViewBase):
         pr.clear_background(pr.BLACK)
 
         text_title = "Pac-Man"
-        text_play = "Play"
-        text_quit = "Quit"
 
         center_x = pr.get_screen_width() // 2
         center_y = pr.get_screen_height() // 2
@@ -55,18 +73,18 @@ class MainMenuView(ViewBase):
         )
 
         with self.no_overlay:
-            play_pressed = pr.gui_label_button(
-                pr.Rectangle(center_x - 125, center_y - 60, 250, 70),
-                text_play,
+            pr.gui_set_style(
+                pr.GuiControl.DEFAULT,
+                pr.GuiDefaultProperty.TEXT_SIZE,
+                60,
             )
-            stop_pressed = pr.gui_label_button(
-                pr.Rectangle(center_x - 125, center_y + 20, 250, 70), text_quit
+            pr.gui_set_style(
+                pr.GuiControl.DEFAULT,
+                pr.GuiDefaultProperty.TEXT_SPACING,
+                10,
             )
 
-            if play_pressed:
-                self._app.switch_to("game")
-
-            if stop_pressed:
-                self._app.stop()
+            for i, rect in v_stack(200, 200, self._menu_buttons, spacing=60):
+                self._menu_buttons[i].render(rect)
 
         super().render()
