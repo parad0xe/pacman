@@ -1,7 +1,15 @@
 from typing import Protocol
+from enum import Enum
 
 from src.models.ghost import GhostPort
 from src.models.player import PlayerPort
+
+class Direction(Enum):
+    IDLE = -1
+    NORTH = 0
+    EAST = 1
+    SOUTH = 2
+    WEST = 3
 
 
 class StagePort(Protocol):

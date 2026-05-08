@@ -1,13 +1,7 @@
-from enum import Enum
 from typing import Protocol
 import pyray as rl
 
-class Direction(Enum):
-    IDLE = -1
-    NORTH = 0
-    EAST = 1
-    SOUTH = 2
-    WEST = 3
+from src.models.game import Direction
 
 
 class PlayerPort(Protocol):

@@ -1,4 +1,5 @@
 from src.models.player import PlayerPort, Direction
+
 import pyray as rl
 
 
@@ -8,6 +9,7 @@ class Player(PlayerPort):
         self._direction = Direction.IDLE
         self._frame = 0
         self.key_buffer = rl.KeyboardKey.KEY_LEFT
+        self.speed = 0.0625 # 0.03125
 
     @property
     def pos(self) -> rl.Vector2:
@@ -79,16 +81,16 @@ class Player(PlayerPort):
          or not self.pos.y == int(self.pos.y):
 
             if self.direction == Direction.WEST:
-                self._pos.x -= .125
+                self._pos.x -= self.speed
 
             if self.direction == Direction.EAST:
-                self._pos.x += .125
+                self._pos.x += self.speed
 
             if self.direction == Direction.NORTH:
-                self._pos.y -= .125
+                self._pos.y -= self.speed
 
             if self.direction == Direction.SOUTH:
-                self._pos.y += .125
+                self._pos.y += self.speed
 
         else:
             x = int(self.pos.x)
@@ -96,19 +98,19 @@ class Player(PlayerPort):
 
             if self.direction == Direction.WEST\
              and not maze[y][x] & 8:
-                self._pos.x -= .125
+                self._pos.x -= self.speed
 
             if self.direction == Direction.EAST\
              and not maze[y][x] & 2:
-                self._pos.x += .125
+                self._pos.x += self.speed
 
             if self.direction == Direction.NORTH\
              and not maze[y][x] & 1:
-                self._pos.y -= .125
+                self._pos.y -= self.speed
 
             if self.direction == Direction.SOUTH\
              and not maze[y][x] & 4:
-                self._pos.y += .125
+                self._pos.y += self.speed
 
     def update(self, maze: list[list[int]]) -> None:
         self.update_key()

@@ -6,6 +6,9 @@ import pyray as rl
 class GhostState(Enum):
     IDLE = auto()
     FLEE = auto()
+    HUNT = auto()
+    RETREAT = auto()
+    DEAD = auto()
 
 
 class GhostPort(Protocol):

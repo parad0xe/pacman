@@ -1,11 +1,14 @@
-from mazegenerator.mazegenerator import MazeGenerator
+from src.game.game import PathFinder
 from src.models.game import StagePort
 from src.game.ghosts import GhostPort, Ghost
 from src.game.player import PlayerPort, Player
 
+from mazegenerator.mazegenerator import MazeGenerator
+
 
 class Stage(StagePort):
     def __init__(self, generator: MazeGenerator,
+                 pathfinder: PathFinder,
                  level: int,
                  time: int = 90) -> None:
         generator.generate()
@@ -15,8 +18,8 @@ class Stage(StagePort):
         self._remaining = time
 
         self._player: PlayerPort = Player()
-        self._ghosts: list[GhostPort] = [Ghost(0), Ghost(1),
-                                         Ghost(2), Ghost(3)]
+        self._ghosts: list[GhostPort] = [Ghost(0, pathfinder),
+            Ghost(1, pathfinder), Ghost(2, pathfinder), Ghost(3, pathfinder)]
 
         for i in self.board:
             print(i, "\n")
