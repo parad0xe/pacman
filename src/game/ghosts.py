@@ -28,18 +28,18 @@ class Ghost(GhostPort):
     def state(self) -> GhostState:
         return self._state
 
-    def _cell(self) -> tuple[int, int]:
+    def cell(self) -> tuple[int, int]:
         """Current cell the ghost is on or nearest to."""
         return (round(self._pos.x), round(self._pos.y))
 
-    def _on_cell(self) -> bool:
-        """True if the ghost is aligned on a cell (safe to turn)."""
+    def on_cell(self) -> bool:
+        """True if the ghost is aligned on a cell."""
         return (abs(self._pos.x - round(self._pos.x)) < self.speed and
                 abs(self._pos.y - round(self._pos.y)) < self.speed)
 
     def follow_current_path(self) -> None:
         """Move the ghost one step along current_path."""
-        if self._on_cell():
+        if self.on_cell():
             self._pos.x = float(round(self._pos.x))
             self._pos.y = float(round(self._pos.y))
             if not self.current_path:
@@ -58,7 +58,7 @@ class Ghost(GhostPort):
 
     def hunt(self, player: Player) -> None:
         """Chase the player directly."""
-        start = self._cell()
+        start = self.cell()
         end = (round(player.pos.x), round(player.pos.y))
         if start == end:
             return
@@ -79,7 +79,7 @@ class Ghost(GhostPort):
         player_cell = (round(player.pos.x), round(player.pos.y))
         farthest = max(corners, key=lambda c: PathFinder.dist(c, player_cell))
 
-        start = self._cell()
+        start = self.cell()
         if start == farthest:
             return
         self.current_path = self.path_finder.search(start, farthest)
@@ -87,7 +87,7 @@ class Ghost(GhostPort):
 
     def retreat(self) -> None:
         """Return to the ghost's spawn corner."""
-        start = self._cell()
+        start = self.cell()
         if start == self.corner:
             return
         self.current_path = self.path_finder.search(start, self.corner)

@@ -30,22 +30,34 @@ class Game(GamePort):
 
     def player_death(self) -> int:
         self._life -= 1
+        print("touch")
         if self.life == 0:
             return 1
         for ghost in self.stage.ghosts:
-            ghost.coords.x = ghost.corner[1]
-            ghost.coords.y = ghost.corner[0]
-
+            ghost.pos.x = ghost.corner[1]
+            ghost.pos.y = ghost.corner[0]
+        self.stage.player.pos.x = int(len(self.stage.board[0]) / 2)
+        self.stage.player.pos.y = int(len(self.stage.board) / 2)
         return 0
 
     def update(self) -> int:
         self.stage.player.update(self.stage.board)
 
+        if self.stage.player.on_cell():
+            
+            cell = self.stage.player.cell()
+            if self.stage.pacgums[cell[1]][cell[0]] == 1:
+                self._score += 1
+                self.stage.pacgums[cell[1]][cell[0]] = 0
+            
+            if not any([any(row) for row in self.stage.pacgums]):
+                return 2
+
         for ghost in self.stage.ghosts:
             ghost.update(GhostState.HUNT, self.stage.player)
 
             if abs(ghost.pos.x - self.stage.player.pos.x) < .5 \
-             or abs(ghost.pos.y - self.stage.player.pos.y) < .5:
+             and abs(ghost.pos.y - self.stage.player.pos.y) < .5:
                  return self.player_death()
 
         return 0

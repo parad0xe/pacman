@@ -20,6 +20,12 @@ class Stage(StagePort):
 
         self._player: PlayerPort = Player((int(len(self.board[0]) / 2),
                                            int(len(self.board) / 2)))
+
+        self.pacgums = [
+            [0 if cell == 15 else 1 for cell in row]
+            for row in self.board
+        ]
+
         self._ghosts: list[GhostPort] = [
             Ghost(0, pathfinder, (0, 0)),
             Ghost(1, pathfinder, (0, len(self.board[0]) - 1)),

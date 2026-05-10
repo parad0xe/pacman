@@ -24,6 +24,15 @@ class Player(PlayerPort):
     def frame(self) -> int:
         return self._frame
 
+    def cell(self) -> tuple[int, int]:
+        """Current cell the player is on or nearest to."""
+        return (round(self._pos.x), round(self._pos.y))
+
+    def on_cell(self) -> bool:
+        """True if the player is aligned on a cell."""
+        return (abs(self._pos.x - round(self._pos.x)) < self.speed and
+                abs(self._pos.y - round(self._pos.y)) < self.speed)
+
     def update_key(self) -> None:
         if rl.is_key_down(rl.KeyboardKey.KEY_LEFT):
             self.key_buffer = rl.KeyboardKey.KEY_LEFT
@@ -55,11 +64,10 @@ class Player(PlayerPort):
              self._direction = Direction.NORTH
 
 
-        if not self.pos.x == int(self.pos.x)\
-         or not self.pos.y == int(self.pos.y):
+        if not self.on_cell():
              return
-        x = int(self.pos.x)
-        y = int(self.pos.y)
+
+        x, y = self.cell()
 
         if self.key_buffer == rl.KeyboardKey.KEY_LEFT\
          and not (maze[y][x] & 8):
@@ -78,8 +86,7 @@ class Player(PlayerPort):
              self._direction = Direction.SOUTH
 
     def update_pos(self, maze: list[list[int]]) -> None:
-        if not self.pos.x == int(self.pos.x)\
-         or not self.pos.y == int(self.pos.y):
+        if not self.on_cell():
 
             if self.direction == Direction.WEST:
                 self._pos.x -= self.speed
@@ -94,8 +101,9 @@ class Player(PlayerPort):
                 self._pos.y += self.speed
 
         else:
-            x = int(self.pos.x)
-            y = int(self.pos.y)
+            self._pos.x = float(round(self._pos.x))
+            self._pos.y = float(round(self._pos.y))
+            x, y = self.cell()
 
             if self.direction == Direction.WEST\
              and not maze[y][x] & 8:
