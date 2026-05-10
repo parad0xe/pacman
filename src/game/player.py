@@ -1,11 +1,12 @@
-from src.models.player import PlayerPort, Direction
+from src.models.player import PlayerPort
+from src.models.direction import Direction
 
 import pyray as rl
 
 
 class Player(PlayerPort):
-    def __init__(self) -> None:
-        self._pos = rl.Vector2(0, 0)
+    def __init__(self, pos: tuple[int, int]) -> None:
+        self._pos = rl.Vector2(pos[0], pos[1])
         self._direction = Direction.IDLE
         self._frame = 0
         self.key_buffer = rl.KeyboardKey.KEY_LEFT

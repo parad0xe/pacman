@@ -1,9 +1,11 @@
-from src.game.game import PathFinder, Direction
+from src.game.pathfinder import PathFinder
+from src.models.direction import Direction
 from src.game.player import Player
 from src.models.ghost import GhostPort, GhostState
 
 import pyray as rl
 from time import time
+from typing import Optional
 
 
 class Ghost(GhostPort):
@@ -91,9 +93,9 @@ class Ghost(GhostPort):
         self.current_path = self.path_finder.search(start, self.corner)
         self._state = GhostState.RETREAT
 
-    def update(self, state: GhostState, player: Player) -> None:
+    def update(self, state: Optional[GhostState], player: Player) -> None:
         if self.state != state or self.last_pathfind - time() > 1000:
-            self._state = state
+            self._state = state if state is not None else self.state
 
             if self.state == GhostState.FLEE:
                 self.flee(player)

@@ -1,7 +1,13 @@
-from typing import Protocol
-import pyray as rl
+from __future__ import annotations
 
-from src.models.game import Direction
+from typing_extensions import TYPE_CHECKING
+
+from src.models.direction import Direction
+
+from typing import Protocol
+if TYPE_CHECKING:
+    import pyray as rl
+
 
 
 class PlayerPort(Protocol):

@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 from enum import Enum, auto
 from typing import Protocol
 
-import pyray as rl
+from typing_extensions import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import pyray as rl
 
 class GhostState(Enum):
     IDLE = auto()
