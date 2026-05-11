@@ -3,12 +3,12 @@ from abc import ABC, abstractmethod
 
 class UIComponent(ABC):
     @property
-    def width(self) -> int:
-        return 0
+    @abstractmethod
+    def width(self) -> int: ...
 
     @property
-    def height(self) -> int:
-        return 0
+    @abstractmethod
+    def height(self) -> int: ...
 
     def __init__(self, identifier: str | None = None) -> None:
         self.identifier = identifier

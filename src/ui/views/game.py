@@ -35,7 +35,7 @@ class GameView(ViewBase):
             self._position.y = pr.get_screen_height() - RADIUS
             self._a *= -1
 
-        if self.elapsed_ms > 4000:
+        if self.elapsed_ms > 2000:
             self._app.switch_to("main_menu")
 
     def render(self) -> None:
@@ -45,7 +45,7 @@ class GameView(ViewBase):
         self.add(
             TextView(
                 "Hello world from GameView: "
-                f"{int(self.elapsed_ms // 1000)}s / 4s",
+                f"{int(self.elapsed_ms // 1000)}s / 2s",
                 x=20,
                 y=20,
                 size=30,

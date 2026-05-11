@@ -4,10 +4,11 @@ from typing import TYPE_CHECKING, Generic, TypeVar
 
 import pyray as pr
 
-from src.ui.views.base import OverlayBase, ViewBase
+from src.ui.views.base import ViewBase
 
 if TYPE_CHECKING:
     from src.app import App
+    from src.ui.views.base import OverlayBase
 
 T = TypeVar("T", bound=ViewBase)
 

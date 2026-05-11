@@ -2,6 +2,14 @@ from src.ui.core.view_group import ViewGroup
 
 
 class Vbox(ViewGroup):
+    @property
+    def height(self) -> int:
+        if not self._childrens:
+            return 0
+        return sum([c.height for c in self._childrens]) + self.spacing * (
+            len(self._childrens) - 1
+        )
+
     def __init__(
         self,
         x: int,

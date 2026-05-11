@@ -34,18 +34,17 @@ class TextView(BoxComponent):
         self._size = size
         self._color = color
 
-    def get_content_width(self) -> int:
-        text_width = pr.measure_text(self._label, self._size)
-        return text_width
+    def get_inner_width(self) -> int:
+        return pr.measure_text(self._label, self._size)
 
-    def get_content_height(self) -> int:
+    def get_inner_height(self) -> int:
         return self._size
 
     def render(self) -> None:
         pr.draw_text(
             self._label,
-            self.content_x,
-            self.content_y,
+            self.inner_x,
+            self.inner_y,
             self._size,
             self._color,
         )

@@ -4,6 +4,18 @@ from src.ui.core.base import UIComponent
 
 
 class ViewGroup(UIComponent, ABC):
+    @property
+    def width(self) -> int:
+        if not self._childrens:
+            return 0
+        return sum([c.width for c in self._childrens])
+
+    @property
+    def height(self) -> int:
+        if not self._childrens:
+            return 0
+        return sum([c.height for c in self._childrens])
+
     def __init__(self) -> None:
         super().__init__()
         self._childrens: list[UIComponent] = []

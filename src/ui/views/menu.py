@@ -2,7 +2,6 @@ import pyray as pr
 
 from src.app import App
 from src.ui.layouts.vbox import Vbox
-from src.ui.overlays.base import NoOverlayContext, OverlayRegistry
 from src.ui.views.base import (
     OverlayBase,
     ViewBase,
@@ -42,8 +41,6 @@ class MainMenuView(ViewBase):
     def __init__(self, app: App) -> None:
         super().__init__(app)
 
-        self._overlay_registry = OverlayRegistry(app)
-
         vbox = Vbox(pr.get_screen_width() // 2, 50)
         vbox.add(
             TextView("Pac-Man", size=90, padding_bottom=100, color=pr.BLUE),
@@ -65,8 +62,8 @@ class MainMenuView(ViewBase):
     def update(self) -> None:
         if pr.is_key_pressed(pr.KeyboardKey.KEY_Q):
             self._app.stop()
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
-            self._overlay_registry.toggle(MainMenuHelloOverlay)
+        # if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+        #    self.toggle_overlay(MainMenuHelloOverlay)
 
         super().update()
 
@@ -80,7 +77,4 @@ class MainMenuView(ViewBase):
             pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SPACING, 10
         )
 
-        with NoOverlayContext(self._overlay_registry):
-            super().render()
-
-        self._overlay_registry.render_all()
+        super().render()

@@ -5,6 +5,22 @@ from src.ui.core.base import UIComponent
 
 
 class BoxComponent(UIComponent, ABC):
+    @property
+    def width(self) -> int:
+        return self.get_inner_width() + self._padding_l + self._padding_r
+
+    @property
+    def height(self) -> int:
+        return self.get_inner_height() + self._padding_t + self._padding_b
+
+    @property
+    def inner_x(self) -> int:
+        return self.x + self._padding_l
+
+    @property
+    def inner_y(self) -> int:
+        return self.y + self._padding_t
+
     def __init__(
         self,
         identifer: str | None = None,
@@ -22,23 +38,7 @@ class BoxComponent(UIComponent, ABC):
         self._padding_b = padding if padding is not None else padding_bottom
 
     @abstractmethod
-    def get_content_width(self) -> int: ...
+    def get_inner_width(self) -> int: ...
 
     @abstractmethod
-    def get_content_height(self) -> int: ...
-
-    @property
-    def width(self) -> int:
-        return self.get_content_width() + self._padding_l + self._padding_r
-
-    @property
-    def height(self) -> int:
-        return self.get_content_height() + self._padding_t + self._padding_b
-
-    @property
-    def content_x(self) -> int:
-        return self.x + self._padding_l
-
-    @property
-    def content_y(self) -> int:
-        return self.y + self._padding_t
+    def get_inner_height(self) -> int: ...

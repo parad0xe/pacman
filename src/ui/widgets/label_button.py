@@ -17,7 +17,7 @@ class LabelButton(BoxComponent):
         self._label = label
         self._onclick = onclick
 
-    def get_content_width(self) -> int:
+    def get_inner_width(self) -> int:
         font = pr.gui_get_font()
         font_size = pr.gui_get_style(
             pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SIZE
@@ -27,7 +27,7 @@ class LabelButton(BoxComponent):
         )
         return int(pr.measure_text_ex(font, self._label, font_size, spacing).x)
 
-    def get_content_height(self) -> int:
+    def get_inner_height(self) -> int:
         return pr.gui_get_style(
             pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SIZE
         )
