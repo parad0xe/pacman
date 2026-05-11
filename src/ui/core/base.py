@@ -2,13 +2,16 @@ from abc import ABC, abstractmethod
 
 
 class UIComponent(ABC):
-    @property
-    @abstractmethod
-    def width(self) -> int: ...
 
     @property
     @abstractmethod
-    def height(self) -> int: ...
+    def width(self) -> int:
+        ...
+
+    @property
+    @abstractmethod
+    def height(self) -> int:
+        ...
 
     def __init__(self, identifier: str | None = None) -> None:
         self.identifier = identifier
@@ -16,7 +19,8 @@ class UIComponent(ABC):
         self.y: int = 0
 
     @abstractmethod
-    def render(self) -> None: ...
+    def render(self) -> None:
+        ...
 
     def update(self) -> None:
         pass

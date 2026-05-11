@@ -4,7 +4,8 @@ import time
 from abc import ABC
 from typing import TYPE_CHECKING, ClassVar
 
-# from src.ui.core.overlay import NoOverlayContext, OverlayRegistry
+import pyray as pr
+
 from src.ui.core.view_group import ViewGroup
 
 if TYPE_CHECKING:
@@ -19,26 +20,46 @@ class ViewBase(ViewGroup, ABC):
         return (time.perf_counter() - self._start_at) * 1000
 
     def __init__(self, app: App) -> None:
-        super().__init__()
+        super().__init__(identifier=self.name)
         self._app = app
         self._start_at = time.perf_counter()
+        self._active_overlay: OverlayBase | None = None
 
+    def show_overlay(self, overlay: OverlayBase) -> None:
+        self._active_overlay = overlay
 
-#       self._overlays = OverlayRegistry(app)
+    def hide_overlay(self) -> None:
+        self._active_overlay = None
 
-# def toggle_overlay(self, overlay: type[OverlayBase]) -> None:
-#    self._overlays.toggle(overlay)
+    def toggle_overlay(self, overlay: OverlayBase) -> None:
+        if self._active_overlay and self._active_overlay.name == overlay.name:
+            self.hide_overlay()
+        else:
+            self.show_overlay(overlay)
 
-# def update(self) -> None:
-#    super().update()
-#    self._overlays.update_all()
+    def event(self) -> None:
+        pass
 
-# def render(self) -> None:
-#    with NoOverlayContext(self._overlays):
-#        super().render()
+    def update(self) -> None:
+        self.event()
+        if self._active_overlay:
+            self._active_overlay.update()
+        else:
+            super().update()
 
-#    self._overlays.render_all()
+    def render(self) -> None:
+        if self._active_overlay:
+            pr.gui_lock()
+
+        super().render()
+
+        if self._active_overlay:
+            pr.gui_unlock()
+            self._active_overlay.render()
 
 
 class OverlayBase(ViewBase, ABC):
-    pass
+
+    def __init__(self, app: App) -> None:
+        super().__init__(app)
+        self._enabled: bool = False

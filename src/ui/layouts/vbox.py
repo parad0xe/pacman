@@ -2,12 +2,19 @@ from src.ui.core.view_group import ViewGroup
 
 
 class Vbox(ViewGroup):
+
+    @property
+    def width(self) -> int:
+        if not self._children:
+            return 0
+        return max([c.width for c in self._children])
+
     @property
     def height(self) -> int:
-        if not self._childrens:
+        if not self._children:
             return 0
-        return sum([c.height for c in self._childrens]) + self.spacing * (
-            len(self._childrens) - 1
+        return sum([c.height for c in self._children]) + self.spacing * (
+            len(self._children) - 1
         )
 
     def __init__(
@@ -26,7 +33,7 @@ class Vbox(ViewGroup):
     def render(self) -> None:
         current_y = self.y
 
-        for child in self._childrens:
+        for child in self._children:
             child.x = self.x - child.width // 2 if self._center else self.x
             child.y = current_y
             child.render()

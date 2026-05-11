@@ -9,6 +9,7 @@ def load_config(file_path: str) -> Config | None:
 
 
 class App:
+
     @property
     def config(self) -> Config:
         return self._config

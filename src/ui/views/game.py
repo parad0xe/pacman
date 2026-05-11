@@ -1,10 +1,37 @@
 import pyray as pr
 
 from src.app import App
-from src.ui.views.base import ViewBase
+from src.ui.layouts.vbox import Vbox
+from src.ui.views.base import OverlayBase, ViewBase
+from src.ui.widgets.rectangle import Rectangle
 from src.ui.widgets.text_view import TextView
 
 RADIUS = 30
+
+
+class GameHelloOverlay(OverlayBase):
+    name = "main_menu_overlay"
+
+    def __init__(self, app: App) -> None:
+        super().__init__(app)
+
+        self.add(
+            Rectangle(
+                0,
+                0,
+                pr.get_screen_width(),
+                pr.get_screen_height(),
+                pr.Color(150, 10, 200, 100),
+                margin=20,
+            )
+        )
+
+        vbox = Vbox(pr.get_screen_width() // 2, pr.get_screen_height() // 2)
+        vbox.add(TextView("Hello world from GameOverlayView", size=30),)
+        self.add(vbox)
+
+    def render(self) -> None:
+        super().render()
 
 
 class GameView(ViewBase):
@@ -20,7 +47,7 @@ class GameView(ViewBase):
                 y=20,
                 size=30,
                 color=pr.RED,
-                identifer="title",
+                identifier="title",
             )
         )
 
@@ -28,7 +55,12 @@ class GameView(ViewBase):
         self._a = 0.0
         self._g = 0.3
 
+        self._overlay = GameHelloOverlay(app)
+
     def update(self) -> None:
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+            self.toggle_overlay(self._overlay)
+
         self._a += self._g
         self._position.y += self._a
         if self._position.y >= pr.get_screen_height() - RADIUS:
@@ -50,7 +82,7 @@ class GameView(ViewBase):
                 y=20,
                 size=30,
                 color=pr.RED,
-                identifer="title",
+                identifier="title",
             ),
             TextView(
                 f"Acceleration: {self._a:.2f}",
@@ -58,7 +90,7 @@ class GameView(ViewBase):
                 y=int(self._position.y) - 10,
                 size=40,
                 color=pr.VIOLET,
-                identifer="acc",
+                identifier="acc",
             ),
         )
 
