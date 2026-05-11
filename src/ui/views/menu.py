@@ -1,151 +1,95 @@
 import pyray as pr
 
-from src.app import App
-from src.ui.layouts.vbox import Vbox
-from src.ui.views.base import (
-    OverlayBase,
-    ViewBase,
-)
+from src.context import Event
+from src.ui.layouts.hbox import HBox
+from src.ui.layouts.vbox import VBox
+from src.ui.panel import Panel
+from src.ui.utils import dynamic_min
+from src.ui.view import View
+from src.ui.widget import WidgetStyle
 from src.ui.widgets.label_button import LabelButton
-from src.ui.widgets.rectangle import Rectangle
 from src.ui.widgets.text_view import TextView
 
 RADIUS = 30
 
 
-class MainMenuHelloOverlay(OverlayBase):
-    name = "main_menu_overlay"
+class MenuPanel(Panel):
+    def init(self) -> None:
+        super().init()
 
-    def __init__(self, app: App) -> None:
-        super().__init__(app)
-
-        self.add(
-            Rectangle(
-                0,
-                0,
-                pr.get_screen_width(),
-                pr.get_screen_height(),
-                pr.Color(10, 10, 10, 220),
-                margin=10,
-            )
-        )
-
-        vbox = Vbox(pr.get_screen_width() // 2, 20)
-        vbox.add(
-            TextView(
-                "Hello world from MainMenuOverlayView",
-                size=30,
-                margin=(200, 0, 0, 0),
-            ),
-        )
-        self.add(vbox)
-
-    def render(self) -> None:
-        super().render()
-
-
-class GameOverlay(OverlayBase):
-    name = "game"
-
-    def __init__(self, app: App) -> None:
-        super().__init__(app)
-
-        self.add(
-            Rectangle(
-                0,
-                0,
-                pr.get_screen_width(),
-                pr.get_screen_height(),
-                pr.Color(10, 10, 10, 220),
-                margin=10,
-            )
-        )
-        self.add(
-            TextView(
-                "Hello world from GameOverlay",
-                x=20,
-                y=20,
-                size=30,
-                color=pr.RED,
-                identifier="title",
-            )
-        )
-
-        self._position = pr.Vector2(pr.get_screen_width() / 2, RADIUS)
+        self._position = pr.Vector2(self.max_height / 2, RADIUS)
         self._a = 0.0
+        self._v = 0.0
         self._g = 0.3
 
     def update(self) -> None:
-        self._a += self._g
-        self._position.y += self._a
-        if self._position.y >= pr.get_screen_height() - RADIUS:
-            self._position.y = pr.get_screen_height() - RADIUS
-            self._a *= -1
+        force = self._g
+        self._a += force
+        self._v += self._a
+        self._position.y += self._v
+        if self._position.y >= self.max_height - RADIUS:
+            self._position.y = self.max_height - RADIUS
+            self._v *= -1
+        if self._position.y < self.y + RADIUS:
+            self._position.y = self.y + RADIUS
+            self._v *= -1
 
     def render(self) -> None:
         super().render()
         pr.draw_circle_v(self._position, RADIUS, pr.VIOLET)
 
-        self.add(
+
+class MenuView(View):
+    name = "menu"
+
+    def init(self) -> None:
+        main_layout = VBox()
+
+        header = HBox(
+            width=self.dvw(100),
+            height=self.dvh(15),
+            style=WidgetStyle(padding=10),
+        )
+        header.add(
             TextView(
-                f"Hello world from GameView: {int(self.elapsed_ms // 1000)}s",
-                x=20,
-                y=20,
-                size=30,
-                color=pr.RED,
-                identifier="title",
-            ),
-            TextView(
-                f"Acceleration: {self._a:.2f}",
-                x=int(self._position.x) + RADIUS + 10,
-                y=int(self._position.y) - 10,
-                size=40,
-                color=pr.VIOLET,
-                identifier="acc",
+                "Pac-Man",
+                size=dynamic_min(self.dvw(15), self.dvh(15)),
+                color=pr.BLUE,
             ),
         )
+        main_layout.add(header)
 
+        main_layout.add(
+            MenuPanel(
+                width=self.dvw(100),
+                height=self.dvh(70),
+                style=WidgetStyle(
+                    border=3, border_color=pr.BLUE, background_color=pr.BLACK
+                ),
+            )
+        )
 
-class MainMenuView(ViewBase):
-    name = "main_menu"
-
-    def __init__(self, app: App) -> None:
-        super().__init__(app)
-
-        vbox = Vbox(pr.get_screen_width() // 2, 50)
-        vbox.add(
-            TextView("Pac-Man", size=90, margin=(0, 0, 100, 0), color=pr.BLUE),
+        footer = HBox(
+            width=self.dvw(100),
+            height=self.dvh(15),
+            style=WidgetStyle(padding=10),
+        )
+        footer.add(
             LabelButton(
                 "Play",
-                onclick=lambda: self._app.switch_to("game"),
-            ),
-            LabelButton(
-                "Highscores",
-                onclick=lambda: self._app.switch_to("highscores"),
-            ),
-            LabelButton(
-                "Quit",
-                onclick=lambda: self._app.stop(),
+                onclick=lambda: self.event.emit(Event.SWITCH_VIEW, "game"),
             ),
         )
-        self.add(vbox)
+        main_layout.add(footer)
 
-        self._overlay = lambda: GameOverlay(app)
+        self.add(main_layout)
 
-    def event(self) -> None:
+    def update(self) -> None:
         if pr.is_key_pressed(pr.KeyboardKey.KEY_Q):
-            self._app.stop()
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
-            self.toggle_overlay(self._overlay())
+            self.event.emit(Event.STOP)
+        return super().update()
 
     def render(self) -> None:
         pr.clear_background(pr.BLACK)
 
-        pr.gui_set_style(
-            pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SIZE, 72
-        )
-        pr.gui_set_style(
-            pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SPACING, 10
-        )
-
-        super().render()
+        return super().render()

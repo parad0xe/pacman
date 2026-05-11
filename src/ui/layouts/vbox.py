@@ -1,40 +1,19 @@
-from src.ui.core.view_group import ViewGroup
+from src.ui.widget import WidgetStyle
+from src.ui.widget_group import WidgetGroup
 
 
-class Vbox(ViewGroup):
-
-    @property
-    def width(self) -> int:
-        if not self._children:
-            return 0
-        return max([c.width for c in self._children])
-
-    @property
-    def height(self) -> int:
-        if not self._children:
-            return 0
-        return sum([c.height for c in self._children]) + self.spacing * (
-            len(self._children) - 1
-        )
-
+class VBox(WidgetGroup):
     def __init__(
         self,
-        x: int,
-        y: int,
-        spacing: int = 10,
-        center: bool = True,
-    ):
-        super().__init__()
-        self.x = x
-        self.y = y
-        self.spacing = spacing
-        self._center = center
+        identifier: str | None = None,
+        style: WidgetStyle | None = None,
+    ) -> None:
+        super().__init__(identifier, style=style)
 
     def render(self) -> None:
-        current_y = self.y
-
+        current_y = self.content_y
         for child in self._children:
-            child.x = self.x - child.width // 2 if self._center else self.x
+            child.x = self.content_x
             child.y = current_y
             child.render()
-            current_y += child.height + self.spacing
+            current_y += child.height

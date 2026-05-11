@@ -1,43 +1,29 @@
 import pyray as pr
 
-from src.ui.core.box import BoxComponent
+from src.ui.utils import DynamicInt, resolve
+from src.ui.widget import Widget
 
 
-class TextView(BoxComponent):
+class TextView(Widget):
+    @property
+    def content_width(self) -> int:
+        return pr.measure_text(self.text, resolve(self.size))
+
+    @property
+    def content_height(self) -> int:
+        return resolve(self.size)
 
     def __init__(
         self,
-        label: str,
-        x: int = 0,
-        y: int = 0,
-        size: int = 10,
-        color: pr.Color = pr.GRAY,
-        padding: int | tuple[int, int, int, int] = 0,
-        margin: int | tuple[int, int, int, int] = 0,
+        text: str,
+        size: DynamicInt,
+        color: pr.Color,
         identifier: str | None = None,
     ) -> None:
-        super().__init__(
-            identifier=identifier,
-            padding=padding,
-            margin=margin,
-        )
-        self._label = label
-        self.x = x
-        self.y = y
-        self._size = size
-        self._color = color
-
-    def get_content_width(self) -> int:
-        return pr.measure_text(self._label, self._size)
-
-    def get_content_height(self) -> int:
-        return self._size
+        super().__init__(identifier)
+        self.text = text
+        self.size = size
+        self.color = color
 
     def render(self) -> None:
-        pr.draw_text(
-            self._label,
-            self.inner_x,
-            self.inner_y,
-            self._size,
-            self._color,
-        )
+        pr.draw_text(self.text, self.x, self.y, self.height, self.color)

@@ -2,40 +2,40 @@ from typing import Callable
 
 import pyray as pr
 
-from src.ui.core.box import BoxComponent
+from src.ui.widget import Widget
 
 
-class LabelButton(BoxComponent):
+class LabelButton(Widget):
+    @property
+    def content_width(self) -> int:
+        return pr.measure_text(self.text, 40) + 40
+
+    @property
+    def content_height(self) -> int:
+        return 60
 
     def __init__(
         self,
-        label: str,
+        text: str,
         onclick: Callable[[], None],
-        padding: int = 10,
         identifier: str | None = None,
     ) -> None:
-        super().__init__(identifier=identifier, padding=padding)
-        self._label = label
-        self._onclick = onclick
+        super().__init__(identifier)
+        self.text = text
+        self.onclick = onclick
 
-    def get_content_width(self) -> int:
-        font = pr.gui_get_font()
-        font_size = pr.gui_get_style(
-            pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SIZE
-        )
-        spacing = pr.gui_get_style(
-            pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SPACING
-        )
-        return int(pr.measure_text_ex(font, self._label, font_size, spacing).x)
+        self.rect = pr.Rectangle(self.x, self.y, self.width, self.height)
 
-    def get_content_height(self) -> int:
-        return pr.gui_get_style(
-            pr.GuiControl.DEFAULT, pr.GuiDefaultProperty.TEXT_SIZE
-        )
+    def update(self) -> None:
+        self.rect = pr.Rectangle(self.x, self.y, self.width, self.height)
+        if pr.check_collision_point_rec(pr.get_mouse_position(), self.rect):
+            if pr.is_mouse_button_pressed(pr.MouseButton.MOUSE_BUTTON_LEFT):
+                self.onclick()
 
     def render(self) -> None:
-        rect = pr.Rectangle(self.x, self.y, self.width, self.height)
-
-        is_pressed = pr.gui_label_button(rect, self._label)
-        if is_pressed:
-            self._onclick()
+        is_hovered = pr.check_collision_point_rec(
+            pr.get_mouse_position(), self.rect
+        )
+        color = pr.GRAY if is_hovered else pr.LIGHTGRAY
+        pr.draw_rectangle_rec(self.rect, color)
+        pr.draw_text(self.text, self.x + 20, self.y + 10, 40, pr.BLACK)
