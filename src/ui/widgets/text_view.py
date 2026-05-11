@@ -1,6 +1,6 @@
 import pyray as pr
 
-from src.ui.utils import DynamicInt, resolve
+from src.ui.utils import DynamicIntParam, resolve
 from src.ui.widget import Widget
 
 
@@ -16,7 +16,7 @@ class TextView(Widget):
     def __init__(
         self,
         text: str,
-        size: DynamicInt,
+        size: DynamicIntParam,
         color: pr.Color,
         identifier: str | None = None,
     ) -> None:
