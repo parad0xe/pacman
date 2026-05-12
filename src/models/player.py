@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Protocol
 
-from src.types import Position
+import pyray as pr
 
 
 class Direction(Enum):
@@ -13,15 +13,11 @@ class Direction(Enum):
 
 
 class PlayerPort(Protocol):
+    @property
+    def pos(self) -> pr.Vector2: ...
 
     @property
-    def pos(self) -> Position:
-        ...
+    def direction(self) -> Direction: ...
 
     @property
-    def direction(self) -> Direction:
-        ...
-
-    @property
-    def frame(self) -> int:
-        ...
+    def frame(self) -> int: ...

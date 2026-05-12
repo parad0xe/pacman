@@ -1,5 +1,7 @@
+from typing import Unpack
+
 from src.ui.utils import DynamicInt, resolve
-from src.ui.widget import Widget, WidgetStyle
+from src.ui.widget import Widget, WidgetKwargs
 
 
 class Panel(Widget):
@@ -21,11 +23,11 @@ class Panel(Widget):
 
     def __init__(
         self,
+        *,
         width: DynamicInt,
         height: DynamicInt,
-        identifier: str | None = None,
-        style: WidgetStyle | None = None,
+        **kwargs: Unpack[WidgetKwargs],
     ) -> None:
+        super().__init__(**kwargs)
         self._width = width
         self._height = height
-        super().__init__(identifier, style=style)

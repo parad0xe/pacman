@@ -2,6 +2,7 @@ import pyray as pr
 
 from src.app import App
 from src.context import Config, Context, EventBus
+from src.ui.views.game.view import GameView
 from src.ui.views.menu.view import MenuView
 
 W_WIDTH = 1200
@@ -10,13 +11,16 @@ W_HEIGHT = 800
 
 def main() -> None:
     pr.init_window(W_WIDTH, W_HEIGHT, "Pac-Man")
-    pr.set_target_fps(60)
+    pr.set_target_fps(120)
 
     context = Context(config=Config(), event_bus=EventBus())
 
     app = App(
         context=context,
-        views=(MenuView,),
+        views=(
+            MenuView,
+            GameView,
+        ),
         default_view=MenuView.name,
     )
 
@@ -25,6 +29,7 @@ def main() -> None:
         view.update()
         pr.begin_drawing()
         view.render()
+        pr.draw_fps(30, 30)
         pr.end_drawing()
 
     pr.close_window()

@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from typing import Protocol
 
-from src.types import Position
+import pyray as pr
 
 
 class GhostState(Enum):
@@ -10,7 +10,10 @@ class GhostState(Enum):
 
 class GhostPort(Protocol):
     @property
-    def pos(self) -> Position: ...
+    def pos(self) -> pr.Vector2: ...
 
     @property
     def state(self) -> GhostState: ...
+
+    @property
+    def color(self) -> pr.Color: ...

@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import TypedDict, Unpack
 
 import pyray as pr
 
 from src.utils import unique_id
+
+
+class WidgetKwargs(TypedDict, total=False):
+    identifier: str | None
+    style: WidgetStyle | None
 
 
 @dataclass
@@ -19,6 +24,10 @@ class WidgetStyle:
 
 
 class Widget(ABC):
+    @property
+    def can_focus(self) -> bool:
+        return False
+
     @property
     @abstractmethod
     def content_width(self) -> int: ...
@@ -58,33 +67,35 @@ class Widget(ABC):
             + self._style.padding
         )
 
-    @property
-    def is_focused(self) -> bool:
-        return pr.check_collision_point_rec(
-            pr.get_mouse_position(),
-            pr.Rectangle(
-                self.content_x,
-                self.content_y,
-                self.content_width,
-                self.content_height,
-            ),
-        )
-
-    @property
-    def elapsed_ms(self) -> float:
-        return (time.time_ns() - self._start_at) // 1000
-
     def __init__(
         self,
-        identifier: str | None = None,
-        style: WidgetStyle | None = None,
+        **kwargs: Unpack[WidgetKwargs],
     ) -> None:
-        self._style = style or WidgetStyle()
-        self.identifier = identifier or unique_id()
+        self._style = kwargs.get("style") or WidgetStyle()
+        self.identifier = kwargs.get("identifier") or unique_id()
+
         self.x: int = 0
         self.y: int = 0
-        self.frame: int = 0
-        self.init()
+
+        self.is_focused: bool = False
+        self.is_hovered: bool = False
+
+        self.__rect = pr.Rectangle(0, 0, 0, 0)
+
+    def update(self) -> None:
+        self.is_hovered = False
+        mouse_pos = pr.get_mouse_position()
+        if (
+            self.content_x
+            <= mouse_pos.x
+            <= self.content_x + self.content_width
+        ):
+            if (
+                self.content_y
+                <= mouse_pos.y
+                <= self.content_y + self.content_height
+            ):
+                self.is_hovered = True
 
     def render(self) -> None:
         visual_x = self.x + self._style.margin
@@ -102,24 +113,16 @@ class Widget(ABC):
             )
 
         if self._style.border > 0:
+            self.__rect.x = visual_x
+            self.__rect.y = visual_y
+            self.__rect.width = visual_w
+            self.__rect.height = visual_h
+
             pr.draw_rectangle_lines_ex(
-                pr.Rectangle(
-                    visual_x,
-                    visual_y,
-                    visual_w,
-                    visual_h,
-                ),
+                self.__rect,
                 self._style.border,
                 self._style.border_color,
             )
-        self.frame += 1
-
-    def init(self) -> None:
-        self.frame = 0
-        self._start_at = time.time_ns()
-
-    def update(self) -> None:
-        pass
 
     def __eq__(self, value: object, /) -> bool:
         if isinstance(value, Widget):

@@ -1,56 +1,17 @@
-from src.ui.utils import DynamicInt, resolve
-from src.ui.widget import WidgetStyle
-from src.ui.widget_group import WidgetGroup
+from typing import Unpack
+
+from src.ui.layout import VerticalLayout
+from src.ui.utils import DynamicInt
+from src.ui.widget_group import WidgetGroup, WidgetGroupKwargs
 
 
 class VBox(WidgetGroup):
-    @property
-    def content_width(self) -> int:
-        if self._width is not None:
-            return max(0, resolve(self._width) - self.offset)
-        if not self._children:
-            return 0
-        return max([c.width for c in self._children])
-
-    @property
-    def content_height(self) -> int:
-        if self._height is not None:
-            return max(0, resolve(self._height) - self.offset)
-        if not self._children:
-            return 0
-        return sum([c.height for c in self._children])
-
     def __init__(
         self,
-        identifier: str | None = None,
-        width: DynamicInt | None = None,
-        height: DynamicInt | None = None,
-        style: WidgetStyle | None = None,
+        *,
         center: bool = False,
-        spacing: int = 0,
+        spacing: DynamicInt = 0,
+        **kwargs: Unpack[WidgetGroupKwargs],
     ) -> None:
-        super().__init__(identifier, style=style)
-        self._width = width
-        self._height = height
-        self._center = center
-        self._spacing = spacing
-
-    def update(self) -> None:
-        total_children_height = sum([c.height for c in self._children])
-        current_y = self.content_y
-
-        if self._center:
-            current_y += (self.content_height - total_children_height) // 2
-
-        for widget in self._children:
-            widget.y = current_y
-
-            if self._center:
-                widget.x = (
-                    self.content_x + (self.content_width - widget.width) // 2
-                )
-            else:
-                widget.x = self.content_x
-
-            widget.update()
-            current_y += widget.height + self._spacing
+        kwargs["layout"] = VerticalLayout(spacing=spacing, center=center)
+        super().__init__(**kwargs)
