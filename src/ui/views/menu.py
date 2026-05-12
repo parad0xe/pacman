@@ -23,16 +23,23 @@ class MenuPanel(Panel):
         self._g = 0.3
 
     def update(self) -> None:
-        force = self._g
-        self._a += force
-        self._v += self._a
-        self._position.y += self._v
+        if pr.is_mouse_button_down(pr.MouseButton.MOUSE_BUTTON_LEFT):
+            mouse_pos = pr.get_mouse_position()
+            self._position = mouse_pos
+            self._a = 0
+            self._v = 0.0
+        else:
+            force = self._g
+            self._a += force
+            self._v += self._a
+            self._position.y += self._v
         if self._position.y >= self.max_height - RADIUS:
             self._position.y = self.max_height - RADIUS
             self._v *= -1
-        if self._position.y < self.y + RADIUS:
-            self._position.y = self.y + RADIUS
+        if self._position.y <= self.content_y + RADIUS:
+            self._position.y = self.content_y + RADIUS
             self._v *= -1
+        super().update()
 
     def render(self) -> None:
         super().render()
@@ -64,7 +71,10 @@ class MenuView(View):
                 width=self.dvw(100),
                 height=self.dvh(70),
                 style=WidgetStyle(
-                    border=3, border_color=pr.BLUE, background_color=pr.BLACK
+                    border=2,
+                    margin=10,
+                    border_color=pr.GRAY,
+                    background_color=pr.BLACK,
                 ),
             )
         )
@@ -87,9 +97,8 @@ class MenuView(View):
     def update(self) -> None:
         if pr.is_key_pressed(pr.KeyboardKey.KEY_Q):
             self.event.emit(Event.STOP)
-        return super().update()
+        super().update()
 
     def render(self) -> None:
         pr.clear_background(pr.BLACK)
-
-        return super().render()
+        super().render()

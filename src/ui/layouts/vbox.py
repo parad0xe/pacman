@@ -3,6 +3,18 @@ from src.ui.widget_group import WidgetGroup
 
 
 class VBox(WidgetGroup):
+    @property
+    def content_width(self) -> int:
+        if not self._children:
+            return 0
+        return max([c.width for c in self._children])
+
+    @property
+    def content_height(self) -> int:
+        if not self._children:
+            return 0
+        return sum([c.height for c in self._children])
+
     def __init__(
         self,
         identifier: str | None = None,
@@ -10,10 +22,10 @@ class VBox(WidgetGroup):
     ) -> None:
         super().__init__(identifier, style=style)
 
-    def render(self) -> None:
+    def update(self) -> None:
         current_y = self.content_y
-        for child in self._children:
-            child.x = self.content_x
-            child.y = current_y
-            child.render()
-            current_y += child.height
+        for widget in self._children:
+            widget.x = self.content_x
+            widget.y = current_y
+            widget.update()
+            current_y += widget.height

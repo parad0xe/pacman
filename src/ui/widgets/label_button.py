@@ -19,15 +19,30 @@ class LabelButton(Widget):
         text: str,
         onclick: Callable[[], None],
         identifier: str | None = None,
+        background_color: pr.Color = pr.BLUE,
+        hover_color: pr.Color = pr.SKYBLUE,
     ) -> None:
         super().__init__(identifier)
         self.text = text
         self.onclick = onclick
 
-        self.rect = pr.Rectangle(self.x, self.y, self.width, self.height)
+        self._background_color = background_color
+        self._hover_color = hover_color
+
+        self.rect = pr.Rectangle(
+            self.content_x,
+            self.content_y,
+            self.content_width,
+            self.content_height,
+        )
 
     def update(self) -> None:
-        self.rect = pr.Rectangle(self.x, self.y, self.width, self.height)
+        self.rect = pr.Rectangle(
+            self.content_x,
+            self.content_y,
+            self.content_width,
+            self.content_height,
+        )
         if pr.check_collision_point_rec(pr.get_mouse_position(), self.rect):
             if pr.is_mouse_button_pressed(pr.MouseButton.MOUSE_BUTTON_LEFT):
                 self.onclick()
@@ -36,6 +51,12 @@ class LabelButton(Widget):
         is_hovered = pr.check_collision_point_rec(
             pr.get_mouse_position(), self.rect
         )
-        color = pr.GRAY if is_hovered else pr.LIGHTGRAY
+        color = self._hover_color if is_hovered else self._background_color
         pr.draw_rectangle_rec(self.rect, color)
-        pr.draw_text(self.text, self.x + 20, self.y + 10, 40, pr.BLACK)
+        pr.draw_text(
+            self.text,
+            self.content_x + 20,
+            self.content_y + 10,
+            40,
+            pr.BLACK,
+        )

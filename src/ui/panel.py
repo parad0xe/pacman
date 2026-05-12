@@ -5,19 +5,19 @@ from src.ui.widget import Widget, WidgetStyle
 class Panel(Widget):
     @property
     def content_width(self) -> int:
-        return resolve(self._width)
+        return max(0, resolve(self._width) - self.offset)
 
     @property
     def content_height(self) -> int:
-        return resolve(self._height)
+        return max(0, resolve(self._height) - self.offset)
 
     @property
     def max_width(self) -> int:
-        return self.x + self.content_width - self._style.border
+        return self.content_x + self.content_width
 
     @property
     def max_height(self) -> int:
-        return self.y + self.content_height - self._style.border
+        return self.content_y + self.content_height
 
     def __init__(
         self,

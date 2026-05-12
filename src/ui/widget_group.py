@@ -45,9 +45,8 @@ class WidgetGroup(Widget):
     def update(self) -> None:
         for widget in self._children:
             widget.update()
-        super().update()
 
     def render(self) -> None:
+        super().render()
         for widget in self._children:
             widget.render()
-        super().render()

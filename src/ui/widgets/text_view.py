@@ -26,4 +26,10 @@ class TextView(Widget):
         self.color = color
 
     def render(self) -> None:
-        pr.draw_text(self.text, self.x, self.y, self.height, self.color)
+        pr.draw_text(
+            self.text,
+            self.content_x,
+            self.content_y,
+            self.content_height,
+            self.color,
+        )

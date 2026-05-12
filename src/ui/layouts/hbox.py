@@ -5,16 +5,20 @@ from src.ui.widget_group import WidgetGroup
 
 class HBox(WidgetGroup):
     @property
-    def width(self) -> int:
+    def content_width(self) -> int:
         if self._width is not None:
-            return resolve(self._width) + self.offset
-        return super().width
+            return max(0, resolve(self._width) - self.offset)
+        if not self._children:
+            return 0
+        return sum([c.width for c in self._children])
 
     @property
-    def height(self) -> int:
+    def content_height(self) -> int:
         if self._height is not None:
-            return resolve(self._height) + self.offset
-        return super().height
+            return max(0, resolve(self._height) - self.offset)
+        if not self._children:
+            return 0
+        return max([c.height for c in self._children])
 
     def __init__(
         self,
@@ -27,11 +31,10 @@ class HBox(WidgetGroup):
         self._width = width
         self._height = height
 
-    def render(self) -> None:
-        super().render()
+    def update(self) -> None:
         current_x = self.content_x
-        for child in self._children:
-            child.x = current_x
-            child.y = self.content_y
-            child.render()
-            current_x += child.width
+        for widget in self._children:
+            widget.x = current_x
+            widget.y = self.content_y
+            widget.update()
+            current_x += widget.width

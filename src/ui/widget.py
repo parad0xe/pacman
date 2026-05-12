@@ -71,8 +71,8 @@ class Widget(ABC):
     def render(self) -> None:
         visual_x = self.x + self._style.margin
         visual_y = self.y + self._style.margin
-        visual_w = self.width - (self._style.margin * 2)
-        visual_h = self.height - (self._style.margin * 2)
+        visual_w = self.width - self._style.margin * 2
+        visual_h = self.height - self._style.margin * 2
 
         if self._style.background_color:
             pr.draw_rectangle(
@@ -88,8 +88,8 @@ class Widget(ABC):
                 pr.Rectangle(
                     visual_x,
                     visual_y,
-                    visual_w - self._style.border * 2,
-                    visual_h - self._style.border * 2,
+                    visual_w,
+                    visual_h,
                 ),
                 self._style.border,
                 self._style.border_color,
