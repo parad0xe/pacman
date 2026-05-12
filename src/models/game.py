@@ -21,6 +21,9 @@ class StagePort(Protocol):
     @property
     def ghosts(self) -> list[GhostPort]: ...
 
+    @property
+    def pacgums(self) -> list[list[int]]: ...
+
 
 class GamePort(Protocol):
     @property

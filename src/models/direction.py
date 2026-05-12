@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Direction(Enum):
     IDLE = -1
     NORTH = 0

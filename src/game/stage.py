@@ -21,7 +21,7 @@ class Stage(StagePort):
         self._player: PlayerPort = Player((int(len(self.board[0]) / 2),
                                            int(len(self.board) / 2)))
 
-        self.pacgums = [
+        self._pacgums = [
             [0 if cell == 15 else 1 for cell in row]
             for row in self.board
         ]
@@ -55,3 +55,7 @@ class Stage(StagePort):
     @property
     def ghosts(self) -> list[GhostPort]:
         return self._ghosts
+
+    @property
+    def pacgums(self) -> list[list[int]]:
+        return self._pacgums

@@ -2,6 +2,7 @@ from src.models.direction import Direction
 
 from heapq import heappush, heappop
 
+
 class PathFinder():
     def __init__(self, maze: list[list[int]] = []) -> None:
         self.maze = maze
@@ -61,7 +62,7 @@ class PathFinder():
         return path
 
     def search(self, start: tuple[int, int], end: tuple[int, int])\
-    -> list[Direction]:
+            -> list[Direction]:
         open_heap: list[tuple[int, int, tuple[int, int]]] = []
         heappush(open_heap, (self.dist(start, end), 0, start))
 
