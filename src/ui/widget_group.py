@@ -35,15 +35,37 @@ class WidgetGroup(Widget):
             else:
                 self._children.append(widget)
 
+    def get(self, identifier: str) -> Widget | None:
+        if self.identifier == identifier:
+            return self
+
+        for widget in self._children:
+            if widget.identifier == identifier:
+                return widget
+            if isinstance(widget, WidgetGroup):
+                found = widget.get(identifier)
+                if found is not None:
+                    return found
+
+        return None
+
     def clear(self) -> None:
         self._children.clear()
 
-    def remove(self, widget: Widget) -> None:
-        if widget in self._children:
-            self._children.remove(widget)
+    def remove(self, identifier: str) -> bool:
+        for widget in self._children:
+            if widget.identifier == identifier:
+                self._children.remove(widget)
+                return True
+            if isinstance(widget, WidgetGroup):
+                if widget.remove(identifier):
+                    return True
+        return False
 
     def update(self) -> None:
         for widget in self._children:
+            widget.x = self.content_x
+            widget.y = self.content_y
             widget.update()
 
     def render(self) -> None:

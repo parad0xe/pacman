@@ -1,4 +1,3 @@
-import time
 from typing import ClassVar
 
 import pyray as pr
@@ -13,10 +12,6 @@ class View(WidgetGroup):
     name: ClassVar[str]
 
     @property
-    def elapsed_ms(self) -> float:
-        return (time.perf_counter() - self._start_at) * 1000
-
-    @property
     def event(self) -> EventBus:
         return self._context.event
 
@@ -25,12 +20,8 @@ class View(WidgetGroup):
         context: Context,
         style: WidgetStyle | None = None,
     ) -> None:
-        super().__init__(style=style)
         self._context = context
-        self.reset()
-
-    def reset(self) -> None:
-        self._start_at = time.perf_counter()
+        super().__init__(style=style)
 
     def dvw(self, value: int) -> DynamicInt:
         return lambda: int((value / 100) * pr.get_screen_width())

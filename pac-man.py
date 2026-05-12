@@ -2,7 +2,7 @@ import pyray as pr
 
 from src.app import App
 from src.context import Config, Context, EventBus
-from src.ui.views.menu import MenuView
+from src.ui.views.menu.view import MenuView
 
 W_WIDTH = 1200
 W_HEIGHT = 800

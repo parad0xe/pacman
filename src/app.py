@@ -37,7 +37,6 @@ class App:
             # TD: Custom Exception
             raise Exception(f"view {view_name} does not exists.")
         self._current_view = self._views[view_name](self._context)
-        self._current_view.init()
 
     def stop(self) -> None:
         self._is_running = False

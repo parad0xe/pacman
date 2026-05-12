@@ -5,7 +5,7 @@ import pyray as pr
 from src.ui.widget import Widget
 
 
-class LabelButton(Widget):
+class Button(Widget):
     @property
     def content_width(self) -> int:
         return pr.measure_text(self.text, 40) + 40
@@ -43,15 +43,14 @@ class LabelButton(Widget):
             self.content_width,
             self.content_height,
         )
-        if pr.check_collision_point_rec(pr.get_mouse_position(), self.rect):
+        if self.is_focused:
             if pr.is_mouse_button_pressed(pr.MouseButton.MOUSE_BUTTON_LEFT):
                 self.onclick()
 
     def render(self) -> None:
-        is_hovered = pr.check_collision_point_rec(
-            pr.get_mouse_position(), self.rect
+        color = (
+            self._hover_color if self.is_focused else self._background_color
         )
-        color = self._hover_color if is_hovered else self._background_color
         pr.draw_rectangle_rec(self.rect, color)
         pr.draw_text(
             self.text,

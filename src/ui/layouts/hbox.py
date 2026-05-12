@@ -26,15 +26,31 @@ class HBox(WidgetGroup):
         width: DynamicInt | None = None,
         height: DynamicInt | None = None,
         style: WidgetStyle | None = None,
+        center: bool = False,
+        spacing: int = 0,
     ) -> None:
         super().__init__(identifier, style=style)
         self._width = width
         self._height = height
+        self._center = center
+        self._spacing = spacing
 
     def update(self) -> None:
+        total_children_width = sum([c.width for c in self._children])
         current_x = self.content_x
+
+        if self._center:
+            current_x += (self.content_width - total_children_width) // 2
+
         for widget in self._children:
             widget.x = current_x
-            widget.y = self.content_y
+
+            if self._center:
+                widget.y = (
+                    self.content_y + (self.content_height - widget.height) // 2
+                )
+            else:
+                widget.y = self.content_y
+
             widget.update()
-            current_x += widget.width
+            current_x += widget.width + self._spacing

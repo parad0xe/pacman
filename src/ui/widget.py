@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
@@ -14,7 +15,7 @@ class WidgetStyle:
     padding: int = 0
     border: int = 0
     border_color: pr.Color = pr.GRAY
-    background_color: pr.Color | None = None
+    background_color: pr.Color = pr.BLACK
 
 
 class Widget(ABC):
@@ -57,6 +58,22 @@ class Widget(ABC):
             + self._style.padding
         )
 
+    @property
+    def is_focused(self) -> bool:
+        return pr.check_collision_point_rec(
+            pr.get_mouse_position(),
+            pr.Rectangle(
+                self.content_x,
+                self.content_y,
+                self.content_width,
+                self.content_height,
+            ),
+        )
+
+    @property
+    def elapsed_ms(self) -> float:
+        return (time.time_ns() - self._start_at) // 1000
+
     def __init__(
         self,
         identifier: str | None = None,
@@ -66,6 +83,7 @@ class Widget(ABC):
         self.identifier = identifier or unique_id()
         self.x: int = 0
         self.y: int = 0
+        self.frame: int = 0
         self.init()
 
     def render(self) -> None:
@@ -94,9 +112,11 @@ class Widget(ABC):
                 self._style.border,
                 self._style.border_color,
             )
+        self.frame += 1
 
     def init(self) -> None:
-        pass
+        self.frame = 0
+        self._start_at = time.time_ns()
 
     def update(self) -> None:
         pass
