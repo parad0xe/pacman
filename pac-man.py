@@ -29,7 +29,6 @@ def main() -> None:
         view.update()
         pr.begin_drawing()
         view.render()
-        pr.draw_fps(30, 30)
         pr.end_drawing()
 
     pr.close_window()

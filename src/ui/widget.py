@@ -20,7 +20,7 @@ class WidgetStyle:
     padding: int = 0
     border: int = 0
     border_color: pr.Color = pr.GRAY
-    background_color: pr.Color = pr.BLACK
+    background_color: pr.Color | None = None
 
 
 class Widget(ABC):

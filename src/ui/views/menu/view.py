@@ -16,6 +16,8 @@ from src.ui.views.menu.panel import MenuGamePanel
 from src.ui.widget import WidgetStyle
 from src.ui.widget_group import WidgetGroup, WidgetGroupKwargs
 from src.ui.widgets.button import Button
+from src.ui.widgets.fixed_text_view import FixedTextView
+from src.ui.widgets.progress_bar import ProgressBar
 from src.ui.widgets.text_view import TextView
 
 
@@ -94,7 +96,49 @@ class MenuView(View):
             ),
         )
 
+        self.hud = WidgetGroup()
+        hud_layout = HBox(
+            width=dvw(100),
+            height=dvh(10),
+            style=WidgetStyle(padding=30),
+            spacing=50,
+            center=True,
+        )
+        hud_layout.add(
+            ProgressBar(
+                width=dvw(20),
+                height=dvh(4),
+                get_progress=lambda: (
+                    (
+                        self.game_panel.game.energy
+                        / self.game_panel.game.energy_max
+                    )
+                    if self.game_panel
+                    else 0
+                ),
+                fill_color=pr.BLUE,
+            ),
+            FixedTextView(
+                text="200 / 200",
+                size=aspect_ratio(5),
+                width=dvw(20),
+                color=pr.WHITE,
+                align="center",
+                identifier="hud_energy",
+            ),
+            FixedTextView(
+                text="Score: 0",
+                size=aspect_ratio(5),
+                width=dvw(20),
+                color=pr.WHITE,
+                align="center",
+                identifier="hud_score",
+            ),
+        )
+        self.hud.add(hud_layout)
+
         self._game_container.add(self.game_panel)
+        self._game_container.add(self.hud)
 
     def on_game_over(self) -> None:
         self._game_container.add(
@@ -117,3 +161,17 @@ class MenuView(View):
 
         if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
             self.event.emit(Event.SWITCH_VIEW, "game")
+
+        if self.game_panel and not self.game_panel.game.is_over:
+            game = self.game_panel.game
+
+            updates = {
+                "hud_energy": f"{game.energy:.0f} / {game.energy_max:.0f}",
+                "hud_score": f"Score: {game.score}",
+            }
+
+            for identifier, new_text in updates.items():
+                if (w := self.get(identifier)) and isinstance(
+                    w, FixedTextView
+                ):
+                    w.text = new_text

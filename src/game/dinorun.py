@@ -15,40 +15,61 @@ class DinoRun:
         self.ball_y: float = float(resolve(height) - self.radius)
         self.v: float = 0.0
         self.g: float = 0.2
+
         self.energy: float = 200.0
         self.energy_max: float = 200.0
-        self.energy_refill: float = 6.0
-        self.energy_consume: float = 4.0
-        self.spawn_at: int = random.randint(250, 350)
-        self.is_over: bool = False
-        self.frame: int = 0
-        self.score: int = 0
+        self.energy_refill_per_sec: float = 360.0
+        self.energy_consume_per_sec: float = 500.0
+        self.jump_speed: float = 4.0
 
-    def update(self) -> None:
+        self.spawn_timer: float = 0.0
+        self.time_to_next_spawn: float = random.uniform(1.0, 3.0)
+
+        self.is_over: bool = False
+        self.score: int = 0
+        self.game_speed = 120.0
+
+        self._last_width = resolve(width)
+        self._last_height = resolve(height)
+
+    def update(self, dt: float) -> None:
         if self.is_over:
             return
 
-        self.frame += 1
+        time_step = dt * self.game_speed
         width = resolve(self.width)
         height = resolve(self.height)
 
-        if self.frame % self.spawn_at == 0 and self.frame > 0:
+        if width != self._last_width or height != self._last_height:
+            x_diff = width - self._last_width
+            y_diff = height - self._last_height
+            self.ball_x = width / 2
+            self.ball_y += y_diff
+            self._last_width = width
+            self._last_height = height
+            self.cacs = [(x + x_diff / 2, speed) for x, speed in self.cacs]
+
+        self.spawn_timer += dt
+        if self.spawn_timer >= self.time_to_next_spawn:
             self.cacs.append(
-                (float(width - self.radius), random.randint(2, 3))
+                (float(width - self.radius), random.uniform(1.0, 3.0))
             )
-            self.spawn_at = random.randint(350, 450)
+            self.spawn_timer = 0.0
+            self.time_to_next_spawn = random.uniform(1.0, 3.0)
 
         if pr.is_key_down(pr.KeyboardKey.KEY_SPACE) and self.energy > 0:
-            self.v = -self.energy_consume
-            self.energy -= self.energy_consume
+            self.v = -self.jump_speed
+            self.energy -= self.energy_consume_per_sec * dt
         elif self.v == 0.0 and self.energy < self.energy_max:
-            self.energy += self.energy_refill
+            self.energy += self.energy_refill_per_sec * dt
 
+        if self.energy < 0:
+            self.energy = 0
         if self.energy > self.energy_max:
             self.energy = self.energy_max
 
-        self.v += self.g
-        self.ball_y += self.v
+        self.v += self.g * time_step
+        self.ball_y += self.v * time_step
 
         floor_y = float(height - self.radius)
         if self.ball_y >= floor_y:
@@ -66,11 +87,13 @@ class DinoRun:
         )
 
         for x, speed in self.cacs:
-            if x - speed < 0:
+            if (x - (speed * time_step)) < 0:
                 self.score += 1
 
         self.cacs = [
-            (x - speed, speed) for x, speed in self.cacs if (x - speed) >= 0
+            (x - (speed * time_step), speed)
+            for x, speed in self.cacs
+            if (x - (speed * time_step)) >= 0
         ]
 
         for cac_x, _ in self.cacs:
