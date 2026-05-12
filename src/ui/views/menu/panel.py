@@ -42,7 +42,9 @@ class MenuPanel(Panel):
             return
 
         if self.frame % self.spawn_at == 0 and self.frame > 0:
-            self.cacs.append((float(self.content_width), random.randint(4, 8)))
+            self.cacs.append(
+                (float(self.content_width - RADIUS), random.randint(4, 8))
+            )
             self.spawn_at = random.randint(150, 250)
 
         if pr.is_key_down(pr.KeyboardKey.KEY_SPACE) and self._energy > 0:
