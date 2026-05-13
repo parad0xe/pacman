@@ -1,23 +1,47 @@
-from enum import Enum
+from __future__ import annotations
+
+from enum import Enum, auto
 from typing import Protocol
 
-import pyray as pr
+from typing_extensions import TYPE_CHECKING
+
+from src.models.direction import Direction
+
+if TYPE_CHECKING:
+    import pyray as rl
 
 
-class Direction(Enum):
-    IDLE = -1
-    NORTH = 0
-    EAST = 1
-    SOUTH = 2
-    WEST = 3
+class PlayerState(Enum):
+    NORMAL = auto()
+    SUPER = auto()
 
 
 class PlayerPort(Protocol):
-    @property
-    def pos(self) -> pr.Vector2: ...
 
     @property
-    def direction(self) -> Direction: ...
+    def pos(self) -> rl.Vector2:
+        ...
 
     @property
-    def frame(self) -> int: ...
+    def direction(self) -> Direction:
+        ...
+
+    @property
+    def frame(self) -> int:
+        ...
+
+    @property
+    def state(self) -> PlayerState:
+        ...
+
+    def state_switch(self) -> None:
+        ...
+
+    def update(self, maze: list[list[int]]) -> None:
+        ...
+
+    def cell(self) -> tuple[int, int]:
+        ...
+
+    def on_cell(self) -> bool:
+        ...

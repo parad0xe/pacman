@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Unpack
+from typing_extensions import Unpack
 
 from src.ui.layout import LayoutStrategy
 from src.ui.utils import DynamicInt, resolve
@@ -14,6 +14,7 @@ class WidgetGroupKwargs(WidgetKwargs, total=False):
 
 
 class WidgetGroup(Widget):
+
     @property
     def content_width(self) -> int:
         if self._width is not None:

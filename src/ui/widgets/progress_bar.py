@@ -1,12 +1,14 @@
-from typing import Callable, Unpack
+from typing import Callable
 
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.ui.utils import DynamicInt, resolve
 from src.ui.widget import Widget, WidgetKwargs, WidgetStyle
 
 
 class ProgressBar(Widget):
+
     def __init__(
         self,
         *,

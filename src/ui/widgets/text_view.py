@@ -1,12 +1,12 @@
-from typing import Unpack
-
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.ui.utils import DynamicIntParam, resolve
 from src.ui.widget import Widget, WidgetKwargs
 
 
 class TextView(Widget):
+
     def __init__(
         self,
         *,
@@ -28,10 +28,8 @@ class TextView(Widget):
     def content_width(self) -> int:
         current_size = resolve(self.size)
 
-        if (
-            current_size != self._last_resolved_size
-            or self.text != self._last_text
-        ):
+        if (current_size != self._last_resolved_size or
+                self.text != self._last_text):
             self._last_resolved_size = current_size
             self._last_text = self.text
             self._cached_width = pr.measure_text(self.text, current_size)

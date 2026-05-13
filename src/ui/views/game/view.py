@@ -1,6 +1,5 @@
-from typing import Unpack
-
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.context import Context
 from src.ui.layouts.hbox import HBox
@@ -11,7 +10,7 @@ from src.ui.views.game.overlay import GameOverOverlay
 from src.ui.views.game.panel import GamePanel
 from src.ui.widget import WidgetStyle
 from src.ui.widget_group import WidgetGroup, WidgetGroupKwargs
-from src.ui.widgets.text_view import TextView
+from src.ui.widgets.fixed_text_view import FixedTextView
 
 
 class GameView(View):
@@ -35,20 +34,23 @@ class GameView(View):
             center=True,
         )
         header.add(
-            TextView(
+            FixedTextView(
                 text="Score:",
+                width=dvw(10),
                 size=aspect_ratio(5),
                 color=pr.RED,
                 identifier="score",
             ),
-            TextView(
+            FixedTextView(
                 text="Level:",
+                width=dvw(10),
                 size=aspect_ratio(5),
                 color=pr.RED,
                 identifier="level",
             ),
-            TextView(
+            FixedTextView(
                 text="Time:",
+                width=dvw(10),
                 size=aspect_ratio(5),
                 color=pr.RED,
                 identifier="time",
@@ -64,8 +66,9 @@ class GameView(View):
             center=True,
         )
         footer.add(
-            TextView(
+            FixedTextView(
                 text="Life:",
+                width=dvw(10),
                 size=aspect_ratio(5),
                 color=pr.RED,
                 identifier="life",
@@ -117,17 +120,17 @@ class GameView(View):
         game = self.game_panel.game
 
         if w := self.get("life"):
-            if isinstance(w, TextView):
+            if isinstance(w, FixedTextView):
                 w.text = f"Life: {game.life}"
 
         if w := self.get("time"):
-            if isinstance(w, TextView):
+            if isinstance(w, FixedTextView):
                 w.text = f"Time: {game.stage.remaining}s"
 
         if w := self.get("level"):
-            if isinstance(w, TextView):
+            if isinstance(w, FixedTextView):
                 w.text = f"Level: {game.stage.level}"
 
         if w := self.get("score"):
-            if isinstance(w, TextView):
+            if isinstance(w, FixedTextView):
                 w.text = f"Score: {game.score}"

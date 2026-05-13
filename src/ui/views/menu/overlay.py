@@ -1,6 +1,7 @@
-from typing import Callable, Unpack
+from typing import Callable
 
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.ui.layouts.vbox import VBox
 from src.ui.utils import DynamicInt
@@ -9,6 +10,7 @@ from src.ui.widgets.text_view import TextView
 
 
 class GameOverOverlay(VBox):
+
     def __init__(
         self,
         *,

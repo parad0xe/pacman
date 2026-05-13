@@ -1,10 +1,11 @@
-from typing import Unpack
+from typing_extensions import Unpack
 
 from src.ui.utils import DynamicInt, resolve
 from src.ui.widget import Widget, WidgetKwargs
 
 
 class Panel(Widget):
+
     @property
     def content_width(self) -> int:
         return max(0, resolve(self._width) - self.offset)

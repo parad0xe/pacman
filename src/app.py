@@ -5,6 +5,7 @@ from src.ui.view import View
 
 
 class App:
+
     @property
     def is_running(self) -> bool:
         return self._is_running

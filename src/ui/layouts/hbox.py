@@ -1,4 +1,4 @@
-from typing import Unpack
+from typing_extensions import Unpack
 
 from src.ui.layout import HorizontalLayout
 from src.ui.utils import DynamicInt
@@ -6,6 +6,7 @@ from src.ui.widget_group import WidgetGroup, WidgetGroupKwargs
 
 
 class HBox(WidgetGroup):
+
     def __init__(
         self,
         *,

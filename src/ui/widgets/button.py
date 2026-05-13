@@ -1,11 +1,13 @@
-from typing import Callable, Unpack
+from typing import Callable
 
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.ui.widget import Widget, WidgetKwargs
 
 
 class Button(Widget):
+
     @property
     def can_focus(self) -> bool:
         return True

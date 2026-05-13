@@ -1,6 +1,5 @@
-from typing import Unpack
-
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.context import Context, Event
 from src.ui.layouts.hbox import HBox
@@ -64,9 +63,8 @@ class MenuView(View):
             ),
             Button(
                 text="Highscores",
-                onclick=lambda: self.event.emit(
-                    Event.SWITCH_VIEW, "highscores"
-                ),
+                onclick=lambda: self.event.
+                emit(Event.SWITCH_VIEW, "highscores"),
             ),
             Button(
                 text="Quit",
@@ -108,14 +106,10 @@ class MenuView(View):
             ProgressBar(
                 width=dvw(20),
                 height=dvh(4),
-                get_progress=lambda: (
-                    (
-                        self.game_panel.game.energy
-                        / self.game_panel.game.energy_max
-                    )
-                    if self.game_panel
-                    else 0
-                ),
+                get_progress=lambda: ((
+                    self.game_panel.game.energy / self.game_panel.game.
+                    energy_max
+                ) if self.game_panel else 0),
                 fill_color=pr.BLUE,
             ),
             FixedTextView(
@@ -171,7 +165,6 @@ class MenuView(View):
             }
 
             for identifier, new_text in updates.items():
-                if (w := self.get(identifier)) and isinstance(
-                    w, FixedTextView
-                ):
+                if (w := self.get(identifier)) and isinstance(w,
+                                                              FixedTextView):
                     w.text = new_text

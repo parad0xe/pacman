@@ -1,6 +1,7 @@
-from typing import Callable, Unpack
+from typing import Callable
 
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.game.dinorun import DinoRun
 from src.ui.panel import Panel
@@ -9,6 +10,7 @@ from src.ui.widget import WidgetKwargs
 
 
 class MenuGamePanel(Panel):
+
     def __init__(
         self,
         *,

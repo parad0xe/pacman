@@ -1,14 +1,16 @@
-from typing import Callable, Unpack
+from typing import Callable
 
 import pyray as pr
+from typing_extensions import Unpack
 
-from src.game.pacman import PacmanMock
+from src.game.game import Game
 from src.ui.panel import Panel
 from src.ui.utils import DynamicInt
 from src.ui.widget import WidgetKwargs
 
 
 class GamePanel(Panel):
+
     def __init__(
         self,
         *,
@@ -22,7 +24,9 @@ class GamePanel(Panel):
         self._on_game_over = on_game_over
         self._running = True
 
-        self.game = PacmanMock()
+        self.game = Game(None)
+        self._super_pacgum_visible: bool = True
+        self._frame: int = 0
 
     def update(self) -> None:
         super().update()
@@ -55,22 +59,44 @@ class GamePanel(Panel):
             self.content_y + (self.content_height - rows * cell_size) // 2
         )
 
+        pacgums = self.game.stage.pacgums
+
         for y in range(rows):
             for x in range(cols):
                 cell = board[y][x]
-                cx = start_x + x * cell_size
-                cy = start_y + y * cell_size
-                next_x = cx + cell_size
-                next_y = cy + cell_size
+                sx = start_x + x * cell_size
+                sy = start_y + y * cell_size
+                next_x = sx + cell_size
+                next_y = sy + cell_size
+                cx = sx + cell_size / 2
+                cy = sy + cell_size / 2
 
                 if cell & 0x1:
-                    pr.draw_line(cx, cy, next_x, cy, pr.BLUE)
+                    pr.draw_line(sx, sy, next_x, sy, pr.BLUE)
                 if cell & 0x2:
-                    pr.draw_line(next_x, cy, next_x, next_y, pr.BLUE)
+                    pr.draw_line(next_x, sy, next_x, next_y, pr.BLUE)
                 if cell & 0x4:
-                    pr.draw_line(cx, next_y, next_x, next_y, pr.BLUE)
+                    pr.draw_line(sx, next_y, next_x, next_y, pr.BLUE)
                 if cell & 0x8:
-                    pr.draw_line(cx, cy, cx, next_y, pr.BLUE)
+                    pr.draw_line(sx, sy, sx, next_y, pr.BLUE)
+
+                if pacgums[y][x] > 0:
+                    is_corner = ((x == 0 and y == 0) or
+                                 (x == cols - 1 and y == 0) or
+                                 (x == 0 and y == rows - 1) or
+                                 (x == cols - 1 and y == rows - 1))
+                    color = pr.Color(180, 180, 10, 200)
+                    if is_corner:
+                        if self._super_pacgum_visible:
+                            pr.draw_circle_v(pr.Vector2(cx, cy), 10, color)
+                        else:
+                            color = pr.Color(180, 180, 10, 50)
+                            pr.draw_circle_v(pr.Vector2(cx, cy), 10, color)
+                    else:
+                        pr.draw_circle_v(pr.Vector2(cx, cy), 3, color)
+
+        if self._frame % 80 == 0:
+            self._super_pacgum_visible = not self._super_pacgum_visible
 
         self._draw_entity(
             self.game.stage.player.pos,
@@ -88,6 +114,8 @@ class GamePanel(Panel):
                 start_y,
                 ghost.color,
             )
+
+        self._frame += 1
 
     def _draw_entity(
         self,

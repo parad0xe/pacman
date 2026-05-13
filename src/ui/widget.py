@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TypedDict, Unpack
+from typing import TypedDict
 
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.utils import unique_id
 
@@ -24,17 +25,20 @@ class WidgetStyle:
 
 
 class Widget(ABC):
+
     @property
     def can_focus(self) -> bool:
         return False
 
     @property
     @abstractmethod
-    def content_width(self) -> int: ...
+    def content_width(self) -> int:
+        ...
 
     @property
     @abstractmethod
-    def content_height(self) -> int: ...
+    def content_height(self) -> int:
+        ...
 
     @property
     def offset(self) -> int:
@@ -52,19 +56,15 @@ class Widget(ABC):
     @property
     def content_x(self) -> int:
         return (
-            self.x
-            + self._style.margin
-            + self._style.border
-            + self._style.padding
+            self.x + self._style.margin + self._style.border +
+            self._style.padding
         )
 
     @property
     def content_y(self) -> int:
         return (
-            self.y
-            + self._style.margin
-            + self._style.border
-            + self._style.padding
+            self.y + self._style.margin + self._style.border +
+            self._style.padding
         )
 
     def __init__(
@@ -85,16 +85,10 @@ class Widget(ABC):
     def update(self) -> None:
         self.is_hovered = False
         mouse_pos = pr.get_mouse_position()
-        if (
-            self.content_x
-            <= mouse_pos.x
-            <= self.content_x + self.content_width
-        ):
-            if (
-                self.content_y
-                <= mouse_pos.y
-                <= self.content_y + self.content_height
-            ):
+        if (self.content_x <= mouse_pos.x <=
+                self.content_x + self.content_width):
+            if (self.content_y <= mouse_pos.y <=
+                    self.content_y + self.content_height):
                 self.is_hovered = True
 
     def render(self) -> None:
