@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from src.context import Context, Event
-from src.ui.view import View
+from src.ui._v2.views.menu.view import View
 
 
 class App:
+
     @property
     def is_running(self) -> bool:
         return self._is_running

@@ -2,17 +2,16 @@ import random
 
 import pyray as pr
 
-from src.ui.utils import DynamicInt, resolve
-
 
 class DinoRun:
-    def __init__(self, width: DynamicInt, height: DynamicInt) -> None:
+
+    def __init__(self, width: float, height: float) -> None:
         self.radius = 30
         self.width = width
         self.height = height
         self.cacs: list[tuple[float, float]] = []
-        self.ball_x: float = float(resolve(width) / 2)
-        self.ball_y: float = float(resolve(height) - self.radius)
+        self.ball_x: float = float(width / 2)
+        self.ball_y: float = float(height - self.radius)
         self.v: float = 0.0
         self.g: float = 0.2
 
@@ -29,16 +28,16 @@ class DinoRun:
         self.score: int = 0
         self.game_speed = 120.0
 
-        self._last_width = resolve(width)
-        self._last_height = resolve(height)
+        self._last_width = width
+        self._last_height = height
 
     def update(self, dt: float) -> None:
         if self.is_over:
             return
 
         time_step = dt * self.game_speed
-        width = resolve(self.width)
-        height = resolve(self.height)
+        width = self.width
+        height = self.height
 
         if width != self._last_width or height != self._last_height:
             x_diff = width - self._last_width
@@ -90,11 +89,9 @@ class DinoRun:
             if (x - (speed * time_step)) < 0:
                 self.score += 1
 
-        self.cacs = [
-            (x - (speed * time_step), speed)
-            for x, speed in self.cacs
-            if (x - (speed * time_step)) >= 0
-        ]
+        self.cacs = [(x - (speed * time_step), speed)
+                     for x, speed in self.cacs
+                     if (x - (speed * time_step)) >= 0]
 
         for cac_x, _ in self.cacs:
             cac_rec = pr.Rectangle(

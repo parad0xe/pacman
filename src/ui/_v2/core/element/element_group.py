@@ -1,9 +1,10 @@
 from typing_extensions import Unpack
 
-from src.ui._v2.core.element import UIElement, UIElementKwargs
+from src.ui._v2.core.element.element import UIElement, UIElementKwargs
 
 
 class UIElementGroup(UIElement):
+
     def __init__(self, **kwargs: Unpack[UIElementKwargs]) -> None:
         super().__init__(**kwargs)
         self._children: dict[str, UIElement] = {}
@@ -12,6 +13,18 @@ class UIElementGroup(UIElement):
         for element in elements:
             element.parent = self
             self._children[element.id] = element
+
+    def clear(self) -> None:
+        self._children.clear()
+
+    def get_focusables(self) -> list[UIElement]:
+        focusables: list[UIElement] = []
+        for child in self._children.values():
+            if child.can_focus:
+                focusables.append(child)
+            if isinstance(child, UIElementGroup):
+                focusables.extend(child.get_focusables())
+        return focusables
 
     def _update_layout_impl(
         self,
@@ -36,9 +49,8 @@ class UIElementGroup(UIElement):
 
         if self._resolved_width <= 0:
             self.boxes.border_box.width = (
-                max_child_width
-                + (self.properties.padding * 2)
-                + (self.properties.border * 2)
+                max_child_width + (self.properties.padding * 2) +
+                (self.properties.border * 2)
             )
             self.boxes.margin_box.width = self.boxes.border_box.width + (
                 self.properties.margin * 2
@@ -53,9 +65,8 @@ class UIElementGroup(UIElement):
 
         if self._resolved_height <= 0:
             self.boxes.border_box.height = (
-                max_child_height
-                + (self.properties.padding * 2)
-                + (self.properties.border * 2)
+                max_child_height + (self.properties.padding * 2) +
+                (self.properties.border * 2)
             )
             self.boxes.margin_box.height = self.boxes.border_box.height + (
                 self.properties.margin * 2

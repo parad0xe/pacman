@@ -20,14 +20,19 @@ class UIElementPropertiesDef(TypedDict, total=False):
     background_color: pr.Color
 
     font: Optional[pr.Font]
-    font_size: float
+    font_size: float | str
 
     text_content: str
     text_align: Literal["left", "center", "right"]
     text_color: pr.Color
     letter_spacing: float
 
+    hover_color: pr.Color
+
     gap: float
+
+    justify_content: Literal["start", "center", "end"]
+    align_items: Literal["start", "center", "end"]
 
 
 @dataclass
@@ -42,14 +47,19 @@ class UIElementProperties:
     background_color: Optional[pr.Color] = None
 
     font: Optional[pr.Font] = None
-    font_size: float = 20.0
+    font_size: float | str = 20.0
 
     text_content: Optional[str] = None
     text_align: Literal["left", "center", "right"] = "center"
     text_color: pr.Color = pr.BLACK
     letter_spacing: float = 2.0
 
+    hover_color: pr.Color = field(default_factory=lambda: pr.Color(0, 0, 0, 0))
+
     gap: float = 0.0
+
+    justify_content: Literal["start", "center", "end"] = "start"
+    align_items: Literal["start", "center", "end"] = "start"
 
 
 @dataclass

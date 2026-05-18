@@ -1,25 +1,25 @@
 from abc import ABC
 from dataclasses import replace
-from typing import TYPE_CHECKING, Optional, TypedDict
+from typing import TYPE_CHECKING, Any, Optional, TypedDict, cast
 
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui._v2.core.base import (
+from src.ui._v2.core.element.base import (
     UIElementBoxes,
     UIElementProperties,
     UIElementPropertiesDef,
     unique_id,
 )
-from src.ui._v2.core.render_middlewares import (
+from src.ui._v2.core.middlewares import (
     BACKGROUND_RENDERER,
     BORDER_RENDERER,
     TEXT_RENDERER,
-    RenderMiddleware,
 )
+from src.ui._v2.core.middlewares.base import RenderMiddleware
 
 if TYPE_CHECKING:
-    from src.ui._v2.core.element_group import UIElementGroup
+    from src.ui._v2.core.element.element_group import UIElementGroup
 
 
 class UIElementKwargs(TypedDict, total=False):
@@ -32,6 +32,7 @@ class UIElementKwargs(TypedDict, total=False):
 
 
 class UIElement(ABC):
+
     def __init__(self, **kwargs: Unpack[UIElementKwargs]) -> None:
         self.id = kwargs.get("id") or unique_id()
         self.x = kwargs.get("x") or 0.0
@@ -42,6 +43,9 @@ class UIElement(ABC):
         self._resolved_width = 0.0
         self._resolved_height = 0.0
 
+        self.is_focused: bool = False
+        self.is_hovered: bool = False
+
         self.parent: Optional["UIElementGroup"] = None
         self.boxes = UIElementBoxes()
 
@@ -49,11 +53,17 @@ class UIElement(ABC):
             UIElementProperties(), **(kwargs.get("properties") or {})
         )
 
+        self._req_font_size: float | str = self.properties.font_size
+
         self._render_middlewares: list[RenderMiddleware] = [
             BACKGROUND_RENDERER,
             BORDER_RENDERER,
             TEXT_RENDERER,
         ]
+
+    @property
+    def can_focus(self) -> bool:
+        return False
 
     @property
     def width(self) -> float:
@@ -103,6 +113,11 @@ class UIElement(ABC):
             parent_height,
         )
 
+        min_parent_dim = min(parent_width, parent_height)
+        self.properties.font_size = self._resolve_size(
+            self._req_font_size, min_parent_dim
+        )
+
         content_width = 0.0
         content_height = 0.0
         if self.properties.text_content:
@@ -119,17 +134,15 @@ class UIElement(ABC):
         final_width = self._resolved_width
         if self._resolved_width <= 0:
             final_width = (
-                content_width
-                + (self.properties.padding * 2)
-                + (self.properties.border * 2)
+                content_width + (self.properties.padding * 2) +
+                (self.properties.border * 2)
             )
 
         final_height = self._resolved_height
         if self._resolved_height <= 0:
             final_height = (
-                content_height
-                + (self.properties.padding * 2)
-                + (self.properties.border * 2)
+                content_height + (self.properties.padding * 2) +
+                (self.properties.border * 2)
             )
 
         p = self.properties
@@ -166,17 +179,38 @@ class UIElement(ABC):
             self.boxes.content_box.height,
         )
 
+        self.is_hovered = False
+        mouse_pos = pr.get_mouse_position()
+        if (self.boxes.border_box.x <= mouse_pos.x <=
+                self.boxes.border_box.x + self.boxes.border_box.width):
+            if (self.boxes.border_box.y <= mouse_pos.y <=
+                    self.boxes.border_box.y + self.boxes.border_box.height):
+                self.is_hovered = True
+
     def render(self) -> None:
-        if (
-            self.boxes.border_box.width <= 0
-            or self.boxes.border_box.height <= 0
-        ):
+        if (self.boxes.border_box.width <= 0 or
+                self.boxes.border_box.height <= 0):
             return
 
         for middleware in self._render_middlewares:
             middleware.render(self.boxes, self.properties)
 
         self._render_impl()
+
+    def _default_properties(
+        self,
+        base: Optional[UIElementPropertiesDef],
+        kwargs: UIElementKwargs,
+    ) -> None:
+        if base is None:
+            return
+
+        properties = cast(dict[str, Any], kwargs.get("properties") or {})
+        for key, value in base.items():
+            if key not in properties:
+                properties[key] = value
+
+        kwargs["properties"] = cast(UIElementPropertiesDef, properties)
 
     def _update_layout_impl(
         self,

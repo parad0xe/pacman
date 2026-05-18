@@ -2,6 +2,7 @@ import pyray as pr
 
 from src.ui._v2.core.layout import UIHBox, UIVBox
 from src.ui._v2.elements.button import Button
+from src.ui._v2.elements.text import Text
 
 if __name__ == "__main__":
     W_WIDTH = 1200
@@ -12,9 +13,9 @@ if __name__ == "__main__":
 
     button_1 = Button(
         text="50% Width",
+        onclick=lambda: print("OK"),
         width="50%",
         properties={
-            "background_color": pr.BLUE,
             "text_color": pr.WHITE,
             "border": 2,
             "border_color": pr.DARKBLUE,
@@ -25,6 +26,7 @@ if __name__ == "__main__":
     button_2 = Button(
         text="50% Width",
         width="50%",
+        onclick=lambda: print("OK"),
         properties={
             "background_color": pr.RED,
             "text_color": pr.WHITE,
@@ -37,15 +39,11 @@ if __name__ == "__main__":
     hbox = UIHBox(width="100%", properties={"gap": 10})
     hbox.add(button_1, button_2)
 
-    button_3 = Button(
+    button_3 = Text(
         text="Auto Width",
+        width="100%",
         properties={
-            "background_color": pr.DARKGREEN,
-            "text_color": pr.WHITE,
-            "border": 2,
-            "border_color": pr.GREEN,
-            "padding": 10.0,
-            "margin": 5.0,
+            "text_align": "center",
         },
     )
 
