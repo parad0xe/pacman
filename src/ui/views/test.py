@@ -175,8 +175,7 @@ class Widget(ABC):
         self.style = style
 
     @abstractmethod
-    def _render_content(self) -> None:
-        ...
+    def _render_content(self) -> None: ...
 
     @property
     def x(self) -> float:
@@ -270,8 +269,8 @@ class Widget(ABC):
                 text_pos_x += self.style.content_box.width - text_size.x
 
             text_pos_y = (
-                self.style.content_box.y +
-                (self.style.content_box.height - text_size.y) / 2
+                self.style.content_box.y
+                + (self.style.content_box.height - text_size.y) / 2
             )
 
             pr.draw_text_ex(
@@ -304,7 +303,6 @@ T = TypeVar("T", bound="Widget")
 
 
 class WidgetGroup(Widget, Generic[T]):
-
     def __init__(self, **kwargs: Unpack[WidgetKwargs]) -> None:
         super().__init__(**kwargs)
         self._children: dict[str, T] = {}
@@ -348,15 +346,17 @@ class WidgetGroup(Widget, Generic[T]):
         width = self.style.width
         if width <= 0:
             width = (
-                max_child_w + (self.style.padding * 2) +
-                (self.style.border * 2)
+                max_child_w
+                + (self.style.padding * 2)
+                + (self.style.border * 2)
             )
 
         height = self.style.height
         if height <= 0:
             height = (
-                max_child_h + (self.style.padding * 2) +
-                (self.style.border * 2)
+                max_child_h
+                + (self.style.padding * 2)
+                + (self.style.border * 2)
             )
 
         self.style.update_boxes(rel_x, rel_y, width, height)
@@ -367,7 +367,6 @@ class WidgetGroup(Widget, Generic[T]):
 
 
 class VBox(WidgetGroup):
-
     def update_layout(
         self,
         parent_x: float = 0.0,
@@ -397,8 +396,9 @@ class VBox(WidgetGroup):
         width = self.style.width
         if width <= 0:
             width = (
-                max_child_w + (self.style.padding * 2) +
-                (self.style.border * 2)
+                max_child_w
+                + (self.style.padding * 2)
+                + (self.style.border * 2)
             )
 
         height = self.style.height
@@ -411,7 +411,6 @@ class VBox(WidgetGroup):
 
 
 class HBox(WidgetGroup):
-
     def update_layout(
         self,
         parent_x: float = 0.0,
@@ -447,8 +446,9 @@ class HBox(WidgetGroup):
         height = self.style.height
         if height <= 0:
             height = (
-                max_child_h + (self.style.padding * 2) +
-                (self.style.border * 2)
+                max_child_h
+                + (self.style.padding * 2)
+                + (self.style.border * 2)
             )
 
         self.style.update_boxes(rel_x, rel_y, width, height)
@@ -521,9 +521,11 @@ if __name__ == "__main__":
     )
     vbox.add(hbox, button_3)
 
-    group: WidgetGroup = WidgetGroup(style={
-        "border": 4,
-    })
+    group: WidgetGroup = WidgetGroup(
+        style={
+            "border": 4,
+        }
+    )
     group.add(vbox)
 
     while not pr.window_should_close():
@@ -541,8 +543,8 @@ if __name__ == "__main__":
         )
 
         group.set_position(
-            pos.x - vbox.width / 2,
-            pos.y - vbox.height / 2,
+            pos.x - vbox.style.box.cx,
+            pos.y - vbox.style.box.cy,
         )
 
         group.update_layout()
