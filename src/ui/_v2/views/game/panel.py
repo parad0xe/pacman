@@ -1,0 +1,110 @@
+from typing import Callable
+
+import pyray as pr
+from typing_extensions import Unpack
+
+from src.game.pacman import PacmanMock
+from src.ui._v2.core.element.element import UIElementKwargs
+from src.ui._v2.core.element.element_group import UIElementGroup
+
+
+class GamePanel(UIElementGroup):
+    def __init__(
+        self,
+        *,
+        on_game_over: Callable[[], None],
+        **kwargs: Unpack[UIElementKwargs],
+    ) -> None:
+        super().__init__(**kwargs)
+        self._on_game_over = on_game_over
+        self._running = True
+        self.game = PacmanMock()
+
+    def _update_impl(self, dt: float) -> None:
+        super()._update_impl(dt)
+        if not self._running:
+            return
+
+        self.game.update()
+
+        if self.game.is_over:
+            self._on_game_over()
+            self._running = False
+
+    def _render_impl(self) -> None:
+        super()._render_impl()
+
+        board = self.game.stage.board
+        cols = len(board[0])
+        rows = len(board)
+
+        cell_size = int(
+            min(
+                self.boxes.content_box.width / cols,
+                self.boxes.content_box.height / rows,
+            )
+        )
+
+        start_x = (
+            self.boxes.content_box.x
+            + (self.boxes.content_box.width - cols * cell_size) / 2.0
+        )
+        start_y = (
+            self.boxes.content_box.y
+            + (self.boxes.content_box.height - rows * cell_size) / 2.0
+        )
+
+        for y in range(rows):
+            for x in range(cols):
+                cell = board[y][x]
+                cx = start_x + x * cell_size
+                cy = start_y + y * cell_size
+                next_x = cx + cell_size
+                next_y = cy + cell_size
+
+                if cell & 0x1:
+                    pr.draw_line(
+                        int(cx), int(cy), int(next_x), int(cy), pr.BLUE
+                    )
+                if cell & 0x2:
+                    pr.draw_line(
+                        int(next_x), int(cy), int(next_x), int(next_y), pr.BLUE
+                    )
+                if cell & 0x4:
+                    pr.draw_line(
+                        int(cx), int(next_y), int(next_x), int(next_y), pr.BLUE
+                    )
+                if cell & 0x8:
+                    pr.draw_line(
+                        int(cx), int(cy), int(cx), int(next_y), pr.BLUE
+                    )
+
+        self._draw_entity(
+            self.game.stage.player.pos,
+            cell_size,
+            start_x,
+            start_y,
+            pr.RED,
+        )
+
+        for ghost in self.game.stage.ghosts:
+            self._draw_entity(
+                ghost.pos,
+                cell_size,
+                start_x,
+                start_y,
+                ghost.color,
+            )
+
+    def _draw_entity(
+        self,
+        pos: pr.Vector2,
+        cell_size: int,
+        start_x: float,
+        start_y: float,
+        color: pr.Color,
+    ) -> None:
+        radius = cell_size / 3.0
+        cx = start_x + pos.x * cell_size + cell_size / 2.0
+        cy = start_y + pos.y * cell_size + cell_size / 2.0
+        pr.draw_circle_v(pr.Vector2(cx, cy), radius, color)

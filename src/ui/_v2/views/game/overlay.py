@@ -17,13 +17,12 @@ class GameOverOverlay(UIVBox):
     ) -> None:
         self._default_properties(
             {
-                "background_color": pr.Color(0, 0, 0, 150),
+                "background_color": pr.Color(20, 20, 30, 200),
                 "justify_content": "center",
             },
             kwargs,
         )
         super().__init__(**kwargs)
-
         self.on_restart = on_restart
 
         self.add(

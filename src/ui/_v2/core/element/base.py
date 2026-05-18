@@ -42,8 +42,8 @@ class UIElementProperties:
     padding: float = 0.0
     margin: float = 0.0
     border: float = 0.0
-    border_radius: float = 0.0
-    border_color: pr.Color = pr.GRAY
+    border_radius: float = 0.01
+    border_color: pr.Color = pr.Color(220, 220, 220, 255)
     background_color: Optional[pr.Color] = None
 
     font: Optional[pr.Font] = None
@@ -51,7 +51,7 @@ class UIElementProperties:
 
     text_content: Optional[str] = None
     text_align: Literal["left", "center", "right"] = "center"
-    text_color: pr.Color = pr.BLACK
+    text_color: pr.Color = pr.Color(40, 40, 40, 255)
     letter_spacing: float = 2.0
 
     hover_color: pr.Color = field(default_factory=lambda: pr.Color(0, 0, 0, 0))

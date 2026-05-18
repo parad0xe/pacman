@@ -8,7 +8,6 @@ from src.ui._v2.elements.text import Text
 
 
 class Button(Text):
-
     @property
     def can_focus(self) -> bool:
         return True
@@ -22,28 +21,21 @@ class Button(Text):
     ) -> None:
         self._default_properties(
             {
-                "background_color": pr.BLACK,
-                "hover_color": pr.Color(0, 0, 255, 100),
+                "border": 3,
+                "border_color": pr.Color(20, 0, 100, 255),
+                "background_color": pr.Color(10, 10, 200, 255),
+                "hover_color": pr.Color(20, 0, 150, 100),
+                "text_color": pr.Color(10, 10, 10, 255),
+                "padding": 12.0,
+                "border_radius": 1.0,
             },
             kwargs,
         )
         super().__init__(text=text, **kwargs)
-
         self.onclick = onclick
 
-    def _update_layout_impl(
-        self,
-        content_x: float,
-        content_y: float,
-        available_width: float,
-        available_height: float,
-    ) -> None:
-        super()._update_layout_impl(
-            content_x,
-            content_y,
-            available_width,
-            available_height,
-        )
+    def _update_impl(self, dt: float) -> None:
+        super()._update_impl(dt)
 
         if self.is_hovered:
             if pr.is_mouse_button_pressed(pr.MouseButton.MOUSE_BUTTON_LEFT):
@@ -54,9 +46,10 @@ class Button(Text):
 
     def _render_impl(self) -> None:
         super()._render_impl()
-
         if self.is_focused:
-            pr.draw_rectangle_rec(
+            pr.draw_rectangle_rounded(
                 self.boxes.padding_box,
+                self.properties.border_radius,
+                36,
                 self.properties.hover_color,
             )

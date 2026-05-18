@@ -4,17 +4,30 @@ from src.ui._v2.core.element.element import UIElement, UIElementKwargs
 
 
 class UIElementGroup(UIElement):
-
     def __init__(self, **kwargs: Unpack[UIElementKwargs]) -> None:
         super().__init__(**kwargs)
         self._children: dict[str, UIElement] = {}
 
+        self._is_updating: bool = False
+        self._pending_adds: list[UIElement] = []
+        self._pending_clear: bool = False
+
     def add(self, *elements: UIElement) -> None:
+        if self._is_updating:
+            self._pending_adds.extend(elements)
+            return
+
         for element in elements:
             element.parent = self
             self._children[element.id] = element
 
     def clear(self) -> None:
+        if self._is_updating:
+            self._pending_clear = True
+            return
+
+        for child in self._children.values():
+            child.parent = None
         self._children.clear()
 
     def get_focusables(self) -> list[UIElement]:
@@ -25,6 +38,22 @@ class UIElementGroup(UIElement):
             if isinstance(child, UIElementGroup):
                 focusables.extend(child.get_focusables())
         return focusables
+
+    def _update_impl(self, dt: float) -> None:
+        self._is_updating = True
+
+        for child in self._children.values():
+            child.update(dt)
+
+        self._is_updating = False
+
+        if self._pending_clear:
+            self.clear()
+            self._pending_clear = False
+
+        if self._pending_adds:
+            self.add(*self._pending_adds)
+            self._pending_adds.clear()
 
     def _update_layout_impl(
         self,
@@ -47,37 +76,25 @@ class UIElementGroup(UIElement):
                 max_child_height, child.y + child.boxes.margin_box.height
             )
 
+        p = self.properties
         if self._resolved_width <= 0:
-            self.boxes.border_box.width = (
-                max_child_width + (self.properties.padding * 2) +
-                (self.properties.border * 2)
+            self.boxes.content_box.width = max_child_width
+            self.boxes.padding_box.width = max_child_width + (p.padding * 2)
+            self.boxes.border_box.width = self.boxes.padding_box.width + (
+                p.border * 2
             )
             self.boxes.margin_box.width = self.boxes.border_box.width + (
-                self.properties.margin * 2
-            )
-            self.boxes.padding_box.width = max(
-                0.0, self.boxes.border_box.width - (self.properties.border * 2)
-            )
-            self.boxes.content_box.width = max(
-                0.0,
-                self.boxes.padding_box.width - (self.properties.padding * 2),
+                p.margin * 2
             )
 
         if self._resolved_height <= 0:
-            self.boxes.border_box.height = (
-                max_child_height + (self.properties.padding * 2) +
-                (self.properties.border * 2)
+            self.boxes.content_box.height = max_child_height
+            self.boxes.padding_box.height = max_child_height + (p.padding * 2)
+            self.boxes.border_box.height = self.boxes.padding_box.height + (
+                p.border * 2
             )
             self.boxes.margin_box.height = self.boxes.border_box.height + (
-                self.properties.margin * 2
-            )
-            self.boxes.padding_box.height = max(
-                0.0,
-                self.boxes.border_box.height - (self.properties.border * 2),
-            )
-            self.boxes.content_box.height = max(
-                0.0,
-                self.boxes.padding_box.height - (self.properties.padding * 2),
+                p.margin * 2
             )
 
     def _render_impl(self) -> None:
