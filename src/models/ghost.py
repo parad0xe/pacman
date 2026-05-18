@@ -53,5 +53,5 @@ class GhostPort(Protocol):
     def reset(self) -> None:
         ...
 
-    def update(self, state: Optional[GhostState], player: PlayerPort) -> None:
+    def update(self, state: GhostState, player: PlayerPort) -> None:
         ...

@@ -1,3 +1,4 @@
+from random import randint
 from typing import Optional
 
 from mazegenerator import mazegenerator
@@ -69,13 +70,10 @@ class Game(GamePort):
                 return 2
 
         for ghost in self.stage.ghosts:
-            if self.stage.player.state == PlayerState.SUPER:
-                ghost.update(GhostState.FLEE, self.stage.player)
-            else:
-                ghost.update(GhostState.HUNT, self.stage.player)
+            ghost.update(GhostState.HUNT, self.stage.player)
 
-            if (abs(ghost.pos.x - self.stage.player.pos.x) < 0.75 and
-                    abs(ghost.pos.y - self.stage.player.pos.y) < 0.75):
+            if (abs(ghost.pos.x - self.stage.player.pos.x) < .5 and
+                    abs(ghost.pos.y - self.stage.player.pos.y) < .5):
                 if self.stage.player.state == PlayerState.NORMAL:
                     return self.player_death()
                 else:
