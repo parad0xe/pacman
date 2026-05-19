@@ -1,6 +1,6 @@
 from typing_extensions import Unpack
 
-from src.ui._v2.core.element.element import UIElement, UIElementKwargs
+from src.ui.core.element.element import UIElement, UIElementKwargs
 
 
 class UIElementGroup(UIElement):

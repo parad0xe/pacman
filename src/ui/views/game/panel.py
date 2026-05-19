@@ -1,32 +1,28 @@
-from typing import Callable, Unpack
+from typing import Callable
 
 import pyray as pr
+from typing_extensions import Unpack
 
 from src.game.pacman import PacmanMock
-from src.ui.panel import Panel
-from src.ui.utils import DynamicInt
-from src.ui.widget import WidgetKwargs
+from src.ui.core.element.element import UIElementKwargs
+from src.ui.core.element.element_group import UIElementGroup
 
 
-class GamePanel(Panel):
+class GamePanel(UIElementGroup):
+
     def __init__(
         self,
         *,
-        width: DynamicInt,
-        height: DynamicInt,
         on_game_over: Callable[[], None],
-        **kwargs: Unpack[WidgetKwargs],
+        **kwargs: Unpack[UIElementKwargs],
     ) -> None:
-        super().__init__(width=width, height=height, **kwargs)
-
+        super().__init__(**kwargs)
         self._on_game_over = on_game_over
         self._running = True
-
         self.game = PacmanMock()
 
-    def update(self) -> None:
-        super().update()
-
+    def _update_impl(self, dt: float) -> None:
+        super()._update_impl(dt)
         if not self._running:
             return
 
@@ -36,8 +32,8 @@ class GamePanel(Panel):
             self._on_game_over()
             self._running = False
 
-    def render(self) -> None:
-        super().render()
+    def _render_impl(self) -> None:
+        super()._render_impl()
 
         board = self.game.stage.board
         cols = len(board[0])
@@ -45,14 +41,18 @@ class GamePanel(Panel):
 
         cell_size = int(
             min(
-                self.content_width / cols,
-                self.content_height / rows,
+                self.boxes.content_box.width / cols,
+                self.boxes.content_box.height / rows,
             )
         )
 
-        start_x = self.content_x + (self.content_width - cols * cell_size) // 2
+        start_x = (
+            self.boxes.content_box.x +
+            (self.boxes.content_box.width - cols * cell_size) / 2.0
+        )
         start_y = (
-            self.content_y + (self.content_height - rows * cell_size) // 2
+            self.boxes.content_box.y +
+            (self.boxes.content_box.height - rows * cell_size) / 2.0
         )
 
         for y in range(rows):
@@ -64,13 +64,21 @@ class GamePanel(Panel):
                 next_y = cy + cell_size
 
                 if cell & 0x1:
-                    pr.draw_line(cx, cy, next_x, cy, pr.BLUE)
+                    pr.draw_line(
+                        int(cx), int(cy), int(next_x), int(cy), pr.BLUE
+                    )
                 if cell & 0x2:
-                    pr.draw_line(next_x, cy, next_x, next_y, pr.BLUE)
+                    pr.draw_line(
+                        int(next_x), int(cy), int(next_x), int(next_y), pr.BLUE
+                    )
                 if cell & 0x4:
-                    pr.draw_line(cx, next_y, next_x, next_y, pr.BLUE)
+                    pr.draw_line(
+                        int(cx), int(next_y), int(next_x), int(next_y), pr.BLUE
+                    )
                 if cell & 0x8:
-                    pr.draw_line(cx, cy, cx, next_y, pr.BLUE)
+                    pr.draw_line(
+                        int(cx), int(cy), int(cx), int(next_y), pr.BLUE
+                    )
 
         self._draw_entity(
             self.game.stage.player.pos,
@@ -93,8 +101,8 @@ class GamePanel(Panel):
         self,
         pos: pr.Vector2,
         cell_size: int,
-        start_x: int,
-        start_y: int,
+        start_x: float,
+        start_y: float,
         color: pr.Color,
     ) -> None:
         radius = cell_size / 3.0

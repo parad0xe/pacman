@@ -3,8 +3,8 @@ from typing import Callable
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui._v2.core.element.element import UIElementKwargs
-from src.ui._v2.elements.text import Text
+from src.ui.core.element.element import UIElementKwargs
+from src.ui.elements.text import Text
 
 
 class Button(Text):

@@ -1,4 +1,4 @@
-from src.ui._v2.core.element.element_group import UIElementGroup
+from src.ui.core.element.element_group import UIElementGroup
 
 
 class UIVBox(UIElementGroup):

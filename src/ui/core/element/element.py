@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Optional, TypedDict, cast
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui._v2.core.element.base import (
+from src.ui.core.element.base import (
     UIElementBoxes,
     UIElementProperties,
     UIElementPropertiesDef,
@@ -13,7 +13,7 @@ from src.ui._v2.core.element.base import (
 )
 
 if TYPE_CHECKING:
-    from src.ui._v2.core.element.element_group import UIElementGroup
+    from src.ui.core.element.element_group import UIElementGroup
 
 
 class UIElementKwargs(TypedDict, total=False):
@@ -26,6 +26,7 @@ class UIElementKwargs(TypedDict, total=False):
 
 
 class UIElement(ABC):
+
     def __init__(self, **kwargs: Unpack[UIElementKwargs]) -> None:
         self.id = kwargs.get("id") or unique_id()
         self.x = kwargs.get("x") or 0.0
@@ -121,9 +122,8 @@ class UIElement(ABC):
         final_width = self._resolved_width
         if self._resolved_width <= 0:
             final_width = (
-                content_width
-                + (self.properties.padding * 2)
-                + (self.properties.border * 2)
+                content_width + (self.properties.padding * 2) +
+                (self.properties.border * 2)
             )
         else:
             final_width = max(
@@ -133,9 +133,8 @@ class UIElement(ABC):
         final_height = self._resolved_height
         if self._resolved_height <= 0:
             final_height = (
-                content_height
-                + (self.properties.padding * 2)
-                + (self.properties.border * 2)
+                content_height + (self.properties.padding * 2) +
+                (self.properties.border * 2)
             )
         else:
             final_height = max(
@@ -187,10 +186,8 @@ class UIElement(ABC):
     # --- Render ---
 
     def render(self) -> None:
-        if (
-            self.boxes.border_box.width <= 0
-            or self.boxes.border_box.height <= 0
-        ):
+        if (self.boxes.border_box.width <= 0 or
+                self.boxes.border_box.height <= 0):
             return
 
         if self.properties.background_color:
@@ -210,10 +207,8 @@ class UIElement(ABC):
                 self.properties.border_color,
             )
 
-        if (
-            self.properties.text_content
-            and float(self.properties.font_size) > 0
-        ):
+        if (self.properties.text_content and
+                float(self.properties.font_size) > 0):
             font = self.properties.font or pr.get_font_default()
             text_size = pr.measure_text_ex(
                 font,
@@ -229,8 +224,8 @@ class UIElement(ABC):
                 text_pos_x += self.boxes.content_box.width - text_size.x
 
             text_pos_y = (
-                self.boxes.content_box.y
-                + (self.boxes.content_box.height - text_size.y) / 2
+                self.boxes.content_box.y +
+                (self.boxes.content_box.height - text_size.y) / 2
             )
 
             pr.draw_text_ex(
