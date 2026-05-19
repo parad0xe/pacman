@@ -11,6 +11,7 @@ from src.ui._v2.elements.text import Text
 
 
 class MenuGamePanel(UIElementGroup):
+
     def __init__(
         self,
         *,
@@ -39,6 +40,7 @@ class MenuGamePanel(UIElementGroup):
             text="Score: 0",
             properties={
                 "font_size": 24.0,
+                "text_color": pr.WHITE,
                 "text_align": "right",
             },
         )
@@ -49,16 +51,13 @@ class MenuGamePanel(UIElementGroup):
     def _update_impl(self, dt: float) -> None:
         super()._update_impl(dt)
 
-        if not self._is_running:
-            return
-
         self.game.update(dt)
 
         self.score_text.properties.text_content = (
             f"Score: {int(self.game.score)}"
         )
 
-        if self.game.is_over:
+        if self.game.is_over and self._is_running:
             self._is_running = False
             self._on_game_over()
 

@@ -4,6 +4,7 @@ from src.ui._v2.core.element.element import UIElement, UIElementKwargs
 
 
 class UIElementGroup(UIElement):
+
     def __init__(self, **kwargs: Unpack[UIElementKwargs]) -> None:
         super().__init__(**kwargs)
         self._children: dict[str, UIElement] = {}
@@ -66,9 +67,7 @@ class UIElementGroup(UIElement):
         max_child_height = 0.0
 
         for child in self._children.values():
-            child.update_layout(
-                content_x, content_y, available_width, available_height
-            )
+            child.update_layout(0.0, 0.0, available_width, available_height)
             max_child_width = max(
                 max_child_width, child.x + child.boxes.margin_box.width
             )
@@ -95,6 +94,27 @@ class UIElementGroup(UIElement):
             )
             self.boxes.margin_box.height = self.boxes.border_box.height + (
                 p.margin * 2
+            )
+
+        final_width = self.boxes.content_box.width
+        final_height = self.boxes.content_box.height
+
+        for child in self._children.values():
+            if p.justify_content == "center":
+                child.x = (final_width - child.boxes.margin_box.width) / 2
+            elif p.justify_content == "end":
+                child.x = final_width - child.boxes.margin_box.width
+
+            if p.align_items == "center":
+                child.y = (final_height - child.boxes.margin_box.height) / 2
+            elif p.align_items == "end":
+                child.y = final_height - child.boxes.margin_box.height
+
+            child.update_layout(
+                self.boxes.content_box.x,
+                self.boxes.content_box.y,
+                final_width,
+                final_height,
             )
 
     def _render_impl(self) -> None:

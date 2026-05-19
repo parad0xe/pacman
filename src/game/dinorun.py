@@ -32,9 +32,6 @@ class DinoRun:
         self._last_height = height
 
     def update(self, dt: float) -> None:
-        if self.is_over:
-            return
-
         time_step = dt * self.game_speed
         width = self.width
         height = self.height
@@ -47,6 +44,9 @@ class DinoRun:
             self._last_width = width
             self._last_height = height
             self.cacs = [(x + x_diff / 2, speed) for x, speed in self.cacs]
+
+        if self.is_over:
+            return
 
         self.spawn_timer += dt
         if self.spawn_timer >= self.time_to_next_spawn:

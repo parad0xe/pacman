@@ -8,6 +8,7 @@ from src.ui._v2.elements.text import Text
 
 
 class Button(Text):
+
     @property
     def can_focus(self) -> bool:
         return True
@@ -22,10 +23,10 @@ class Button(Text):
         self._default_properties(
             {
                 "border": 3,
-                "border_color": pr.Color(20, 0, 100, 255),
-                "background_color": pr.Color(10, 10, 200, 255),
-                "hover_color": pr.Color(20, 0, 150, 100),
-                "text_color": pr.Color(10, 10, 10, 255),
+                "border_color": pr.Color(29, 29, 36, 255),
+                "background_color": pr.Color(39, 39, 48, 255),
+                "hover_color": pr.Color(54, 193, 231, 150),
+                "text_color": pr.Color(200, 200, 200, 255),
                 "padding": 12.0,
                 "border_radius": 1.0,
             },

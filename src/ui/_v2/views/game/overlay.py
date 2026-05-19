@@ -9,6 +9,7 @@ from src.ui._v2.elements.text import Text
 
 
 class GameOverOverlay(UIVBox):
+
     def __init__(
         self,
         *,
@@ -32,7 +33,7 @@ class GameOverOverlay(UIVBox):
                 properties={
                     "text_color": pr.RED,
                     "text_align": "center",
-                    "font_size": "15%",
+                    "font_size": "6%",
                 },
             ),
             Text(
@@ -41,7 +42,7 @@ class GameOverOverlay(UIVBox):
                 properties={
                     "text_color": pr.WHITE,
                     "text_align": "center",
-                    "font_size": "8%",
+                    "font_size": "4%",
                 },
             ),
         )

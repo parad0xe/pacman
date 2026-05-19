@@ -4,6 +4,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.context import Context, Event
+from src.ui._v2.core.element.base import UIElementPropertiesDef
 from src.ui._v2.core.element.element import UIElementKwargs
 from src.ui._v2.core.element.element_group import UIElementGroup
 from src.ui._v2.core.layout import UIHBox, UIVBox
@@ -27,11 +28,14 @@ class GameView(View):
         )
         super().__init__(context=context, **kwargs)
 
-        main_layout = UIVBox(width="100%", height="100%")
+        main_layout = UIVBox(
+            width="100%",
+            height="100%",
+        )
 
         self._game_container = UIElementGroup(
             width="100%",
-            height="80%",
+            height="70%",
         )
 
         main_layout.add(
@@ -47,7 +51,7 @@ class GameView(View):
     def _build_header(self) -> UIHBox:
         header = UIHBox(
             width="100%",
-            height="10%",
+            height="15%",
             properties={
                 "padding": 20.0,
                 "justify_content": "center",
@@ -55,17 +59,22 @@ class GameView(View):
             },
         )
 
+        text_props: UIElementPropertiesDef = {
+            "text_color": pr.RED,
+            "font_size": "30%",
+        }
+
         self._score_text = Text(
             text="Score: 0",
-            properties={"text_color": pr.RED, "font_size": "40%"},
+            properties=text_props,
         )
         self._level_text = Text(
             text="Level: 1",
-            properties={"text_color": pr.RED, "font_size": "40%"},
+            properties=text_props,
         )
         self._time_text = Text(
             text="Time: 0s",
-            properties={"text_color": pr.RED, "font_size": "40%"},
+            properties=text_props,
         )
 
         header.add(self._score_text, self._level_text, self._time_text)
@@ -74,15 +83,16 @@ class GameView(View):
     def _build_footer(self) -> UIHBox:
         footer = UIHBox(
             width="100%",
-            height="10%",
+            height="15%",
             properties={
-                "padding": 20.0,
+                "padding": 10.0,
                 "justify_content": "center",
+                "align_items": "center",
             },
         )
         self._life_text = Text(
             text="Life: 3",
-            properties={"text_color": pr.RED, "font_size": "40%"},
+            properties={"text_color": pr.RED, "font_size": "30%"},
         )
         footer.add(self._life_text)
         return footer

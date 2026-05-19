@@ -2,6 +2,7 @@ from src.ui._v2.core.element.element_group import UIElementGroup
 
 
 class UIVBox(UIElementGroup):
+
     def _update_layout_impl(
         self,
         content_x: float,
@@ -71,6 +72,7 @@ class UIVBox(UIElementGroup):
 
 
 class UIHBox(UIElementGroup):
+
     def _update_layout_impl(
         self,
         content_x: float,

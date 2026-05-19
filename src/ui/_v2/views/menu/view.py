@@ -23,20 +23,27 @@ class MenuView(View):
     ) -> None:
         self._default_properties(
             {
-                "background_color": pr.Color(20, 20, 30, 200),
+                "background_color": pr.Color(20, 20, 30, 255),
+                "justify_content": "center",
             },
             kwargs,
         )
         super().__init__(context=context, **kwargs)
 
-        main_layout = UIVBox(width="100%", height="100%")
+        main_layout = UIVBox(
+            width="80%",
+            height="100%",
+            properties={
+                "align_items": "center",
+            },
+        )
 
         self._game_container = UIElementGroup(
             width="100%",
-            height="75%",
+            height="50%",
             properties={
-                "border": 2,
                 "margin": 10,
+                "justify_content": "center",
             },
         )
 
@@ -52,7 +59,7 @@ class MenuView(View):
     def _build_header(self) -> UIHBox:
         header = UIHBox(
             width="100%",
-            height="15%",
+            height="25%",
             properties={
                 "padding": 20,
                 "justify_content": "center",
@@ -65,7 +72,7 @@ class MenuView(View):
                 height="100%",
                 properties={
                     "font_size": "70%",
-                    "text_color": pr.BLUE,
+                    "text_color": pr.Color(54, 193, 231, 255),
                     "letter_spacing": 12,
                 },
             ),
@@ -75,16 +82,17 @@ class MenuView(View):
     def _build_footer(self) -> UIHBox:
         footer = UIHBox(
             width="100%",
-            height="10%",
+            height="25%",
             properties={
                 "padding": 20,
                 "gap": 10,
                 "justify_content": "center",
+                "align_items": "center",
             },
         )
 
         btn_props: UIElementPropertiesDef = {
-            "font_size": "50%",
+            "font_size": 20,
             "padding": 10,
         }
 
@@ -98,9 +106,8 @@ class MenuView(View):
             Button(
                 text="Highscores",
                 width="33.33%",
-                onclick=lambda: self.event.emit(
-                    Event.SWITCH_VIEW, "highscores"
-                ),
+                onclick=lambda: self.event.
+                emit(Event.SWITCH_VIEW, "highscores"),
                 properties=btn_props,
             ),
             Button(
@@ -119,6 +126,9 @@ class MenuView(View):
             width="100%",
             height="100%",
             on_game_over=self._handle_game_over,
+            properties={
+                "border": 2,
+            },
         )
         self._game_container.add(game_panel)
 
@@ -129,3 +139,9 @@ class MenuView(View):
             height="100%",
         )
         self._game_container.add(overlay)
+
+    def _update_impl(self, dt: float) -> None:
+        super()._update_impl(dt)
+
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+            self.event.emit(Event.SWITCH_VIEW, "game")
