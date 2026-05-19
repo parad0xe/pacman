@@ -1,7 +1,12 @@
-from enum import Enum
+from enum import Enum, auto
 from typing import Protocol
 
 import pyray as pr
+
+
+class PlayerState(Enum):
+    NORMAL = auto()
+    SUPER = auto()
 
 
 class Direction(Enum):
@@ -13,11 +18,18 @@ class Direction(Enum):
 
 
 class PlayerPort(Protocol):
-    @property
-    def pos(self) -> pr.Vector2: ...
 
     @property
-    def direction(self) -> Direction: ...
+    def pos(self) -> pr.Vector2:
+        ...
 
     @property
-    def frame(self) -> int: ...
+    def direction(self) -> Direction:
+        ...
+
+    @property
+    def frame(self) -> int:
+        ...
+
+    def update(self, maze: list[list[int]]) -> None:
+        ...
