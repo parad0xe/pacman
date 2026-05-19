@@ -10,8 +10,11 @@ W_HEIGHT = 800
 
 
 def main() -> None:
+    pr.set_config_flags(pr.ConfigFlags.FLAG_WINDOW_RESIZABLE)
     pr.init_window(W_WIDTH, W_HEIGHT, "Pac-Man")
-    pr.set_target_fps(120)
+
+    pr.set_window_min_size(800, 600)
+    pr.set_target_fps(60)
 
     context = Context(config=Config(), event_bus=EventBus())
 
@@ -25,8 +28,14 @@ def main() -> None:
     )
 
     while not pr.window_should_close() and app.is_running:
+        screen_w = pr.get_screen_width()
+        screen_h = pr.get_screen_height()
+
         view = app.current_view
-        view.update()
+
+        view.update(pr.get_frame_time())
+        view.update_layout(0.0, 0.0, screen_w, screen_h)
+
         pr.begin_drawing()
         view.render()
         pr.end_drawing()

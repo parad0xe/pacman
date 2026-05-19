@@ -7,6 +7,7 @@ from src.utils import Timer
 
 
 class PlayerMock(PlayerPort):
+
     @property
     def pos(self) -> pr.Vector2:
         return self._pos
@@ -25,6 +26,7 @@ class PlayerMock(PlayerPort):
 
 
 class GhostMock(GhostPort):
+
     @property
     def pos(self) -> pr.Vector2:
         return self._pos
@@ -44,6 +46,7 @@ class GhostMock(GhostPort):
 
 
 class StageMock(StagePort):
+
     @property
     def level(self) -> int:
         return 1
@@ -76,6 +79,22 @@ class StageMock(StagePort):
     def ghosts(self) -> list[GhostPort]:
         return self._ghosts
 
+    @property
+    def pacgums(self) -> list[list[int]]:
+        return [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        ]
+
     def __init__(self) -> None:
         super().__init__()
         self._timer = Timer()
@@ -88,6 +107,7 @@ class StageMock(StagePort):
 
 
 class PacmanMock(GamePort):
+
     @property
     def life(self) -> int:
         return max(0, 3)

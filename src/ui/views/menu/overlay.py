@@ -3,33 +3,52 @@ from typing import Callable
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui.layouts.vbox import VBox
-from src.ui.utils import DynamicInt
-from src.ui.widget_group import WidgetGroupKwargs
-from src.ui.widgets.text_view import TextView
+from src.ui.core.element.element import UIElementKwargs
+from src.ui.core.layout import UIVBox
+from src.ui.elements.text import Text
 
 
-class GameOverOverlay(VBox):
+class GameOverOverlay(UIVBox):
 
     def __init__(
         self,
         *,
         on_restart: Callable[[], None],
-        center: bool = False,
-        spacing: DynamicInt = 0,
-        **kwargs: Unpack[WidgetGroupKwargs],
+        **kwargs: Unpack[UIElementKwargs],
     ) -> None:
-        super().__init__(center=center, spacing=spacing, **kwargs)
+        self._default_properties(
+            {
+                "background_color": pr.Color(0, 0, 0, 150),
+                "justify_content": "center",
+            },
+            kwargs,
+        )
+        super().__init__(**kwargs)
 
         self.on_restart = on_restart
 
         self.add(
-            TextView(text="GAME OVER", size=60, color=pr.RED),
-            TextView(text="Press R to restart", size=30, color=pr.WHITE),
+            Text(
+                text="GAME OVER",
+                width="100%",
+                properties={
+                    "text_color": pr.RED,
+                    "text_align": "center",
+                    "font_size": "15%",
+                },
+            ),
+            Text(
+                text="Press R to restart",
+                width="100%",
+                properties={
+                    "text_color": pr.WHITE,
+                    "text_align": "center",
+                    "font_size": "8%",
+                },
+            ),
         )
 
-    def update(self) -> None:
-        super().update()
-
+    def _update_impl(self, dt: float) -> None:
+        super()._update_impl(dt)
         if pr.is_key_pressed(pr.KeyboardKey.KEY_R):
             self.on_restart()
