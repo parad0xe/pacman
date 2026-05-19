@@ -23,7 +23,10 @@ class GamePanel(UIElementGroup):
         self.game = PacmanMock()
 
         self._super_pacgum_visible: bool = True
-        self._acc_dt: float = 0.0
+        self._super_pacgum_dt: float = 0.0
+
+        self._player_frame: int = 0
+        self._player_frame_dt: float = 0.0
 
     def _update_impl(self, dt: float) -> None:
         super()._update_impl(dt)
@@ -36,7 +39,8 @@ class GamePanel(UIElementGroup):
             self._on_game_over()
             self._running = False
 
-        self._acc_dt += dt
+        self._super_pacgum_dt += dt
+        self._player_frame_dt += dt
 
     def _render_impl(self) -> None:
         super()._render_impl()
@@ -113,9 +117,9 @@ class GamePanel(UIElementGroup):
                     else:
                         pr.draw_circle_v(pr.Vector2(cx, cy), 3, color)
 
-        if self._acc_dt > 0.8:
+        if self._super_pacgum_dt > 0.8:
             self._super_pacgum_visible = not self._super_pacgum_visible
-            self._acc_dt = 0.0
+            self._super_pacgum_dt = 0.0
 
         self._draw_entity(
             self.game.stage.player.pos,
