@@ -131,13 +131,14 @@ class Ghost(GhostPort):
         self._current_path = self.path_finder.search(start, self.corner)
         self._state = GhostState.RETREAT
 
-    def update(self, state: GhostState, player: PlayerPort) -> None:
+    def update(self, player: PlayerPort) -> None:
 
         if player.state == PlayerState.SUPER:
             self._state = GhostState.FLEE
             self.flee(player)
 
-        elif self.state == GhostState.RETREAT and time() - self.retreat_timer < 5:
+        elif self.state == GhostState.RETREAT and\
+        time() - self.retreat_timer < 5:
             self.retreat()
 
         elif randint(1, 1000) == 999:
@@ -147,20 +148,6 @@ class Ghost(GhostPort):
         else:
             self._state = GhostState.HUNT
             self.hunt(player)
-
-
-        # if self.state != state or time() - self.last_pathfind > 1:
-        #     self._state = state
-        #     if self.on_cell():
-        #         if self._state == GhostState.FLEE:
-        #             self.flee(player)
-
-        #         if self._state == GhostState.HUNT:
-        #             self.hunt(player)
-
-        #         if self._state == GhostState.RETREAT:
-        #             self.retreat()
-        #         self.last_pathfind = int(time())
 
         if self.on_cell() or self.direction == Direction.IDLE:
             if self.current_path:
