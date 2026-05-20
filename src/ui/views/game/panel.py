@@ -23,27 +23,42 @@ class Animation:
         index: int = 0,
         offset_x: int = 0,
         offset_y: int = 0,
+        once: bool = False,
     ) -> None:
-        self._frame_width = frame_width
-        self._frame_height = frame_height
-        self._offset_x = offset_x
-        self._offset_y = offset_y
-        self._max_frames = max_frames
-        self._direction_x = direction_x
-        self._direction_y = direction_y
-        self._index = index
+        self.frame_width = frame_width
+        self.frame_height = frame_height
+        self.offset_x = offset_x
+        self.offset_y = offset_y
+        self.max_frames = max_frames
+        self.direction_x = direction_x
+        self.direction_y = direction_y
+        self.index = index
+        self.once = once
+
+    @property
+    def is_last_frame(self) -> bool:
+        return self.index == self.max_frames
+
+    @property
+    def done(self) -> bool:
+        return self.once and self.is_last_frame
 
     def next(self) -> None:
-        self._index = (self._index + 1) % self._max_frames
+        if self.done:
+            return
+        if self.once:
+            self.index = self.index + 1
+        else:
+            self.index = (self.index + 1) % self.max_frames
 
     def get_frame(self) -> pr.Rectangle:
         return pr.Rectangle(
-            (self._frame_width * self._offset_x) +
-            (self._frame_width * self._index) * self._direction_x,
-            (self._frame_height * self._offset_y) +
-            (self._frame_height * self._index) * self._direction_y,
-            self._frame_width,
-            self._frame_height,
+            (self.frame_width * self.offset_x) +
+            (self.frame_width * self.index) * self.direction_x,
+            (self.frame_height * self.offset_y) +
+            (self.frame_height * self.index) * self.direction_y,
+            self.frame_width,
+            self.frame_height,
         )
 
 
@@ -57,6 +72,9 @@ class AnimTexturePack:
         self.texture = texture
 
     def render(self, animation: Animation, dest: pr.Rectangle) -> None:
+        if animation.done:
+            return
+
         pr.draw_texture_pro(
             self.texture,
             animation.get_frame(),
@@ -88,6 +106,7 @@ class GamePanel(UIElementGroup):
             # TD: Reaise custom Exception
             raise Exception("Missing asset file.")
 
+        # -- Load Texture
         image = pr.load_image("assets/asset.png")
         pr.image_format(
             image, pr.PixelFormat.PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
@@ -95,13 +114,14 @@ class GamePanel(UIElementGroup):
         pr.image_color_replace(
             image, pr.Color(0, 0, 0, 255), pr.Color(0, 0, 0, 0)
         )
+        # -- End Load Texture
 
         # -- Animation OBJECT
         self._animation = AnimTexturePack(
             texture=pr.load_texture_from_image(image),
         )
 
-        self._player_left_anim = Animation(
+        self._player_anim = Animation(
             frame_width=(self._animation.texture.width / 14),
             frame_height=(self._animation.texture.height / 10),
             max_frames=2,
@@ -109,48 +129,18 @@ class GamePanel(UIElementGroup):
             direction_y=0,
             offset_x=0,
         )
-        self._player_right_anim = Animation(
+        self._ghost_anim = Animation(
             frame_width=(self._animation.texture.width / 14),
             frame_height=(self._animation.texture.height / 10),
             max_frames=2,
             direction_x=1,
             direction_y=0,
             offset_x=0,
-            offset_y=1,
+            offset_y=4,
         )
-        self._player_up_anim = Animation(
-            frame_width=(self._animation.texture.width / 14),
-            frame_height=(self._animation.texture.height / 10),
-            max_frames=2,
-            direction_x=1,
-            direction_y=0,
-            offset_x=0,
-            offset_y=2,
-        )
-        self._player_down_anim = Animation(
-            frame_width=(self._animation.texture.width / 14),
-            frame_height=(self._animation.texture.height / 10),
-            max_frames=2,
-            direction_x=1,
-            direction_y=0,
-            offset_x=0,
-            offset_y=3,
-        )
-        self._player_death_anim = Animation(
-            frame_width=(self._animation.texture.width / 14),
-            frame_height=(self._animation.texture.height / 10),
-            max_frames=12,
-            direction_x=1,
-            direction_y=0,
-            offset_x=2,
-            offset_y=0,
-        )
-        self._player_anim: Animation = self._player_right_anim
+
         # -- End Animation OBJECT
 
-        self._asset = pr.load_texture_from_image(image)
-
-        self._player_frame = 0
         self._player_frame_dt: float = 0.0
 
         self._last_player_position = pr.Vector2(
@@ -164,21 +154,27 @@ class GamePanel(UIElementGroup):
         if not self._running:
             return
 
-        self.game.update()
+        if not self.game.is_over:
+            self.game.update()
 
         if self.game.stage.player.direction == Direction.EAST:
-            self._player_anim = self._player_left_anim
+            self._player_anim.offset_y = 0
         elif self.game.stage.player.direction == Direction.WEST:
-            self._player_anim = self._player_right_anim
+            self._player_anim.offset_y = 1
         elif self.game.stage.player.direction == Direction.NORTH:
-            self._player_anim = self._player_up_anim
+            self._player_anim.offset_y = 2
         elif self.game.stage.player.direction == Direction.SOUTH:
-            self._player_anim = self._player_down_anim
+            self._player_anim.offset_y = 3
 
         if self.game.is_over:
-            self._player_anim = self._player_death_anim
-        #    self._on_game_over()
-        #    self._running = False
+            self._player_anim.offset_x = 2
+            self._player_anim.offset_y = 0
+            self._player_anim.max_frames = 12
+            self._player_anim.once = True
+
+        if self._player_anim.done:
+            self._on_game_over()
+            self._running = False
 
         if self._super_pacgum_dt > 0.8:
             self._super_pacgum_visible = not self._super_pacgum_visible
