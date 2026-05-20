@@ -1,5 +1,5 @@
-from time import time
 from random import randint
+from time import time
 
 import pyray as rl
 
@@ -137,8 +137,8 @@ class Ghost(GhostPort):
             self._state = GhostState.FLEE
             self.flee(player)
 
-        elif self.state == GhostState.RETREAT and\
-        time() - self.retreat_timer < 5:
+        elif (self.state == GhostState.RETREAT and
+              time() - self.retreat_timer < 5):
             self.retreat()
 
         elif randint(1, 1000) == 999:
