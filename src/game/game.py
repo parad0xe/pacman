@@ -47,7 +47,7 @@ class Game(GamePort):
             ghost.reset()
         self.stage.player.pos.x = int(len(self.stage.board[0]) / 2)
         self.stage.player.pos.y = int(len(self.stage.board) / 2)
-        return 0
+        return 2
 
     def ghost_death(self, ghost: GhostPort) -> None:
         ghost.reset()

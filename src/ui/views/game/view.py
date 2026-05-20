@@ -102,6 +102,9 @@ class GameView(View):
         self._game_panel = GamePanel(
             width="100%",
             height="100%",
+            properties={
+                "padding": 2,
+            },
             on_game_over=self._handle_game_over,
         )
         if self._game_panel:
