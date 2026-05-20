@@ -6,7 +6,7 @@ from src.ui.views.game.animation import Animation, AnimTexturePack
 from typing_extensions import Unpack
 
 from src.game.game import Game
-from src.models.direction import Direction
+from src.game2.direction import Direction
 from src.ui.core.element.element import UIElementKwargs
 from src.ui.core.element.element_group import UIElementGroup
 

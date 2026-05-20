@@ -5,8 +5,11 @@ from typing import Any, Callable
 
 @dataclass
 class Config:
-    pass
-
+    width: int = 15
+    height: int = 15
+    seed: int = 0
+    time: int = 90
+    
 
 class EventBus:
     def __init__(self) -> None:

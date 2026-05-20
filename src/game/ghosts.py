@@ -4,7 +4,7 @@ from time import time
 import pyray as rl
 
 from src.game.pathfinder import PathFinder
-from src.models.direction import Direction
+from src.game2.direction import Direction
 from src.models.ghost import GhostPort, GhostState
 from src.models.player import PlayerPort, PlayerState
 

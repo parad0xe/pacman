@@ -40,7 +40,6 @@ class Game(GamePort):
 
     def player_death(self) -> int:
         self._life -= 1
-        print("touch")
         if self.life == 0:
             return 1
         for ghost in self.stage.ghosts:

@@ -1,4 +1,4 @@
-from src.models.direction import Direction
+from src.game2.direction import Direction
 
 from heapq import heappush, heappop
 

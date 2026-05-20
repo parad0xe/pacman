@@ -5,7 +5,7 @@ from typing import Protocol
 
 from typing_extensions import TYPE_CHECKING
 
-from src.models.direction import Direction
+from src.game2.direction import Direction
 
 if TYPE_CHECKING:
     import pyray as rl

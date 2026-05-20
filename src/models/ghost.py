@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Protocol
 if TYPE_CHECKING:
     import pyray as rl
 
-from src.models.direction import Direction
+from src.game2.direction import Direction
 from src.models.player import PlayerPort
 
 

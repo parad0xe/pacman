@@ -1,5 +1,5 @@
 from src.models.player import PlayerPort, PlayerState
-from src.models.direction import Direction
+from src.game2.direction import Direction
 
 import pyray as rl
 from time import time
@@ -14,7 +14,7 @@ class Player(PlayerPort):
 
         self._direction = Direction.IDLE
         self.key_buffer = rl.KeyboardKey.KEY_LEFT
-        self.speed = 0.0625  # 0.03125
+        self.speed = 0.0625
 
         self._frame = 0
 
