@@ -1,136 +1,134 @@
+from typing import ClassVar
+
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.context import Context
-from src.ui.layouts.hbox import HBox
-from src.ui.layouts.vbox import VBox
-from src.ui.utils import aspect_ratio, dvh, dvw
-from src.ui.view import View
+from src.context import Context, Event
+from src.ui.core.element.base import UIElementPropertiesDef
+from src.ui.core.element.element import UIElementKwargs
+from src.ui.core.element.element_group import UIElementGroup
+from src.ui.core.layout import UIHBox, UIVBox
+from src.ui.core.view import View
+from src.ui.elements.text import Text
 from src.ui.views.game.overlay import GameOverOverlay
 from src.ui.views.game.panel import GamePanel
-from src.ui.widget import WidgetStyle
-from src.ui.widget_group import WidgetGroup, WidgetGroupKwargs
-from src.ui.widgets.fixed_text_view import FixedTextView
 
 
 class GameView(View):
-    name = "game"
+    name: ClassVar[str] = "game"
 
     def __init__(
-        self,
-        *,
-        context: Context,
-        **kwargs: Unpack[WidgetGroupKwargs],
+        self, *, context: Context, **kwargs: Unpack[UIElementKwargs]
     ) -> None:
+        self._default_properties(
+            {
+                "background_color": pr.Color(20, 20, 30, 255),
+            },
+            kwargs,
+        )
         super().__init__(context=context, **kwargs)
 
-        main_layout = VBox()
-
-        header = HBox(
-            width=dvw(100),
-            height=dvh(10),
-            style=WidgetStyle(padding=20),
-            spacing=dvw(20),
-            center=True,
-        )
-        header.add(
-            FixedTextView(
-                text="Score:",
-                width=dvw(10),
-                size=aspect_ratio(5),
-                color=pr.RED,
-                identifier="score",
-            ),
-            FixedTextView(
-                text="Level:",
-                width=dvw(10),
-                size=aspect_ratio(5),
-                color=pr.RED,
-                identifier="level",
-            ),
-            FixedTextView(
-                text="Time:",
-                width=dvw(10),
-                size=aspect_ratio(5),
-                color=pr.RED,
-                identifier="time",
-            ),
+        main_layout = UIVBox(
+            width="100%",
+            height="100%",
         )
 
-        self.game_container = WidgetGroup()
-
-        footer = HBox(
-            width=dvw(100),
-            height=dvh(10),
-            style=WidgetStyle(padding=20),
-            center=True,
-        )
-        footer.add(
-            FixedTextView(
-                text="Life:",
-                width=dvw(10),
-                size=aspect_ratio(5),
-                color=pr.RED,
-                identifier="life",
-            ),
+        self._game_container = UIElementGroup(
+            width="100%",
+            height="70%",
         )
 
-        main_layout.add(header)
-        main_layout.add(self.game_container)
-        main_layout.add(footer)
+        main_layout.add(
+            self._build_header(),
+            self._game_container,
+            self._build_footer(),
+        )
         self.add(main_layout)
 
-        self.game_panel: GamePanel | None = None
+        self._game_panel: GamePanel | None = None
         self.start_game()
 
+    def _build_header(self) -> UIHBox:
+        header = UIHBox(
+            width="100%",
+            height="15%",
+            properties={
+                "padding": 20.0,
+                "justify_content": "center",
+                "gap": 50.0,
+            },
+        )
+
+        text_props: UIElementPropertiesDef = {
+            "text_color": pr.RED,
+            "font_size": "30%",
+        }
+
+        self._score_text = Text(
+            text="Score: 0",
+            properties=text_props,
+        )
+        self._level_text = Text(
+            text="Level: 1",
+            properties=text_props,
+        )
+        self._time_text = Text(
+            text="Time: 0s",
+            properties=text_props,
+        )
+
+        header.add(self._score_text, self._level_text, self._time_text)
+        return header
+
+    def _build_footer(self) -> UIHBox:
+        footer = UIHBox(
+            width="100%",
+            height="15%",
+            properties={
+                "padding": 10.0,
+                "justify_content": "center",
+                "align_items": "center",
+            },
+        )
+        self._life_text = Text(
+            text="Life: 3",
+            properties={"text_color": pr.RED, "font_size": "30%"},
+        )
+        footer.add(self._life_text)
+        return footer
+
     def start_game(self) -> None:
-        self.game_container.clear()
-        self.game_panel = GamePanel(
-            width=dvw(100),
-            height=dvh(80),
-            on_game_over=self.game_over,
-            style=WidgetStyle(
-                border=0,
-                border_color=pr.GRAY,
-            ),
+        self._game_container.clear()
+        self._game_panel = GamePanel(
+            width="100%",
+            height="100%",
+            on_game_over=self._handle_game_over,
         )
-        self.game_container.add(self.game_panel)
+        if self._game_panel:
+            self._game_container.add(self._game_panel)
 
-    def game_over(self) -> None:
-        self.game_container.add(
-            GameOverOverlay(
-                width=dvw(100),
-                height=dvh(80),
-                on_restart=self.start_game,
-                center=True,
-                style=WidgetStyle(
-                    border=0,
-                    background_color=pr.Color(10, 10, 10, 200),
-                    border_color=pr.RED,
-                ),
-            )
+    def _handle_game_over(self) -> None:
+        overlay = GameOverOverlay(
+            on_restart=self.start_game,
+            width="100%",
+            height="100%",
         )
+        self._game_container.add(overlay)
 
-    def update(self) -> None:
-        super().update()
+    def _update_impl(self, dt: float) -> None:
+        super()._update_impl(dt)
 
-        if not self.game_panel:
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_ESCAPE):
+            self.event.emit(Event.SWITCH_VIEW, "menu")
+
+        if not self._game_panel:
             return
 
-        game = self.game_panel.game
+        game = self._game_panel.game
 
-        if w := self.get("life"):
-            if isinstance(w, FixedTextView):
-                w.text = f"Life: {game.life}"
-
-        if w := self.get("time"):
-            if isinstance(w, FixedTextView):
-                w.text = f"Time: {game.stage.remaining}s"
-
-        if w := self.get("level"):
-            if isinstance(w, FixedTextView):
-                w.text = f"Level: {game.stage.level}"
-
-        if w := self.get("score"):
-            if isinstance(w, FixedTextView):
-                w.text = f"Score: {game.score}"
+        self._life_text.properties.text_content = f"Life: {game.life}"
+        self._time_text.properties.text_content = (
+            f"Time: {game.stage.remaining}s"
+        )
+        self._level_text.properties.text_content = f"Level: {game.stage.level}"
+        self._score_text.properties.text_content = f"Score: {game.score}"

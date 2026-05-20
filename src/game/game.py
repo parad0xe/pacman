@@ -71,8 +71,8 @@ class Game(GamePort):
         for ghost in self.stage.ghosts:
             ghost.update(self.stage.player)
 
-            if (abs(ghost.pos.x - self.stage.player.pos.x) < .5 and
-                    abs(ghost.pos.y - self.stage.player.pos.y) < .5):
+            if (abs(ghost.pos.x - self.stage.player.pos.x) < 0.5 and
+                    abs(ghost.pos.y - self.stage.player.pos.y) < 0.5):
                 if self.stage.player.state == PlayerState.NORMAL:
                     return self.player_death()
                 else:
