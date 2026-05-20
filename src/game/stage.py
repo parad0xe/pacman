@@ -30,6 +30,10 @@ class Stage(StagePort):
         self._pacgums = [[0 if cell == 15 else 1
                           for cell in row]
                          for row in self.board]
+        self._pacgums[0][0] = 2
+        self._pacgums[len(self.board) - 1][0] = 2
+        self._pacgums[0][len(self.board[0]) - 1] = 2
+        self._pacgums[len(self.board) - 1][len(self.board[0]) - 1] = 2
 
         self._ghosts: list[GhostPort] = [
             Ghost(0, pathfinder, rl.RED, (0, 0)),
@@ -42,9 +46,6 @@ class Stage(StagePort):
                 (len(self.board) - 1, len(self.board[0]) - 1),
             ),
         ]
-
-        for i in self.board:
-            print(i, "\n")
 
     @property
     def level(self) -> int:

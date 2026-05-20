@@ -6,7 +6,7 @@ from src.context import Config
 from src.game.pathfinder import PathFinder
 from src.game.stage import Stage, StagePort
 from src.models.game import GamePort
-from src.models.ghost import GhostPort, GhostState
+from src.models.ghost import GhostPort
 from src.models.player import PlayerState
 
 
@@ -69,13 +69,10 @@ class Game(GamePort):
                 return 2
 
         for ghost in self.stage.ghosts:
-            if self.stage.player.state == PlayerState.SUPER:
-                ghost.update(GhostState.FLEE, self.stage.player)
-            else:
-                ghost.update(GhostState.HUNT, self.stage.player)
+            ghost.update(self.stage.player)
 
-            if (abs(ghost.pos.x - self.stage.player.pos.x) < 0.75 and
-                    abs(ghost.pos.y - self.stage.player.pos.y) < 0.75):
+            if (abs(ghost.pos.x - self.stage.player.pos.x) < 0.5 and
+                    abs(ghost.pos.y - self.stage.player.pos.y) < 0.5):
                 if self.stage.player.state == PlayerState.NORMAL:
                     return self.player_death()
                 else:

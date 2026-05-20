@@ -94,6 +94,7 @@ class GamePanel(UIElementGroup):
         **kwargs: Unpack[UIElementKwargs],
     ) -> None:
         super().__init__(**kwargs)
+
         self._on_game_over = on_game_over
         self._running = True
 
@@ -217,8 +218,6 @@ class GamePanel(UIElementGroup):
             self.boxes.content_box.y +
             (self.boxes.content_box.height - rows * cell_size) / 2.0
         )
-
-        pacgums = self.game.stage.pacgums
 
         pacgums = self.game.stage.pacgums
 

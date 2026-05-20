@@ -50,5 +50,6 @@ class GameOverOverlay(UIVBox):
 
     def _update_impl(self, dt: float) -> None:
         super()._update_impl(dt)
+
         if pr.is_key_pressed(pr.KeyboardKey.KEY_R):
             self.on_restart()
