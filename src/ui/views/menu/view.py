@@ -50,6 +50,12 @@ class MenuView(View):
         main_layout.add(
             self._build_header(),
             self._game_container,
+            Text(
+                text="Press SPACE to jump",
+                properties={
+                    "padding": 10,
+                },
+            ),
             self._build_footer(),
         )
         self.add(main_layout)
@@ -98,7 +104,7 @@ class MenuView(View):
 
         footer.add(
             Button(
-                text="Play",
+                text="Play (P)",
                 width="33.33%",
                 onclick=lambda: self.event.emit(Event.SWITCH_VIEW, "game"),
                 properties=btn_props,
@@ -111,7 +117,7 @@ class MenuView(View):
                 properties=btn_props,
             ),
             Button(
-                text="Quit",
+                text="Quit (Q)",
                 width="33.33%",
                 onclick=lambda: self.event.emit(Event.STOP),
                 properties=btn_props,

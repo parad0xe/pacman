@@ -14,7 +14,7 @@ def main() -> None:
     pr.init_window(W_WIDTH, W_HEIGHT, "Pac-Man")
 
     pr.set_window_min_size(800, 600)
-    pr.set_target_fps(60)
+    pr.set_target_fps(120)
 
     context = Context(config=Config(), event_bus=EventBus())
 
