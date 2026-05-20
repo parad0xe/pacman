@@ -2,87 +2,13 @@ import os
 from typing import Callable
 
 import pyray as pr
+from src.ui.views.game.animation import Animation, AnimTexturePack
 from typing_extensions import Unpack
 
 from src.game.game import Game
 from src.models.direction import Direction
 from src.ui.core.element.element import UIElementKwargs
 from src.ui.core.element.element_group import UIElementGroup
-
-
-class Animation:
-
-    def __init__(
-        self,
-        *,
-        frame_width: float,
-        frame_height: float,
-        max_frames: int,
-        direction_x: int,
-        direction_y: int,
-        index: int = 0,
-        offset_x: int = 0,
-        offset_y: int = 0,
-        once: bool = False,
-    ) -> None:
-        self.frame_width = frame_width
-        self.frame_height = frame_height
-        self.offset_x = offset_x
-        self.offset_y = offset_y
-        self.max_frames = max_frames
-        self.direction_x = direction_x
-        self.direction_y = direction_y
-        self.index = index
-        self.once = once
-
-    @property
-    def is_last_frame(self) -> bool:
-        return self.index == self.max_frames
-
-    @property
-    def done(self) -> bool:
-        return self.once and self.is_last_frame
-
-    def next(self) -> None:
-        if self.done:
-            return
-        if self.once:
-            self.index = self.index + 1
-        else:
-            self.index = (self.index + 1) % self.max_frames
-
-    def get_frame(self) -> pr.Rectangle:
-        return pr.Rectangle(
-            (self.frame_width * self.offset_x) +
-            (self.frame_width * self.index) * self.direction_x,
-            (self.frame_height * self.offset_y) +
-            (self.frame_height * self.index) * self.direction_y,
-            self.frame_width,
-            self.frame_height,
-        )
-
-
-class AnimTexturePack:
-
-    def __init__(
-        self,
-        *,
-        texture: pr.Texture,
-    ) -> None:
-        self.texture = texture
-
-    def render(self, animation: Animation, dest: pr.Rectangle) -> None:
-        if animation.done:
-            return
-
-        pr.draw_texture_pro(
-            self.texture,
-            animation.get_frame(),
-            dest,
-            pr.Vector2(0, 0),
-            0.0,
-            pr.WHITE,
-        )
 
 
 class GamePanel(UIElementGroup):
@@ -94,7 +20,6 @@ class GamePanel(UIElementGroup):
         **kwargs: Unpack[UIElementKwargs],
     ) -> None:
         super().__init__(**kwargs)
-
         self._on_game_over = on_game_over
         self._running = True
 
@@ -130,23 +55,36 @@ class GamePanel(UIElementGroup):
             direction_y=0,
             offset_x=0,
         )
-        self._ghost_anim = Animation(
-            frame_width=(self._animation.texture.width / 14),
-            frame_height=(self._animation.texture.height / 10),
-            max_frames=2,
-            direction_x=1,
-            direction_y=0,
-            offset_x=0,
-            offset_y=4,
-        )
+        self._ghost_anims: list[Animation] = []
+
+        for i, _ in enumerate(self.game.stage.ghosts):
+            self._ghost_anims.append(
+                Animation(
+                    frame_width=(self._animation.texture.width / 14),
+                    frame_height=(self._animation.texture.height / 10),
+                    max_frames=2,
+                    direction_x=1,
+                    direction_y=0,
+                    offset_x=0,
+                    offset_y=4 + i,
+                )
+            )
 
         # -- End Animation OBJECT
 
         self._player_frame_dt: float = 0.0
+        self._ghosts_frame_dt: float = 0.0
+        self._wait_frame_dt: float = 0.8
 
         self._last_player_position = pr.Vector2(
             self.game.stage.player.pos.x,
             self.game.stage.player.pos.y,
+        )
+
+    def _has_move(self) -> bool:
+        return (
+            self.game.stage.player.pos.x != self._last_player_position.x or
+            self.game.stage.player.pos.y != self._last_player_position.y
         )
 
     def _update_impl(self, dt: float) -> None:
@@ -155,23 +93,55 @@ class GamePanel(UIElementGroup):
         if not self._running:
             return
 
-        if not self.game.is_over:
-            self.game.update()
+        if not self.game.is_over and self._wait_frame_dt <= 0:
+            death = self.game.update()
+            if death == 2:
+                self._wait_frame_dt = 0.8
 
-        if self.game.stage.player.direction == Direction.EAST:
+        if self._wait_frame_dt > 0:
+            self._player_anim.index = 0
             self._player_anim.offset_y = 0
-        elif self.game.stage.player.direction == Direction.WEST:
-            self._player_anim.offset_y = 1
-        elif self.game.stage.player.direction == Direction.NORTH:
-            self._player_anim.offset_y = 2
-        elif self.game.stage.player.direction == Direction.SOUTH:
-            self._player_anim.offset_y = 3
+            self._player_anim.offset_x = 2
+            self._player_anim.max_frames = 1
+        elif self._has_move():
+            if self.game.stage.player.direction == Direction.EAST:
+                self._player_anim.offset_y = 0
+                self._player_anim.offset_x = 0
+                self._player_anim.max_frames = 2
+            elif self.game.stage.player.direction == Direction.WEST:
+                self._player_anim.offset_y = 1
+                self._player_anim.offset_x = 0
+                self._player_anim.max_frames = 2
+            elif self.game.stage.player.direction == Direction.NORTH:
+                self._player_anim.offset_y = 2
+                self._player_anim.offset_x = 0
+                self._player_anim.max_frames = 2
+            elif self.game.stage.player.direction == Direction.SOUTH:
+                self._player_anim.offset_y = 3
+                self._player_anim.offset_x = 0
+                self._player_anim.max_frames = 2
 
         if self.game.is_over:
             self._player_anim.offset_x = 2
             self._player_anim.offset_y = 0
             self._player_anim.max_frames = 12
             self._player_anim.once = True
+
+        for i, ghost in enumerate(self.game.stage.ghosts):
+            if ghost.direction == Direction.EAST:
+                self._ghost_anims[i].offset_x = 0
+            elif ghost.direction == Direction.WEST:
+                self._ghost_anims[i].offset_x = 2
+            elif ghost.direction == Direction.NORTH:
+                self._ghost_anims[i].offset_x = 4
+            elif ghost.direction == Direction.SOUTH:
+                self._ghost_anims[i].offset_x = 6
+
+            if self._ghosts_frame_dt >= 0.2:
+                self._ghost_anims[i].next()
+
+        if self._ghosts_frame_dt >= 0.2:
+            self._ghosts_frame_dt = 0
 
         if self._player_anim.done:
             self._on_game_over()
@@ -182,9 +152,7 @@ class GamePanel(UIElementGroup):
             self._super_pacgum_dt = 0.0
 
         if self._player_frame_dt >= 0.2:
-            if (self.game.stage.player.pos.x != self._last_player_position.x or
-                    self.game.stage.player.pos.y
-                    != self._last_player_position.y) or self.game.is_over:
+            if self._has_move() or self.game.is_over:
                 self._player_anim.next()
             self._player_frame_dt = 0
 
@@ -195,6 +163,8 @@ class GamePanel(UIElementGroup):
 
         self._super_pacgum_dt += dt
         self._player_frame_dt += dt
+        self._ghosts_frame_dt += dt
+        self._wait_frame_dt -= dt
 
     def _render_impl(self) -> None:
         super()._render_impl()
@@ -289,13 +259,15 @@ class GamePanel(UIElementGroup):
 
         # -- GHOSTS --
 
-        for ghost in self.game.stage.ghosts:
-            self._draw_entity(
-                ghost.pos,
-                cell_size,
-                start_x,
-                start_y,
-                ghost.color,
+        for i, ghost in enumerate(self.game.stage.ghosts):
+            self._animation.render(
+                self._ghost_anims[i],
+                pr.Rectangle(
+                    start_x + ghost.pos.x * cell_size,
+                    start_y + ghost.pos.y * cell_size,
+                    cell_size,
+                    cell_size,
+                ),
             )
 
     def _draw_entity(
