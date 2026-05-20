@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-from src.models.player import PlayerPort
-from src.models.direction import Direction
-
 from enum import Enum, auto
-from typing import Protocol, Optional
-
-from typing_extensions import TYPE_CHECKING
-
+from typing import TYPE_CHECKING, Optional, Protocol
 
 if TYPE_CHECKING:
     import pyray as rl
+
+from src.models.direction import Direction
+from src.models.player import PlayerPort
 
 
 class GhostState(Enum):
@@ -22,26 +19,39 @@ class GhostState(Enum):
 
 
 class GhostPort(Protocol):
-    @property
-    def pos(self) -> rl.Vector2: ...
 
     @property
-    def state(self) -> GhostState: ...
+    def pos(self) -> rl.Vector2:
+        ...
 
     @property
-    def corner(self) -> tuple[int, int]: ...
+    def state(self) -> GhostState:
+        ...
 
     @property
-    def current_path(self) -> list[Direction]: ...
+    def color(self) -> rl.Color:
+        ...
 
     @property
-    def direction(self) -> Direction: ...
+    def corner(self) -> tuple[int, int]:
+        ...
 
-    def reset_path(self) -> None: ...
+    @property
+    def current_path(self) -> list[Direction]:
+        ...
 
-    def reset_direction(self) -> None: ...
+    @property
+    def direction(self) -> Direction:
+        ...
 
-    def reset(self) -> None: ...
+    def reset_path(self) -> None:
+        ...
 
-    def update(self, state: Optional[GhostState], player: PlayerPort) -> None:
+    def reset_direction(self) -> None:
+        ...
+
+    def reset(self) -> None:
+        ...
+
+    def update(self, player: PlayerPort) -> None:
         ...

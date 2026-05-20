@@ -2,6 +2,7 @@ from src.models.player import PlayerPort, PlayerState
 from src.models.direction import Direction
 
 import pyray as rl
+from time import time
 
 
 class Player(PlayerPort):
@@ -9,6 +10,7 @@ class Player(PlayerPort):
         self._pos = rl.Vector2(pos[0], pos[1])
 
         self._state = PlayerState.NORMAL
+        self.state_timer = -1
 
         self._direction = Direction.IDLE
         self.key_buffer = rl.KeyboardKey.KEY_LEFT
@@ -35,8 +37,10 @@ class Player(PlayerPort):
     def state_switch(self) -> None:
         if self.state == PlayerState.NORMAL:
             self._state = PlayerState.SUPER
+            self.state_timer = time()
         else:
             self._state = PlayerState.NORMAL
+            self.state_timer = -1
 
     def cell(self) -> tuple[int, int]:
         """Current cell the player is on or nearest to."""
@@ -138,5 +142,7 @@ class Player(PlayerPort):
         self.update_key()
         self.update_direction(maze)
         self.update_pos(maze)
+        if self.state_timer != -1 and time() - self.state_timer > 5:
+           self.state_switch()
         self._frame += 1
         self._frame %= 5

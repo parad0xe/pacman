@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from src.models.direction import Direction
+from enum import Enum, auto
+from typing import Protocol
 
 from typing_extensions import TYPE_CHECKING
-from enum import Enum, auto
 
-from typing import Protocol
+from src.models.direction import Direction
+
 if TYPE_CHECKING:
     import pyray as rl
 
@@ -16,22 +17,31 @@ class PlayerState(Enum):
 
 
 class PlayerPort(Protocol):
-    @property
-    def pos(self) -> rl.Vector2: ...
 
     @property
-    def direction(self) -> Direction: ...
+    def pos(self) -> rl.Vector2:
+        ...
 
     @property
-    def frame(self) -> int: ...
+    def direction(self) -> Direction:
+        ...
 
     @property
-    def state(self) -> PlayerState: ...
+    def frame(self) -> int:
+        ...
 
-    def state_switch(self) -> None: ...
-    
-    def update(self, maze: list[list[int]]) -> None: ...
+    @property
+    def state(self) -> PlayerState:
+        ...
 
-    def cell(self) -> tuple[int, int]: ...
+    def state_switch(self) -> None:
+        ...
 
-    def on_cell(self) -> bool: ...
+    def update(self, maze: list[list[int]]) -> None:
+        ...
+
+    def cell(self) -> tuple[int, int]:
+        ...
+
+    def on_cell(self) -> bool:
+        ...
