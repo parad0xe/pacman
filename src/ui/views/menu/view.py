@@ -11,8 +11,8 @@ from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
 from src.ui.elements.button import Button
 from src.ui.elements.text import Text
-from src.ui.views.menu.overlay import GameOverOverlay
-from src.ui.views.menu.section import GameRenderer
+from src.ui.views.menu.components.overlay import GameOverOverlay
+from src.ui.views.menu.components.canvas import GameCanvas
 
 
 class MenuView(View):
@@ -82,7 +82,7 @@ class MenuView(View):
         )
 
         self.game_container.add(
-            GameRenderer(
+            GameCanvas(
                 game=cast(DinoRun, self._game),
                 width="100%",
                 height="100%",
