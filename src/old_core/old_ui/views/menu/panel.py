@@ -4,10 +4,10 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.game.dinorun import DinoRun
-from src.ui.core.element.element import UIElementKwargs
-from src.ui.core.element.element_group import UIElementGroup
-from src.ui.core.layout import UIHBox
-from src.ui.elements.text import Text
+from src.old_core.old_ui.core.element.element import UIElementKwargs
+from src.old_core.old_ui.core.element.element_group import UIElementGroup
+from src.old_core.old_ui.core.layout import UIHBox
+from src.old_core.old_ui.elements.text import Text
 
 
 class MenuGamePanel(UIElementGroup):

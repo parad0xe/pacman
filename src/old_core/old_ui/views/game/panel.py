@@ -2,13 +2,13 @@ import os
 from typing import Callable
 
 import pyray as pr
-from src.ui.views.game.animation import Animation, AnimTexturePack
+from src.old_core.old_ui.views.game.animation import Animation, AnimTexturePack
 from typing_extensions import Unpack
 
 from src.game.game import Game
 from src.models.direction import Direction
-from src.ui.core.element.element import UIElementKwargs
-from src.ui.core.element.element_group import UIElementGroup
+from src.old_core.old_ui.core.element.element import UIElementKwargs
+from src.old_core.old_ui.core.element.element_group import UIElementGroup
 
 
 class GamePanel(UIElementGroup):

@@ -2,7 +2,7 @@ from typing import Optional
 
 from mazegenerator import mazegenerator
 
-from src.context import Config
+from src.old_core.context import Config
 from src.game.pathfinder import PathFinder
 from src.game.stage import Stage, StagePort
 from src.models.game import GamePort

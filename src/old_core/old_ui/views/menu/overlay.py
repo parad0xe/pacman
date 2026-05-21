@@ -3,9 +3,9 @@ from typing import Callable
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui.core.element.element import UIElementKwargs
-from src.ui.core.layout import UIVBox
-from src.ui.elements.text import Text
+from src.old_core.old_ui.core.element.element import UIElementKwargs
+from src.old_core.old_ui.core.layout import UIVBox
+from src.old_core.old_ui.elements.text import Text
 
 
 class GameOverOverlay(UIVBox):
@@ -18,12 +18,13 @@ class GameOverOverlay(UIVBox):
     ) -> None:
         self._default_properties(
             {
-                "background_color": pr.Color(20, 20, 30, 200),
+                "background_color": pr.Color(0, 0, 0, 150),
                 "justify_content": "center",
             },
             kwargs,
         )
         super().__init__(**kwargs)
+
         self.on_restart = on_restart
 
         self.add(
@@ -33,7 +34,7 @@ class GameOverOverlay(UIVBox):
                 properties={
                     "text_color": pr.RED,
                     "text_align": "center",
-                    "font_size": "6%",
+                    "font_size": "15%",
                 },
             ),
             Text(
@@ -42,12 +43,13 @@ class GameOverOverlay(UIVBox):
                 properties={
                     "text_color": pr.WHITE,
                     "text_align": "center",
-                    "font_size": "4%",
+                    "font_size": "8%",
                 },
             ),
         )
 
     def _update_impl(self, dt: float) -> None:
         super()._update_impl(dt)
+
         if pr.is_key_pressed(pr.KeyboardKey.KEY_R):
             self.on_restart()

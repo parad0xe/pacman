@@ -1,153 +1,134 @@
-from typing import ClassVar
+from typing import Callable, ClassVar, Optional, cast
 
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.context import Context, Event
-from src.ui.core.element.base import UIElementPropertiesDef
-from src.ui.core.element.element import UIElementKwargs
-from src.ui.core.element.element_group import UIElementGroup
-from src.ui.core.layout import UIHBox, UIVBox
+from src.game.dinorun import DinoRun
+from src.context import Context
+from src.ui.core.element import ElementKwargs
+from src.ui.core.element_group import ElementGroup
+from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
 from src.ui.elements.button import Button
 from src.ui.elements.text import Text
 from src.ui.views.menu.overlay import GameOverOverlay
-from src.ui.views.menu.panel import MenuGamePanel
+from src.ui.views.menu.section import GameRenderer
 
 
 class MenuView(View):
     name: ClassVar[str] = "menu"
 
     def __init__(
-        self, *, context: Context, **kwargs: Unpack[UIElementKwargs]
+        self, *, context: Context, **kwargs: Unpack[ElementKwargs]
     ) -> None:
-        self._default_properties(
-            {
-                "background_color": pr.Color(20, 20, 30, 255),
-                "justify_content": "center",
-            },
-            kwargs,
-        )
-        super().__init__(context=context, **kwargs)
+        super().__init__(event=context.event, **kwargs)
+        self.properties.background_color = pr.Color(20, 20, 30, 255)
+        self.properties.justify_content = "center"
 
-        main_layout = UIVBox(
-            width="80%",
-            height="100%",
-            properties={
-                "align_items": "center",
-            },
-        )
+        self._game: Optional[DinoRun] = None
 
-        self._game_container = UIElementGroup(
-            width="100%",
-            height="50%",
-            properties={
-                "margin": 10,
-                "justify_content": "center",
-            },
-        )
+        main_layout = VBox(width="80%", height="100%")
+        main_layout.properties.align_items = "center"
+
+        header = HBox(width="100%", height="25%")
+        header.properties.justify_content = "center"
+        header.properties.padding = 20
+
+        header_title = Text(text="Pac-Man", width="100%", height="100%")
+        header_title.properties.font_size = "70%"
+        header_title.properties.text_color = pr.Color(54, 193, 231, 255)
+        header_title.properties.letter_spacing = 12
+        header.add(header_title)
+
+        self.game_container = ElementGroup(width="100%", height="50%")
+        self.game_container.properties.justify_content = "center"
+        self.game_container.properties.margin = 10
+
+        footer = HBox(width="100%", height="25%")
+        footer.properties.padding = 20
+        footer.properties.gap = 10
+        footer.properties.justify_content = "center"
+        footer.properties.align_items = "center"
+
+        footer_buttons = [
+            ("Play (P)", lambda: self.goto("game")),
+            ("Highscores", lambda: self.goto("highscores")),
+            ("Quit (Q)", lambda: self.quit()),
+        ]
+
+        for text, callback in footer_buttons:
+            footer.add(self._create_menu_button(text, callback))
 
         main_layout.add(
-            self._build_header(),
-            self._game_container,
+            header,
+            self.game_container,
             Text(
                 text="Press SPACE to jump",
                 properties={
                     "padding": 10,
                 },
             ),
-            self._build_footer(),
+            footer,
         )
         self.add(main_layout)
 
-        self.start_game()
+    def on_enter(self) -> None:
+        self.game_container.clear()
 
-    def _build_header(self) -> UIHBox:
-        header = UIHBox(
-            width="100%",
-            height="25%",
-            properties={
-                "padding": 20,
-                "justify_content": "center",
-            },
+        self._game = DinoRun(
+            self.boxes.content_box.width,
+            self.boxes.content_box.height,
+            on_game_over=self._on_game_over,
         )
-        header.add(
-            Text(
-                text="Pac-Man",
+
+        self.game_container.add(
+            GameRenderer(
+                game=cast(DinoRun, self._game),
                 width="100%",
                 height="100%",
                 properties={
-                    "font_size": "70%",
-                    "text_color": pr.Color(54, 193, 231, 255),
-                    "letter_spacing": 12,
+                    "border": 2,
                 },
-            ),
-        )
-        return header
-
-    def _build_footer(self) -> UIHBox:
-        footer = UIHBox(
-            width="100%",
-            height="25%",
-            properties={
-                "padding": 20,
-                "gap": 10,
-                "justify_content": "center",
-                "align_items": "center",
-            },
+            )
         )
 
-        btn_props: UIElementPropertiesDef = {
-            "font_size": 20,
-            "padding": 10,
-        }
+    def on_update(self, dt: float) -> None:
+        super().on_update(dt)
 
-        footer.add(
-            Button(
-                text="Play (P)",
-                width="33.33%",
-                onclick=lambda: self.event.emit(Event.SWITCH_VIEW, "game"),
-                properties=btn_props,
-            ),
-            Button(
-                text="Highscores",
-                width="33.33%",
-                onclick=lambda: self.event.
-                emit(Event.SWITCH_VIEW, "highscores"),
-                properties=btn_props,
-            ),
-            Button(
-                text="Quit (Q)",
-                width="33.33%",
-                onclick=lambda: self.event.emit(Event.STOP),
-                properties=btn_props,
-            ),
-        )
-        return footer
+        if not self._game:
+            return
 
-    def start_game(self) -> None:
-        self._game_container.clear()
+        self._game.update(dt)
 
-        game_panel = MenuGamePanel(
-            width="100%",
-            height="100%",
-            on_game_over=self._handle_game_over,
-            properties={
-                "border": 2,
-            },
-        )
-        self._game_container.add(game_panel)
+    def on_layout(
+        self,
+        parent_x: float,
+        parent_y: float,
+        parent_width: float,
+        parent_height: float,
+    ) -> None:
+        super().on_layout(parent_x, parent_y, parent_width, parent_height)
 
-    def _handle_game_over(self) -> None:
-        overlay = GameOverOverlay(
-            on_restart=self.start_game,
-            width="100%",
-            height="100%",
-        )
-        self._game_container.add(overlay)
+        if not self._game:
+            return
 
-    def _update_impl(self, dt: float) -> None:
-        super()._update_impl(dt)
+        self._game.width = self.game_container.boxes.content_box.width
+        self._game.height = self.game_container.boxes.content_box.height
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
-            self.event.emit(Event.SWITCH_VIEW, "game")
+    def on_exit(self) -> None:
+        self.game_container.clear()
+        self._game = None
+
+    def _create_menu_button(
+        self,
+        text: str,
+        action: Callable,
+    ) -> Button:
+        button = Button(text=text, width="33.33%", onclick=action)
+        button.properties.font_size = 20
+        button.properties.padding = 10
+        return button
+
+    def _on_game_over(self) -> None:
+        game_over_overlay = GameOverOverlay(on_restart=self.on_enter)
+        self.game_container.add(game_over_overlay)

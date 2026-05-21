@@ -1,14 +1,20 @@
 import random
+from typing import Callable
 
 import pyray as pr
 
 
 class DinoRun:
 
-    def __init__(self, width: float, height: float) -> None:
+    def __init__(
+        self, width: float, height: float, on_game_over: Callable[[], None]
+    ) -> None:
         self.radius = 30
         self.width = width
         self.height = height
+
+        self.on_game_over = on_game_over
+
         self.cacs: list[tuple[float, float]] = []
         self.ball_x: float = float(width / 2)
         self.ball_y: float = float(height - self.radius)
@@ -30,6 +36,26 @@ class DinoRun:
 
         self._last_width = width
         self._last_height = height
+
+    @property
+    def player(self) -> dict[str, float]:
+        return {
+            "x": self.ball_x,
+            "y": self.ball_y,
+            "radius": float(self.radius),
+        }
+
+    @property
+    def obstacles(self) -> list[dict[str, float]]:
+        return [
+            {
+                "x": x,
+                "y": float(self.height - 30),
+                "width": 30.0,
+                "height": 30.0,
+            }
+            for x, _ in self.cacs
+        ]
 
     def update(self, dt: float) -> None:
         time_step = dt * self.game_speed
@@ -56,10 +82,15 @@ class DinoRun:
             self.spawn_timer = 0.0
             self.time_to_next_spawn = random.uniform(0.4, 2.0)
 
+        floor_y = float(height - self.radius)
         if pr.is_key_down(pr.KeyboardKey.KEY_SPACE) and self.energy > 0:
             self.v = -self.jump_speed
             self.energy -= self.energy_consume_per_sec * dt
-        elif self.v == 0.0 and self.energy < self.energy_max:
+        elif (
+            self.v == 0.0
+            and self.ball_y == floor_y
+            and self.energy < self.energy_max
+        ):
             self.energy += self.energy_refill_per_sec * dt
 
         if self.energy < 0:
@@ -89,9 +120,11 @@ class DinoRun:
             if (x - (speed * time_step)) < 0:
                 self.score += 1
 
-        self.cacs = [(x - (speed * time_step), speed)
-                     for x, speed in self.cacs
-                     if (x - (speed * time_step)) >= 0]
+        self.cacs = [
+            (x - (speed * time_step), speed)
+            for x, speed in self.cacs
+            if (x - (speed * time_step)) >= 0
+        ]
 
         for cac_x, _ in self.cacs:
             cac_rec = pr.Rectangle(
@@ -101,4 +134,6 @@ class DinoRun:
                 30,
             )
             if pr.check_collision_recs(cac_rec, player_rec):
+                self.on_game_over()
                 self.is_over = True
+                break

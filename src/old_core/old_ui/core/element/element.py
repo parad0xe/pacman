@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Optional, TypedDict, cast
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui.core.element.base import (
+from src.old_core.old_ui.core.element.base import (
     UIElementBoxes,
     UIElementProperties,
     UIElementPropertiesDef,
@@ -13,7 +13,7 @@ from src.ui.core.element.base import (
 )
 
 if TYPE_CHECKING:
-    from src.ui.core.element.element_group import UIElementGroup
+    from src.old_core.old_ui.core.element.element_group import UIElementGroup
 
 
 class UIElementKwargs(TypedDict, total=False):

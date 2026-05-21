@@ -3,53 +3,41 @@ from typing import Callable
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui.core.element.element import UIElementKwargs
-from src.ui.core.layout import UIVBox
+from src.ui.core.element import ElementKwargs
+from src.ui.core.layout import VBox
 from src.ui.elements.text import Text
 
 
-class GameOverOverlay(UIVBox):
-
+class GameOverOverlay(VBox):
     def __init__(
         self,
         *,
         on_restart: Callable[[], None],
-        **kwargs: Unpack[UIElementKwargs],
-    ) -> None:
-        self._default_properties(
-            {
-                "background_color": pr.Color(0, 0, 0, 150),
-                "justify_content": "center",
-            },
-            kwargs,
-        )
+        **kwargs: Unpack[ElementKwargs],
+    ):
         super().__init__(**kwargs)
+        self.width = "100%"
+        self.height = "100%"
+        self.properties.justify_content = "center"
+        self.properties.align = "center"
+        self.properties.background_color = pr.Color(0, 0, 0, 150)
 
         self.on_restart = on_restart
 
-        self.add(
-            Text(
-                text="GAME OVER",
-                width="100%",
-                properties={
-                    "text_color": pr.RED,
-                    "text_align": "center",
-                    "font_size": "15%",
-                },
-            ),
-            Text(
-                text="Press R to restart",
-                width="100%",
-                properties={
-                    "text_color": pr.WHITE,
-                    "text_align": "center",
-                    "font_size": "8%",
-                },
-            ),
-        )
+        title = Text(text="GAME OVER", width="100%")
+        title.properties.font_size = "15%"
+        title.properties.text_color = pr.RED
+        title.properties.text_align = "center"
+        self.add(title)
 
-    def _update_impl(self, dt: float) -> None:
-        super()._update_impl(dt)
+        subtitle = Text(text="Press R to restart", width="100%")
+        subtitle.properties.font_size = "8%"
+        subtitle.properties.text_color = pr.WHITE
+        subtitle.properties.text_align = "center"
+        self.add(subtitle)
+
+    def on_update(self, dt: float) -> None:
+        super().on_update(dt)
 
         if pr.is_key_pressed(pr.KeyboardKey.KEY_R):
             self.on_restart()

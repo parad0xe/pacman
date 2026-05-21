@@ -3,16 +3,22 @@ from typing import Callable
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui.core.element import Element, ElementKwargs
+from src.old_core.old_ui.core.element.element import UIElementKwargs
+from src.old_core.old_ui.elements.text import Text
 
 
-class Button(Element):
+class Button(Text):
+
+    @property
+    def can_focus(self) -> bool:
+        return True
+
     def __init__(
         self,
         *,
         text: str,
         onclick: Callable[[], None],
-        **kwargs: Unpack[ElementKwargs],
+        **kwargs: Unpack[UIElementKwargs],
     ) -> None:
         self._default_properties(
             {
@@ -26,14 +32,11 @@ class Button(Element):
             },
             kwargs,
         )
-        super().__init__(**kwargs)
-        self.properties.text_content = text
-
-        self.can_focus = True
+        super().__init__(text=text, **kwargs)
         self.onclick = onclick
 
-    def on_update(self, dt: float) -> None:
-        super().on_update(dt)
+    def _update_impl(self, dt: float) -> None:
+        super()._update_impl(dt)
 
         if self.is_hovered:
             if pr.is_mouse_button_pressed(pr.MouseButton.MOUSE_BUTTON_LEFT):
@@ -42,9 +45,8 @@ class Button(Element):
         if self.is_focused and pr.is_key_pressed(pr.KeyboardKey.KEY_ENTER):
             self.onclick()
 
-    def on_render(self) -> None:
-        super().on_render()
-
+    def _render_impl(self) -> None:
+        super()._render_impl()
         if self.is_focused:
             pr.draw_rectangle_rounded(
                 self.boxes.padding_box,

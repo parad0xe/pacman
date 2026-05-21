@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from src.context import Context, Event
-from src.ui.views.menu.view import View
+from src.old_core.context import Context, Event
+from src.old_core.old_ui.views.menu.view import View
 
 
 class App:

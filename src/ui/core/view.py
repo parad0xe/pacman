@@ -1,39 +1,49 @@
-from typing import ClassVar
+from abc import ABC, abstractmethod
+from typing import ClassVar, Optional
 
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.context import Context, Event, EventBus
-from src.ui.core.element.element import UIElementKwargs
-from src.ui.core.element.element_group import UIElementGroup
+from src.event import AppEvent, Event
+from src.ui.core.element import ElementKwargs
+from src.ui.core.element_group import ElementGroup
 
 
-class View(UIElementGroup):
+class View(ElementGroup, ABC):
     name: ClassVar[str]
-
-    @property
-    def event(self) -> EventBus:
-        return self._context.event
 
     def __init__(
         self,
         *,
-        context: Context,
-        **kwargs: Unpack[UIElementKwargs],
+        event: Event,
+        **kwargs: Unpack[ElementKwargs],
     ) -> None:
         kwargs.setdefault("width", "100%")
         kwargs.setdefault("height", "100%")
         super().__init__(**kwargs)
-        self._context = context
+
+        self.event = event
+
         self._focus_index: int = 0
         self._last_mouse_position = pr.Vector2(-1, -1)
 
-    def _update_impl(self, dt: float) -> None:
-        super()._update_impl(dt)
+    @abstractmethod
+    def on_enter(self) -> None: ...
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_Q):
-            self.event.emit(Event.STOP)
+    @abstractmethod
+    def on_exit(self) -> None: ...
 
+    def on_update(self, dt: float) -> None:
+        super().on_update(dt)
+        self._update_focus()
+
+    def goto(self, name: str) -> None:
+        self.event.emit(AppEvent.SWITCH_VIEW, name)
+
+    def quit(self) -> None:
+        self.event.emit(AppEvent.STOP)
+
+    def _update_focus(self) -> None:
         focusables = self.get_focusables()
         if not focusables:
             return
@@ -42,8 +52,10 @@ class View(UIElementGroup):
             self._focus_index = len(focusables) - 1
 
         mouse_position = pr.get_mouse_position()
-        if (self._last_mouse_position.x != mouse_position.x or
-                self._last_mouse_position.y != mouse_position.y):
+        if (
+            self._last_mouse_position.x != mouse_position.x
+            or self._last_mouse_position.y != mouse_position.y
+        ):
             self._last_mouse_position = mouse_position
             for i, element in enumerate(focusables):
                 if element.is_hovered:
@@ -51,15 +63,51 @@ class View(UIElementGroup):
                     break
 
         if pr.is_key_pressed(pr.KeyboardKey.KEY_DOWN) or pr.is_key_pressed(
-                pr.KeyboardKey.KEY_RIGHT):
+            pr.KeyboardKey.KEY_RIGHT
+        ):
             self._focus_index = (self._focus_index + 1) % len(focusables)
         elif pr.is_key_pressed(pr.KeyboardKey.KEY_UP) or pr.is_key_pressed(
-                pr.KeyboardKey.KEY_LEFT):
+            pr.KeyboardKey.KEY_LEFT
+        ):
             self._focus_index = (self._focus_index - 1) % len(focusables)
 
         for i, element in enumerate(focusables):
             element.is_focused = i == self._focus_index
 
-    def _render_impl(self) -> None:
-        pr.clear_background(pr.BLACK)
-        super()._render_impl()
+
+class ViewManager:
+    def __init__(self, *, event: Event) -> None:
+        self._views: dict[str, View] = {}
+
+        self.current_view: Optional[View] = None
+
+        event.subscribe(AppEvent.SWITCH_VIEW, self._on_switch_view)
+
+    def register(self, view: View) -> None:
+        self._views[view.name] = view
+
+    def update(self, dt: float) -> None:
+        if self.current_view:
+            self.current_view.on_update(dt)
+            self.current_view.on_layout(
+                0.0, 0.0, pr.get_screen_width(), pr.get_screen_height()
+            )
+
+    def render(self) -> None:
+        if self.current_view:
+            pr.begin_drawing()
+            self.current_view.on_render()
+            pr.draw_fps(10, 10)
+            pr.end_drawing()
+
+    def _on_switch_view(self, view_name: str) -> None:
+        if self.current_view:
+            self.current_view.on_exit()
+
+        if view_name in self._views:
+            print(f"[INFO] switching view '{view_name}'")
+            self.current_view = self._views[view_name]
+            if self.current_view:
+                self.current_view.on_enter()
+        else:
+            print(f"[WARNING] the view '{view_name}' is not registered")

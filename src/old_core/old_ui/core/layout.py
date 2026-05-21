@@ -1,27 +1,21 @@
-from src.ui.core.element_group import ElementGroup
+from src.old_core.old_ui.core.element.element_group import UIElementGroup
 
 
-class VBox(ElementGroup):
-    def on_layout(
-            self,
-            parent_x: float,
-            parent_y: float,
-            parent_width: float,
-            parent_height: float,
+class UIVBox(UIElementGroup):
+
+    def _update_layout_impl(
+        self,
+        content_x: float,
+        content_y: float,
+        available_width: float,
+        available_height: float,
     ) -> None:
-        super().on_layout(
-            parent_x, parent_y, parent_width, parent_height
-        )
-
         max_child_width, total_child_height = 0.0, 0.0
 
         for child in self._children.values():
             child.x = 0.0
             child.y = 0.0
-            child.on_layout(
-                0.0, 0.0, self.boxes.content_box.width,
-                self.boxes.content_box.height
-            )
+            child.update_layout(0.0, 0.0, available_width, available_height)
             max_child_width = max(
                 max_child_width, child.boxes.margin_box.width
             )
@@ -35,23 +29,23 @@ class VBox(ElementGroup):
             self.boxes.content_box.width = max_child_width
             self.boxes.padding_box.width = max_child_width + (p.padding * 2)
             self.boxes.border_box.width = self.boxes.padding_box.width + (
-                    p.border * 2
+                p.border * 2
             )
             self.boxes.margin_box.width = self.boxes.border_box.width + (
-                    p.margin * 2
+                p.margin * 2
             )
 
         if self._resolved_height <= 0:
             self.boxes.content_box.height = total_height
             self.boxes.padding_box.height = total_height + (p.padding * 2)
             self.boxes.border_box.height = self.boxes.padding_box.height + (
-                    p.border * 2
+                p.border * 2
             )
             self.boxes.margin_box.height = self.boxes.border_box.height + (
-                    p.margin * 2
+                p.margin * 2
             )
 
-        self_width = self.boxes.content_box.width
+        available_width = self.boxes.content_box.width
         current_y = 0.0
 
         if p.justify_content == "center":
@@ -62,43 +56,36 @@ class VBox(ElementGroup):
         for child in self._children.values():
             child.y = current_y
             if p.align_items == "center":
-                child.x = (self_width - child.boxes.margin_box.width) / 2
+                child.x = (available_width - child.boxes.margin_box.width) / 2
             elif p.align_items == "end":
-                child.x = self_width - child.boxes.margin_box.width
+                child.x = available_width - child.boxes.margin_box.width
             else:
                 child.x = 0.0
 
-            child.on_layout(
+            child.update_layout(
                 self.boxes.content_box.x,
                 self.boxes.content_box.y,
-                self_width,
+                available_width,
                 self.boxes.content_box.height,
             )
             current_y += child.boxes.margin_box.height + p.gap
 
 
-class HBox(ElementGroup):
+class UIHBox(UIElementGroup):
 
-    def on_layout(
-            self,
-            parent_x: float,
-            parent_y: float,
-            parent_width: float,
-            parent_height: float,
+    def _update_layout_impl(
+        self,
+        content_x: float,
+        content_y: float,
+        available_width: float,
+        available_height: float,
     ) -> None:
-        super().on_layout(
-            parent_x, parent_y, parent_width, parent_height
-        )
-
         total_child_width, max_child_height = 0.0, 0.0
 
         for child in self._children.values():
             child.x = 0.0
             child.y = 0.0
-            child.on_layout(
-                0.0, 0.0, self.boxes.content_box.width,
-                self.boxes.content_box.height
-            )
+            child.update_layout(0.0, 0.0, available_width, available_height)
             total_child_width += child.boxes.margin_box.width
             max_child_height = max(
                 max_child_height, child.boxes.margin_box.height
@@ -112,23 +99,23 @@ class HBox(ElementGroup):
             self.boxes.content_box.width = total_width
             self.boxes.padding_box.width = total_width + (p.padding * 2)
             self.boxes.border_box.width = self.boxes.padding_box.width + (
-                    p.border * 2
+                p.border * 2
             )
             self.boxes.margin_box.width = self.boxes.border_box.width + (
-                    p.margin * 2
+                p.margin * 2
             )
 
         if self._resolved_height <= 0:
             self.boxes.content_box.height = max_child_height
             self.boxes.padding_box.height = max_child_height + (p.padding * 2)
             self.boxes.border_box.height = self.boxes.padding_box.height + (
-                    p.border * 2
+                p.border * 2
             )
             self.boxes.margin_box.height = self.boxes.border_box.height + (
-                    p.margin * 2
+                p.margin * 2
             )
 
-        self_height = self.boxes.content_box.height
+        available_height = self.boxes.content_box.height
         current_x = 0.0
 
         if p.justify_content == "center":
@@ -140,17 +127,17 @@ class HBox(ElementGroup):
             child.x = current_x
             if p.align_items == "center":
                 child.y = (
-                                  self_height - child.boxes.margin_box.height
-                          ) / 2
+                    available_height - child.boxes.margin_box.height
+                ) / 2
             elif p.align_items == "end":
-                child.y = self_height - child.boxes.margin_box.height
+                child.y = available_height - child.boxes.margin_box.height
             else:
                 child.y = 0.0
 
-            child.on_layout(
+            child.update_layout(
                 self.boxes.content_box.x,
                 self.boxes.content_box.y,
                 self.boxes.content_box.width,
-                self_height,
+                available_height,
             )
             current_x += child.boxes.margin_box.width + p.gap
