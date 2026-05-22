@@ -124,3 +124,7 @@ class GameCanvas(ElementGroup):
             )
 
         super().on_render()
+
+    def on_exit(self) -> None:
+        self.background_parallax.unload()
+        self.animation_texture.unload()

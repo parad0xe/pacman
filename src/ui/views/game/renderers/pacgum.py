@@ -20,16 +20,15 @@ class PacgumRenderer:
         self._super_pacgum_dt += dt
 
     def on_render(self) -> None:
-        start_x = self.coord_mapper.start_x
-        start_y = self.coord_mapper.start_y
-        cell_size = self.coord_mapper.cell_size
         rows, cols = self.coord_mapper.rows, self.coord_mapper.cols
 
         for y in range(rows):
             for x in range(cols):
+                real_position = self.coord_mapper.to_real_coords(x, y)
+
                 if self.pacgums[y][x] > 0:
-                    cx = start_x + x * cell_size + cell_size / 2
-                    cy = start_y + y * cell_size + cell_size / 2
+                    cx = real_position.x + self.coord_mapper.cell_size / 2
+                    cy = real_position.y + self.coord_mapper.cell_size / 2
                     color = pr.Color(180, 180, 10, 200)
 
                     if self.pacgums[y][x] == 2:

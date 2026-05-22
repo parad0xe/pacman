@@ -59,3 +59,7 @@ class Parallax:
             )
 
         pr.end_scissor_mode()
+
+    def unload(self) -> None:
+        for _, texture in self.textures:
+            pr.unload_texture(texture)

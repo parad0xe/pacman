@@ -98,6 +98,9 @@ class AnimationTexture:
             pr.WHITE,
         )
 
+    def unload(self) -> None:
+        pr.unload_texture(self.texture)
+
 
 class AnimationRegistry:
     def __init__(
@@ -125,3 +128,6 @@ class AnimationRegistry:
     def switch_to(self, name: str | int) -> None:
         if name in self.animations:
             self.current_animation = name
+
+    def unload(self) -> None:
+        self.animation_texture.unload()

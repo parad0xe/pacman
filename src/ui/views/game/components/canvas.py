@@ -49,7 +49,7 @@ class GameCanvas(ElementGroup):
             )
 
         self.maze_renderer = MazeRenderer(coord_mapper=self.coord_mapper)
-        self.pacgum_renderer = PacgumRenderer(
+        self.pacgums_renderer = PacgumRenderer(
             pacgums=self.game.stage.pacgums,
             coord_mapper=self.coord_mapper,
         )
@@ -73,13 +73,17 @@ class GameCanvas(ElementGroup):
         for ghost_renderer in self.ghosts:
             ghost_renderer.on_update(dt)
 
-        self.pacgum_renderer.on_update(dt)
+        self.pacgums_renderer.on_update(dt)
 
     def on_render(self) -> None:
         super().on_render()
+
         self.maze_renderer.on_render()
-        self.pacgum_renderer.on_render()
+        self.pacgums_renderer.on_render()
         self.player.on_render()
 
         for ghost_renderer in self.ghosts:
             ghost_renderer.on_render()
+
+    def on_exit(self) -> None:
+        self.animation_texture.unload()
