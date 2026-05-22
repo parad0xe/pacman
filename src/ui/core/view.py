@@ -37,7 +37,7 @@ class View(ElementGroup, ABC):
         super().on_update(dt)
         self._update_focus()
 
-    def goto(self, name: str) -> None:
+    def goto_view(self, name: str) -> None:
         self.event.emit(AppEvent.SWITCH_VIEW, name)
 
     def quit(self) -> None:

@@ -91,7 +91,7 @@ class GhostRenderer:
 
     def on_render(self) -> None:
         self.animations.render(
-            self.coord_mapper.maze_coord_real(
+            self.coord_mapper.to_real_coords(
                 self.ghost.pos.x, self.ghost.pos.y
             )
         )

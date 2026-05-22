@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import os
 from enum import Enum, auto
 
 import pyray as pr
+
+from ui.core.utils import load_texture_from_path
 
 
 class AnimationMode(Enum):
@@ -75,20 +76,7 @@ class AnimationTexture:
 
     @classmethod
     def from_path(cls, path: str) -> AnimationTexture:
-        if not os.path.isfile(path):
-            raise FileNotFoundError()
-
-        image = pr.load_image(path)
-        pr.image_format(
-            image,
-            pr.PixelFormat.PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,
-        )
-        pr.image_color_replace(
-            image,
-            pr.Color(0, 0, 0, 255),
-            pr.Color(0, 0, 0, 0),
-        )
-        return cls(texture=pr.load_texture_from_image(image))
+        return cls(texture=load_texture_from_path(path))
 
     def __init__(
         self,

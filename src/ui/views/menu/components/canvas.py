@@ -1,37 +1,34 @@
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.game.dinorun import DinoRun
+from src.game.jump_or_die import JumpOrDie
 from src.ui.animation import Animation, AnimationRegistry, AnimationTexture
 from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox
 from src.ui.elements.text import Text
+from ui.elements.progress_bar import ProgressBar
+from ui.parallax import Parallax
 
 
 class GameCanvas(ElementGroup):
-    def __init__(
-        self, *, game: DinoRun, **kwargs: Unpack[ElementKwargs]
-    ) -> None:
+    def __init__(self, *, game: JumpOrDie, **kwargs: Unpack[ElementKwargs]) -> None:
         super().__init__(**kwargs)
-        self._game = game
+        self.game = game
 
-        self.layers1: list[tuple[float, AnimationTexture]] = []
-        self.layers1_ox: list[float] = []
-        for i in range(6, 0, -1):
-            self.layers1.append(
-                (
-                    1.5 / i,
-                    AnimationTexture.from_path(
-                        f"assets/PineForestParallax/MorningLayer{i}.png"
-                    ),
-                )
-            )
-            self.layers1_ox.append(0)
-
-        self.animation_texture = AnimationTexture.from_path(
-            "assets/menu_player.png"
+        self.background_parallax = Parallax(
+            image_paths=[
+                "assets/PineForestParallax/MorningLayer6.png",
+                "assets/PineForestParallax/MorningLayer5.png",
+                "assets/PineForestParallax/MorningLayer4.png",
+                "assets/PineForestParallax/MorningLayer3.png",
+                "assets/PineForestParallax/MorningLayer2.png",
+                "assets/PineForestParallax/MorningLayer1.png",
+            ],
+            container=self.boxes.content_box,
         )
+
+        self.animation_texture = AnimationTexture.from_path("assets/menu_player.png")
         self.player_animations = AnimationRegistry(
             animation_texture=self.animation_texture,
             animations={
@@ -59,7 +56,17 @@ class GameCanvas(ElementGroup):
 
         self.hud = HBox(width="100%")
         self.hud.properties.padding = 15.0
+        self.hud.properties.gap = 50
         self.hud.properties.justify_content = "end"
+
+        self.progress = ProgressBar(
+            width=200,
+            height="100%",
+            max_value=self.game.energy_max,
+            current_value=self.game.energy,
+            color=pr.RED,
+        )
+        self.hud.add(self.progress)
 
         self.score_text = Text(text="Score: 0")
         self.score_text.properties.font_size = 24.0
@@ -72,66 +79,30 @@ class GameCanvas(ElementGroup):
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
 
-        if self._game.is_over:
+        if self.game.is_over or self.game.paused:
             return
 
+        self.background_parallax.on_update(dt)
+
+        self.progress.current_value = self.game.energy
+
         self.player_animations.switch_to("run")
-        if self._game.v < 0:
+        if self.game.v < 0:
             self.player_animations.switch_to("jump_up")
-        elif self._game.v > 0:
+        elif self.game.v > 0:
             self.player_animations.switch_to("jump_down")
 
         self.player_animations.next(dt)
 
-        self.score_text.properties.text_content = (
-            f"Score: {int(self._game.score)}"
-        )
-
-        for i, ox in enumerate(self.layers1_ox):
-            self.layers1_ox[i] += self.layers1[i][0]
-            if self.layers1_ox[i] >= self.boxes.content_box.width:
-                self.layers1_ox[i] = 0
+        self.score_text.properties.text_content = f"Score: {int(self.game.score)}"
 
     def on_render(self) -> None:
-        pr.begin_scissor_mode(
-            int(self.boxes.content_box.x),
-            int(self.boxes.content_box.y),
-            int(self.boxes.content_box.width),
-            int(self.boxes.content_box.height),
-        )
-
-        for (_, layer), ox in zip(self.layers1, self.layers1_ox):
-            pr.draw_texture_pro(
-                layer.texture,
-                pr.Rectangle(0, 0, layer.texture.width, layer.texture.height),
-                self.boxes.content_box,
-                pr.Vector2(ox, 0),
-                0,
-                pr.BLUE,
-            )
-
-            pr.draw_texture_pro(
-                layer.texture,
-                pr.Rectangle(0, 0, layer.texture.width, layer.texture.height),
-                pr.Rectangle(
-                    self.boxes.content_box.x + self.boxes.content_box.width,
-                    self.boxes.content_box.y,
-                    self.boxes.content_box.width,
-                    self.boxes.content_box.height,
-                ),
-                pr.Vector2(ox, 0),
-                0,
-                pr.BLUE,
-            )
-
-        pr.end_scissor_mode()
-
-        super().on_render()
+        self.background_parallax.on_render()
 
         base_x = self.boxes.content_box.x
         base_y = self.boxes.content_box.y
-        player = self._game.player
-        obstacles = self._game.obstacles
+        player = self.game.player
+        obstacles = self.game.obstacles
 
         # -- Player
         size = player["radius"] * self.boxes.content_box.height * 0.005
@@ -151,3 +122,5 @@ class GameCanvas(ElementGroup):
                 pr.Vector2(obstacle["width"], obstacle["height"]),
                 pr.RED,
             )
+
+        super().on_render()

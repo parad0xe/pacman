@@ -45,7 +45,7 @@ class MazeCoordinateMapper:
             + (self.real_coord.height - self.rows * self.cell_size) / 2.0
         )
 
-    def maze_coord_real(self, x: float, y: float) -> pr.Rectangle:
+    def to_real_coords(self, x: float, y: float) -> pr.Rectangle:
         return pr.Rectangle(
             self.start_x + self.cell_size * x,
             self.start_y + self.cell_size * y,

@@ -11,6 +11,7 @@ class ElementGroup(Element):
 
         self._is_updating: bool = False
         self._pending_adds: list[Element] = []
+        self._pending_removes: list[str] = []
         self._pending_clear: bool = False
 
     def add(self, *elements: Element) -> None:
@@ -21,6 +22,17 @@ class ElementGroup(Element):
         for element in elements:
             element.parent = self
             self._children[element.id] = element
+
+    def remove(self, *ids: str) -> None:
+        for id in ids:
+            if id not in self._children:
+                continue
+
+            if self._is_updating:
+                self._pending_removes.append(id)
+                continue
+
+            del self._children[id]
 
     def clear(self) -> None:
         if self._is_updating:
@@ -57,6 +69,10 @@ class ElementGroup(Element):
         if self._pending_adds:
             self.add(*self._pending_adds)
             self._pending_adds.clear()
+
+        if self._pending_removes:
+            self.remove(*self._pending_removes)
+            self._pending_removes.clear()
 
     def on_layout(
         self,

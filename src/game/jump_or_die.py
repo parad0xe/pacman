@@ -1,19 +1,24 @@
 import random
-from typing import Callable
+from enum import Enum, auto
 
 import pyray as pr
 
+from event import Event
 
-class DinoRun:
 
-    def __init__(
-        self, width: float, height: float, on_game_over: Callable[[], None]
-    ) -> None:
+class JumpOrDieEvent(Enum):
+    PAUSE = auto()
+    GAME_OVER = auto()
+
+
+class JumpOrDie:
+
+    def __init__(self, width: float, height: float) -> None:
         self.radius = 30
         self.width = width
         self.height = height
 
-        self.on_game_over = on_game_over
+        self.event = Event()
 
         self.cacs: list[tuple[float, float]] = []
         self.ball_x: float = float(width / 2)
@@ -29,6 +34,8 @@ class DinoRun:
 
         self.spawn_timer: float = 0.0
         self.time_to_next_spawn: float = random.uniform(1.0, 3.0)
+
+        self.paused: float = False
 
         self.is_over: bool = False
         self.score: int = 0
@@ -74,11 +81,16 @@ class DinoRun:
         if self.is_over:
             return
 
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+            self.paused = not self.paused
+            self.event.emit(JumpOrDieEvent.PAUSE, self.paused)
+
+        if self.paused:
+            return
+
         self.spawn_timer += dt
         if self.spawn_timer >= self.time_to_next_spawn:
-            self.cacs.append(
-                (float(width - self.radius), random.uniform(3.0, 5.0))
-            )
+            self.cacs.append((float(width - self.radius), random.uniform(3.0, 5.0)))
             self.spawn_timer = 0.0
             self.time_to_next_spawn = random.uniform(0.4, 2.0)
 
@@ -86,11 +98,7 @@ class DinoRun:
         if pr.is_key_down(pr.KeyboardKey.KEY_SPACE) and self.energy > 0:
             self.v = -self.jump_speed
             self.energy -= self.energy_consume_per_sec * dt
-        elif (
-            self.v == 0.0
-            and self.ball_y == floor_y
-            and self.energy < self.energy_max
-        ):
+        elif self.v == 0.0 and self.ball_y == floor_y and self.energy < self.energy_max:
             self.energy += self.energy_refill_per_sec * dt
 
         if self.energy < 0:
@@ -134,6 +142,6 @@ class DinoRun:
                 30,
             )
             if pr.check_collision_recs(cac_rec, player_rec):
-                self.on_game_over()
+                self.event.emit(JumpOrDieEvent.GAME_OVER)
                 self.is_over = True
                 break

@@ -87,7 +87,7 @@ class PacmanView(View):
         super().on_update(dt)
 
         if pr.is_key_pressed(pr.KeyboardKey.KEY_ZERO):
-            self.goto("menu")
+            self.goto_view("menu")
 
         if not self.game:
             return
