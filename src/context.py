@@ -7,9 +7,9 @@ from typing import Any, Callable
 class Config:
     width: int = 15
     height: int = 15
-    seed: int = 0
+    seed: int = -1
     time: int = 90
-    
+
 
 class EventBus:
     def __init__(self) -> None:

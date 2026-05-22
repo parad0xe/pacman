@@ -1,4 +1,4 @@
-import random
+from random import seed, randint
 from time import time
 from typing import Optional
 from enum import Enum, auto
@@ -15,7 +15,7 @@ class GameEvent(Enum):
     VICTORY = auto()
     NEXT_STAGE = auto()
     PLAYER_DEATH = auto()
-    
+
 
 class Game:
     def __init__(self, config: Optional[Config] = None) -> None:
@@ -23,16 +23,17 @@ class Game:
             config = Config()
         self.config = config
 
-        random.seed(config.seed)
+        seed(config.seed)
         self.mazegenerator = mazegenerator.MazeGenerator()
         self.path_finder = PathFinder()
-        
+
         self.level = 0
-        
+
     def newstage(self) -> None:
-        maze = self.mazegenerator.generate(random.randint(0, 1000000))
+        seed = self.config.seed if self.config.seed != -1 else randint(0, 100000)
+        self.mazegenerator.generate(seed)
         self.level += 1
-        self.stage = Stage(maze.maze, self.path_finder, self.level)
-        
+        self.stage = Stage(self.mazegenerator.maze, self.path_finder, self.level, self.config.time)
+
     def update(self) -> GameEvent:
         ...

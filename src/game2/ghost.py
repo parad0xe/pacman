@@ -23,19 +23,19 @@ class Ghost:
     def __init__(self,id: GhostID, path_finder: PathFinder, pos: tuple[int, int] = (0, 0)) -> None:
         self.id = id
 
-        self.pos = rl.Vector2(pos)
+        self.pos = rl.Vector2(pos[1], pos[0])
         self.direction = Direction.IDLE
         self.current_path: list[Direction] = []
-        self.corner = rl.Vector2(pos)
-        
+        self.corner = rl.Vector2(self.pos.x, self.pos.y)
+
         self.state: GhostState = GhostState.IDLE
 
         self.path_finder = path_finder
-        
+
         self.speed = 0.75
         self.retreat_timer = -1
 
-        
+
     def reset(self) -> None:
         self.direction = Direction.IDLE
         self.current_path = []
@@ -45,13 +45,13 @@ class Ghost:
 
     def cell(self) -> tuple[int, int]:
         """Current cell the ghost is on or nearest to."""
-        return (round(self._pos.x), round(self._pos.y))
+        return (round(self.pos.x), round(self.pos.y))
 
     def on_cell(self) -> bool:
         """True if the ghost is aligned on a cell."""
         return (
-            abs(self._pos.x - round(self._pos.x)) < self.speed and
-            abs(self._pos.y - round(self._pos.y)) < self.speed
+            abs(self.pos.x - round(self.pos.x)) < self.speed and
+            abs(self.pos.y - round(self.pos.y)) < self.speed
         )
 
     def follow_current_path(self) -> None:
@@ -73,7 +73,8 @@ class Ghost:
     def retreat(self) -> None:
         """Return to the ghost's corner."""
         start = self.cell()
-        self._current_path = self.path_finder.search(start, self.corner)
+        self._current_path = self.path_finder.search(start,
+            (int(self.corner.y), int(self.corner.x)))
         self._state = GhostState.RETREAT
 
     def update(self, player: Player) -> None:
