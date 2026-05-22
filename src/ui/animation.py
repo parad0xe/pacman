@@ -4,7 +4,7 @@ from enum import Enum, auto
 
 import pyray as pr
 
-from ui.core.utils import load_texture_from_path
+from src.ui.core.utils import load_texture_from_path
 
 
 class AnimationMode(Enum):

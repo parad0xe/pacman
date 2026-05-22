@@ -3,7 +3,7 @@ from src.ui.animation import (
     Animation,
     AnimationMode,
     AnimationRegistry,
-    AnimationTexture
+    AnimationTexture,
 )
 from src.ui.views.game.utils.mapper import MazeCoordinateMapper
 

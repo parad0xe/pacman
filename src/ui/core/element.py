@@ -8,7 +8,7 @@ from typing_extensions import Unpack
 from src.ui.core.base import (
     ElementBoxes,
     ElementProperties,
-    ElementPropertiesDef
+    ElementPropertiesDef,
 )
 from src.ui.core.utils import unique_id
 

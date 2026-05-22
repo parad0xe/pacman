@@ -1,9 +1,9 @@
 import pyray as pr
 from typing_extensions import Unpack
 
-from ui.core.element import ElementKwargs
-from ui.core.element_group import ElementGroup
-from ui.elements.text import Text
+from src.ui.core.element import ElementKwargs
+from src.ui.core.element_group import ElementGroup
+from src.ui.elements.text import Text
 
 
 class ProgressBar(ElementGroup):

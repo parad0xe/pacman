@@ -3,15 +3,13 @@ from src.ui.core.element_group import ElementGroup
 
 class VBox(ElementGroup):
     def on_layout(
-            self,
-            parent_x: float,
-            parent_y: float,
-            parent_width: float,
-            parent_height: float,
+        self,
+        parent_x: float,
+        parent_y: float,
+        parent_width: float,
+        parent_height: float,
     ) -> None:
-        super().on_layout(
-            parent_x, parent_y, parent_width, parent_height
-        )
+        super().on_layout(parent_x, parent_y, parent_width, parent_height)
 
         max_child_width, total_child_height = 0.0, 0.0
 
@@ -19,8 +17,10 @@ class VBox(ElementGroup):
             child.x = 0.0
             child.y = 0.0
             child.on_layout(
-                0.0, 0.0, self.boxes.content_box.width,
-                self.boxes.content_box.height
+                0.0,
+                0.0,
+                self.boxes.content_box.width,
+                self.boxes.content_box.height,
             )
             max_child_width = max(
                 max_child_width, child.boxes.margin_box.width
@@ -35,20 +35,20 @@ class VBox(ElementGroup):
             self.boxes.content_box.width = max_child_width
             self.boxes.padding_box.width = max_child_width + (p.padding * 2)
             self.boxes.border_box.width = self.boxes.padding_box.width + (
-                    p.border * 2
+                p.border * 2
             )
             self.boxes.margin_box.width = self.boxes.border_box.width + (
-                    p.margin * 2
+                p.margin * 2
             )
 
         if self._resolved_height <= 0:
             self.boxes.content_box.height = total_height
             self.boxes.padding_box.height = total_height + (p.padding * 2)
             self.boxes.border_box.height = self.boxes.padding_box.height + (
-                    p.border * 2
+                p.border * 2
             )
             self.boxes.margin_box.height = self.boxes.border_box.height + (
-                    p.margin * 2
+                p.margin * 2
             )
 
         self_width = self.boxes.content_box.width
@@ -80,15 +80,13 @@ class VBox(ElementGroup):
 class HBox(ElementGroup):
 
     def on_layout(
-            self,
-            parent_x: float,
-            parent_y: float,
-            parent_width: float,
-            parent_height: float,
+        self,
+        parent_x: float,
+        parent_y: float,
+        parent_width: float,
+        parent_height: float,
     ) -> None:
-        super().on_layout(
-            parent_x, parent_y, parent_width, parent_height
-        )
+        super().on_layout(parent_x, parent_y, parent_width, parent_height)
 
         total_child_width, max_child_height = 0.0, 0.0
 
@@ -96,8 +94,10 @@ class HBox(ElementGroup):
             child.x = 0.0
             child.y = 0.0
             child.on_layout(
-                0.0, 0.0, self.boxes.content_box.width,
-                self.boxes.content_box.height
+                0.0,
+                0.0,
+                self.boxes.content_box.width,
+                self.boxes.content_box.height,
             )
             total_child_width += child.boxes.margin_box.width
             max_child_height = max(
@@ -112,20 +112,20 @@ class HBox(ElementGroup):
             self.boxes.content_box.width = total_width
             self.boxes.padding_box.width = total_width + (p.padding * 2)
             self.boxes.border_box.width = self.boxes.padding_box.width + (
-                    p.border * 2
+                p.border * 2
             )
             self.boxes.margin_box.width = self.boxes.border_box.width + (
-                    p.margin * 2
+                p.margin * 2
             )
 
         if self._resolved_height <= 0:
             self.boxes.content_box.height = max_child_height
             self.boxes.padding_box.height = max_child_height + (p.padding * 2)
             self.boxes.border_box.height = self.boxes.padding_box.height + (
-                    p.border * 2
+                p.border * 2
             )
             self.boxes.margin_box.height = self.boxes.border_box.height + (
-                    p.margin * 2
+                p.margin * 2
             )
 
         self_height = self.boxes.content_box.height
@@ -139,9 +139,7 @@ class HBox(ElementGroup):
         for child in self._children.values():
             child.x = current_x
             if p.align_items == "center":
-                child.y = (
-                                  self_height - child.boxes.margin_box.height
-                          ) / 2
+                child.y = (self_height - child.boxes.margin_box.height) / 2
             elif p.align_items == "end":
                 child.y = self_height - child.boxes.margin_box.height
             else:

@@ -10,8 +10,8 @@ from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
 from src.ui.elements.text import Text
-from src.ui.views.game.components.overlay import GameOverOverlay
 from src.ui.views.game.components.canvas import GameCanvas
+from src.ui.views.game.components.overlay import GameOverOverlay
 
 
 class PacmanView(View):
@@ -108,5 +108,3 @@ class PacmanView(View):
     def _on_game_over(self) -> None:
         overlay = GameOverOverlay(on_restart=self.on_enter)
         self.game_container.add(overlay)
-
-

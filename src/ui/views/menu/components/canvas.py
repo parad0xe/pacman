@@ -6,9 +6,9 @@ from src.ui.animation import Animation, AnimationRegistry, AnimationTexture
 from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox
+from src.ui.elements.progress_bar import ProgressBar
 from src.ui.elements.text import Text
-from ui.elements.progress_bar import ProgressBar
-from ui.parallax import Parallax
+from src.ui.parallax import Parallax
 
 
 class GameCanvas(ElementGroup):

@@ -3,7 +3,7 @@ from enum import Enum, auto
 
 import pyray as pr
 
-from event import Event
+from src.event import Event
 
 
 class JumpOrDieEvent(Enum):

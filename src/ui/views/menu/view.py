@@ -3,9 +3,8 @@ from typing import Callable, ClassVar, Optional
 import pyray as pr
 from typing_extensions import Unpack
 
-from game.jump_or_die import JumpOrDieEvent
 from src.context import Context
-from src.game.jump_or_die import JumpOrDie
+from src.game.jump_or_die import JumpOrDie, JumpOrDieEvent
 from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox
@@ -13,8 +12,7 @@ from src.ui.core.view import View
 from src.ui.elements.button import Button
 from src.ui.elements.text import Text
 from src.ui.views.menu.components.canvas import GameCanvas
-from src.ui.views.menu.components.overlay import GameOverOverlay
-from ui.views.menu.components.overlay import PauseOverlay
+from src.ui.views.menu.components.overlay import GameOverOverlay, PauseOverlay
 
 
 class MenuView(View):
