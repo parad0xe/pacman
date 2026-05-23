@@ -48,7 +48,6 @@ class PacmanView(View):
         header.add(self._score_text, self._level_text, self._time_text)
 
         self.game_container = ElementGroup(width="100%", height="70%")
-        self.canvas: GameCanvas | None = None
         main_layout.add(self.game_container)
 
         footer = HBox(width="100%", height="15%")
@@ -69,10 +68,8 @@ class PacmanView(View):
         self.game_container.clear()
         self.game = Game()
 
-        if not self.game:
-            return
-
-        self.canvas = GameCanvas(
+        self.game_container.add(
+            GameCanvas(
                 game=self.game,
                 on_game_over=self._on_game_over,
                 width="100%",
@@ -81,9 +78,6 @@ class PacmanView(View):
                     "padding": 2,
                 },
             )
-
-        self.game_container.add(
-            self.canvas
         )
 
     def on_update(self, dt: float) -> None:
@@ -105,9 +99,9 @@ class PacmanView(View):
         self._score_text.properties.text_content = f"Score: {self.game.score}"
 
     def on_exit(self) -> None:
+        GameCanvas.unload()
+
         self.game_container.clear()
-        self.canvas.on_exit()
-        self.canvas = None
         self.game = None
 
     def _on_game_over(self) -> None:

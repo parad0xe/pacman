@@ -32,6 +32,7 @@ class Application:
             self.view_manager.update(pr.get_frame_time())
             self.view_manager.render()
 
+        self.view_manager.quit()
         pr.close_window()
 
     def _on_stop(self) -> None:

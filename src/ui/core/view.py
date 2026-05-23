@@ -100,6 +100,11 @@ class ViewManager:
             pr.draw_fps(10, 10)
             pr.end_drawing()
 
+    def quit(self) -> None:
+        if self.current_view:
+            self.current_view.on_exit()
+            self.current_view = None
+
     def _on_switch_view(self, view_name: str) -> None:
         if self.current_view:
             self.current_view.on_exit()

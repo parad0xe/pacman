@@ -4,8 +4,6 @@ from enum import Enum, auto
 
 import pyray as pr
 
-from src.ui.core.utils import load_texture_from_path
-
 
 class AnimationMode(Enum):
     INFINITE = auto()
@@ -73,11 +71,6 @@ class Animation:
 
 
 class AnimationTexture:
-
-    @classmethod
-    def from_path(cls, path: str) -> AnimationTexture:
-        return cls(texture=load_texture_from_path(path))
-
     def __init__(
         self,
         *,
@@ -97,9 +90,6 @@ class AnimationTexture:
             0.0,
             pr.WHITE,
         )
-
-    def unload(self) -> None:
-        pr.unload_texture(self.texture)
 
 
 class AnimationRegistry:
@@ -128,6 +118,3 @@ class AnimationRegistry:
     def switch_to(self, name: str | int) -> None:
         if name in self.animations:
             self.current_animation = name
-
-    def unload(self) -> None:
-        self.animation_texture.unload()

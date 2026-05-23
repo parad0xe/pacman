@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, ClassVar
 
 from typing_extensions import Unpack
 
@@ -8,6 +8,7 @@ from src.ui.animation import (
 )
 from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
+from src.ui.texture import TextureManager
 from src.ui.views.game.renderers.ghost import GhostRenderer
 from src.ui.views.game.renderers.maze import MazeRenderer
 from src.ui.views.game.renderers.pacgum import PacgumRenderer
@@ -16,6 +17,8 @@ from src.ui.views.game.utils.mapper import MazeCoordinateMapper
 
 
 class GameCanvas(ElementGroup):
+    _textures: ClassVar[TextureManager] = TextureManager()
+
     def __init__(
         self,
         *,
@@ -30,7 +33,9 @@ class GameCanvas(ElementGroup):
 
         self.coord_mapper = MazeCoordinateMapper(self.boxes.content_box, game)
 
-        self.animation_texture = AnimationTexture.from_path("assets/asset.png")
+        self.animation_texture = AnimationTexture(
+            texture=GameCanvas._textures.load("assets/asset.png")
+        )
         self.player = PlayerRenderer(
             player=self.game.stage.player,
             animation_texture=self.animation_texture,
@@ -85,5 +90,6 @@ class GameCanvas(ElementGroup):
         for ghost_renderer in self.ghosts:
             ghost_renderer.on_render()
 
-    def on_exit(self) -> None:
-        self.animation_texture.unload()
+    @staticmethod
+    def unload() -> None:
+        GameCanvas._textures.unload()

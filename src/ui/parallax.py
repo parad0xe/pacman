@@ -1,22 +1,20 @@
 import pyray as pr
 
-from src.ui.core.utils import load_texture_from_path
-
 
 class Parallax:
     def __init__(
         self,
         *,
-        image_paths: list[str],
+        textures: list[pr.Texture],
         container: pr.Rectangle,
-        fps: float = 50.,
+        fps: float = 50.0,
         dispersion: float = 1.05,
     ) -> None:
         self.container: pr.Rectangle = container
         self.textures: list[tuple[float, pr.Texture]] = []
         self.texture_origin_xs: list[float] = []
-        for i in range(len(image_paths)):
-            self.textures.append((fps * i, load_texture_from_path(image_paths[i])))
+        for i in range(len(textures)):
+            self.textures.append((fps * i, textures[i]))
             self.texture_origin_xs.append(0)
             fps = fps * dispersion
 
@@ -59,7 +57,3 @@ class Parallax:
             )
 
         pr.end_scissor_mode()
-
-    def unload(self) -> None:
-        for _, texture in self.textures:
-            pr.unload_texture(texture)

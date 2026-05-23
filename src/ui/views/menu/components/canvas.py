@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 import pyray as pr
 from typing_extensions import Unpack
 
@@ -9,26 +11,46 @@ from src.ui.core.layout import HBox
 from src.ui.elements.progress_bar import ProgressBar
 from src.ui.elements.text import Text
 from src.ui.parallax import Parallax
+from src.ui.texture import TextureManager
 
 
 class GameCanvas(ElementGroup):
-    def __init__(self, *, game: JumpOrDie, **kwargs: Unpack[ElementKwargs]) -> None:
+    _textures: ClassVar[TextureManager] = TextureManager()
+
+    def __init__(
+        self, *, game: JumpOrDie, **kwargs: Unpack[ElementKwargs]
+    ) -> None:
         super().__init__(**kwargs)
         self.game = game
 
         self.background_parallax = Parallax(
-            image_paths=[
-                "assets/PineForestParallax/MorningLayer6.png",
-                "assets/PineForestParallax/MorningLayer5.png",
-                "assets/PineForestParallax/MorningLayer4.png",
-                "assets/PineForestParallax/MorningLayer3.png",
-                "assets/PineForestParallax/MorningLayer2.png",
-                "assets/PineForestParallax/MorningLayer1.png",
+            textures=[
+                GameCanvas._textures.load(
+                    "assets/PineForestParallax/MorningLayer6.png"
+                ),
+                GameCanvas._textures.load(
+                    "assets/PineForestParallax/MorningLayer5.png"
+                ),
+                GameCanvas._textures.load(
+                    "assets/PineForestParallax/MorningLayer4.png"
+                ),
+                GameCanvas._textures.load(
+                    "assets/PineForestParallax/MorningLayer3.png"
+                ),
+                GameCanvas._textures.load(
+                    "assets/PineForestParallax/MorningLayer2.png"
+                ),
+                GameCanvas._textures.load(
+                    "assets/PineForestParallax/MorningLayer1.png"
+                ),
             ],
             container=self.boxes.content_box,
         )
 
-        self.animation_texture = AnimationTexture.from_path("assets/menu_player.png")
+        self.animation_texture = AnimationTexture(
+            texture=GameCanvas._textures.load("assets/menu_player.png")
+        )
+
         self.player_animations = AnimationRegistry(
             animation_texture=self.animation_texture,
             animations={
@@ -94,7 +116,9 @@ class GameCanvas(ElementGroup):
 
         self.player_animations.next(dt)
 
-        self.score_text.properties.text_content = f"Score: {int(self.game.score)}"
+        self.score_text.properties.text_content = (
+            f"Score: {int(self.game.score)}"
+        )
 
     def on_render(self) -> None:
         self.background_parallax.on_render()
@@ -125,6 +149,6 @@ class GameCanvas(ElementGroup):
 
         super().on_render()
 
-    def on_exit(self) -> None:
-        self.background_parallax.unload()
-        self.animation_texture.unload()
+    @staticmethod
+    def unload() -> None:
+        GameCanvas._textures.unload()

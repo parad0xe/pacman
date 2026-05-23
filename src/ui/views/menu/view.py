@@ -46,10 +46,10 @@ class MenuView(View):
         header_subtitle.properties.letter_spacing = 12
         header.add(header_subtitle)
 
-        self.canvas = ElementGroup(width="100%", height="50%")
-        self.canvas.properties.justify_content = "center"
-        self.canvas.properties.margin = 10
-        self.canvas.properties.border = 2
+        self.main_content = ElementGroup(width="100%", height="50%")
+        self.main_content.properties.justify_content = "center"
+        self.main_content.properties.margin = 10
+        self.main_content.properties.border = 2
 
         footer = HBox(width="100%", height="25%")
         footer.properties.padding = 20
@@ -66,11 +66,11 @@ class MenuView(View):
         for text, callback in footer_buttons:
             footer.add(self._create_menu_button(text, callback))
 
-        main_layout.add(header, self.canvas, footer)
+        main_layout.add(header, self.main_content, footer)
         self.add(main_layout)
 
     def on_enter(self) -> None:
-        self.canvas.add(
+        self.main_content.add(
             Text(
                 text="Press SPACE to start",
                 height="100%",
@@ -89,29 +89,19 @@ class MenuView(View):
                 self._on_start_game()
             return
 
+        self.game.width = self.main_content.boxes.content_box.width
+        self.game.height = self.main_content.boxes.content_box.height
+
         self.game.update(dt)
 
-    def on_layout(
-        self,
-        parent_x: float,
-        parent_y: float,
-        parent_width: float,
-        parent_height: float,
-    ) -> None:
-        super().on_layout(parent_x, parent_y, parent_width, parent_height)
-
-        if not self.game:
-            return
-
-        self.game.width = self.canvas.boxes.content_box.width
-        self.game.height = self.canvas.boxes.content_box.height
-
     def on_exit(self) -> None:
-        self.canvas.clear()
+        GameCanvas.unload()
+
+        self.main_content.clear()
         self.game = None
 
     def _on_start_game(self) -> None:
-        self.canvas.clear()
+        self.main_content.clear()
 
         self.game = JumpOrDie(
             self.boxes.content_box.width,
@@ -120,7 +110,7 @@ class MenuView(View):
         self.game.event.subscribe(JumpOrDieEvent.PAUSE, self._on_pause_toggle)
         self.game.event.subscribe(JumpOrDieEvent.GAME_OVER, self._on_game_over)
 
-        self.canvas.add(
+        self.main_content.add(
             GameCanvas(
                 game=self.game,
                 width="100%",
@@ -128,7 +118,7 @@ class MenuView(View):
             ),
             Text(
                 text="Press SPACE to jump",
-                y=self.canvas.boxes.border_box.height,
+                y=self.main_content.boxes.border_box.height,
                 properties={
                     "padding": 20,
                     "text_color": pr.GRAY,
@@ -138,13 +128,13 @@ class MenuView(View):
 
     def _on_pause_toggle(self, paused: bool) -> None:
         if paused:
-            self.canvas.add(PauseOverlay(id="pause"))
+            self.main_content.add(PauseOverlay(id="pause"))
         else:
-            self.canvas.remove("pause")
+            self.main_content.remove("pause")
 
     def _on_game_over(self) -> None:
         game_over_overlay = GameOverOverlay(on_restart=self._on_start_game)
-        self.canvas.add(game_over_overlay)
+        self.main_content.add(game_over_overlay)
 
     def _create_menu_button(
         self,
