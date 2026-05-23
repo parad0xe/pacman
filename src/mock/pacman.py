@@ -468,6 +468,7 @@ class Game:
         self.level = 0
         self.stage: Stage = self.newstage()
         self.is_over = False
+        self.is_paused = False
 
     def newstage(self) -> Stage:
         self.mazegenerator.generate()
@@ -479,6 +480,9 @@ class Game:
     def update(self, dt: float) -> GameEvent:
         if self.is_over:
             return GameEvent.GAME_OVER
+
+        if self.is_paused:
+            return GameEvent.NONE
 
         if rl.is_key_pressed(rl.KeyboardKey.KEY_S) and self.stage:
             self.stage.trigger_super_mode(duration=5.0)

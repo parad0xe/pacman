@@ -94,6 +94,13 @@ class PacmanView(View):
         if not self.game:
             return
 
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+            self.game.is_paused = not self.game.is_paused
+            if self.game.is_paused:
+                self._on_select_action()
+            else:
+                self.overlays.clear()
+
         self._life_text.properties.text_content = f"Life: {self.game.life}"
         self._time_text.properties.text_content = (
             f"Time: {self.game.stage.remaining}s"
