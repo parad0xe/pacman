@@ -67,7 +67,7 @@ class InputText(ElementGroup):
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_ENTER):
+        if self.is_focused and pr.is_key_pressed(pr.KeyboardKey.KEY_ENTER):
             self.on_submit()
 
         self.label.y = (

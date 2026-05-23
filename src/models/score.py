@@ -23,6 +23,8 @@ def save_highscores(file_path: str | Path, scores: Highscores) -> None:
     if isinstance(file_path, str):
         file_path = Path(file_path)
 
+    scores.scores = scores.scores[:20]
+
     try:
         file_write_json(file_path, scores.model_dump())
     except ValidationError as e:

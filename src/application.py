@@ -4,6 +4,7 @@ from src.context import Config, Context
 from src.event import AppEvent
 from src.ui.core.view import ViewManager
 from src.ui.views.game.view import PacmanView
+from src.ui.views.highscores.view import HighscoreView
 from src.ui.views.menu.view import MenuView
 
 
@@ -21,6 +22,7 @@ class Application:
         self.view_manager = ViewManager(event=self.context.event)
         self.view_manager.register(MenuView(context=self.context))
         self.view_manager.register(PacmanView(context=self.context))
+        self.view_manager.register(HighscoreView(context=self.context))
 
         self.context.event.subscribe(AppEvent.STOP, self._on_stop)
         self.context.event.emit(AppEvent.SWITCH_VIEW, "menu")

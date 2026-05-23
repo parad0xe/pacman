@@ -59,9 +59,9 @@ class MenuView(View):
         footer.properties.align_items = "center"
 
         footer_buttons = [
-            ("Play (P)", lambda: self.goto_view("game")),
-            ("Highscores", lambda: self.goto_view("highscores")),
-            ("Quit (Q)", lambda: self.quit()),
+            ("Play (M)", lambda: self.goto_view("game")),
+            ("Highscores (H)", lambda: self.goto_view("highscores")),
+            ("Quit (Esc)", lambda: self.quit()),
         ]
 
         for text, callback in footer_buttons:
@@ -87,6 +87,11 @@ class MenuView(View):
 
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
+
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_M):
+            self.goto_view("game")
+        elif pr.is_key_pressed(pr.KeyboardKey.KEY_H):
+            self.goto_view("highscores")
 
         if not self.game:
             if pr.is_key_pressed(pr.KeyboardKey.KEY_SPACE):
@@ -116,20 +121,32 @@ class MenuView(View):
         self.game.event.subscribe(JumpOrDieEvent.PAUSE, self._on_pause_toggle)
         self.game.event.subscribe(JumpOrDieEvent.GAME_OVER, self._on_game_over)
 
+        helper = HBox(y=self.main_content.boxes.border_box.height)
+        helper.properties.gap = 20
+        helper.add(
+            Text(
+                text="Press SPACE to jump",
+                properties={
+                    "padding": 20,
+                    "text_color": pr.GRAY,
+                },
+            ),
+            Text(
+                text="Press P to pause",
+                properties={
+                    "padding": 20,
+                    "text_color": pr.GRAY,
+                },
+            ),
+        )
+
         self.main_content.add(
             GameCanvas(
                 game=self.game,
                 width="100%",
                 height="100%",
             ),
-            Text(
-                text="Press SPACE to jump",
-                y=self.main_content.boxes.border_box.height,
-                properties={
-                    "padding": 20,
-                    "text_color": pr.GRAY,
-                },
-            ),
+            helper,
         )
         self.main_content.add(self.overlays)
 
@@ -148,6 +165,6 @@ class MenuView(View):
         action: Callable,
     ) -> Button:
         button = Button(text=text, width="33.33%", onclick=action)
-        button.properties.font_size = 20
+        button.properties.font_size = 24
         button.properties.padding = 10
         return button

@@ -26,6 +26,8 @@ class ElementKwargs(TypedDict, total=False):
 
 
 class Element(ABC):
+    default_font: Optional[pr.Font] = None
+
     def __init__(self, **kwargs: Unpack[ElementKwargs]) -> None:
         self.id = kwargs.get("id") or unique_id()
         self.x = kwargs.get("x") or 0.0
@@ -47,6 +49,20 @@ class Element(ABC):
         self._resolved_width = 0.0
         self._resolved_height = 0.0
         self._resolved_font_size = 0.0
+
+        self._text_cache: dict[str, Any] = {
+            "text": None,
+            "font": None,
+            "resolved_font_size": -1.0,
+            "letter_spacing": -1.0,
+            "computed_width": 0.0,
+            "computed_height": 0.0,
+        }
+
+        if not self.properties.font and not Element.default_font:
+            Element.default_font = pr.load_font(
+                "assets/fonts/pixel-medium.ttf"
+            )
 
     def on_update(self, dt: float) -> None:
         self.is_hovered = pr.check_collision_point_rec(
@@ -73,14 +89,7 @@ class Element(ABC):
 
         content_width, content_height = 0.0, 0.0
         if self.properties.text_content:
-            font = self.properties.font or pr.get_font_default()
-            size = pr.measure_text_ex(
-                font,
-                self.properties.text_content,
-                float(self._resolved_font_size),
-                self.properties.letter_spacing,
-            )
-            content_width, content_height = size.x, size.y
+            content_width, content_height = self._measure_text()
 
         if self._resolved_width <= 0:
             final_width = (
@@ -158,24 +167,21 @@ class Element(ABC):
             self.properties.text_content
             and float(self._resolved_font_size) > 0
         ):
-            font = self.properties.font or pr.get_font_default()
-            text_size = pr.measure_text_ex(
-                font,
-                self.properties.text_content,
-                float(self._resolved_font_size),
-                self.properties.letter_spacing,
-            )
-
+            text_width, text_height = self._measure_text()
             text_pos_x = self.boxes.content_box.x
+
             if self.properties.text_align == "center":
-                text_pos_x += (self.boxes.content_box.width - text_size.x) / 2
+                text_pos_x += (self.boxes.content_box.width - text_width) / 2
+
             elif self.properties.text_align == "right":
-                text_pos_x += self.boxes.content_box.width - text_size.x
+                text_pos_x += self.boxes.content_box.width - text_width
 
             text_pos_y = (
                 self.boxes.content_box.y
-                + (self.boxes.content_box.height - text_size.y) / 2
+                + (self.boxes.content_box.height - text_height) / 2
             )
+
+            font = self.properties.font or Element.default_font
 
             pr.draw_text_ex(
                 font,
@@ -206,3 +212,40 @@ class Element(ABC):
             return float(size)
         except ValueError:
             raise Exception(f"Invalid element size: <{size}>")
+
+    def _measure_text(self) -> tuple[float, float]:
+        text = self.properties.text_content
+
+        if not text:
+            return 0.0, 0.0
+
+        font = self.properties.font or Element.default_font
+
+        cache_valid = (
+            self._text_cache["text"] == text
+            and self._text_cache["font"] == font
+            and self._text_cache["resolved_font_size"]
+            == self._resolved_font_size
+            and self._text_cache["letter_spacing"]
+            == self.properties.letter_spacing
+        )
+
+        if not cache_valid:
+            size = pr.measure_text_ex(
+                font,
+                text,
+                float(self._resolved_font_size),
+                self.properties.letter_spacing,
+            )
+
+            self._text_cache["text"] = text
+            self._text_cache["font"] = font
+            self._text_cache["resolved_font_size"] = self._resolved_font_size
+            self._text_cache["letter_spacing"] = self.properties.letter_spacing
+            self._text_cache["computed_width"] = size.x
+            self._text_cache["computed_height"] = size.y
+
+        return (
+            self._text_cache["computed_width"],
+            self._text_cache["computed_height"],
+        )
