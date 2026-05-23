@@ -11,8 +11,9 @@ from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
 from src.ui.elements.button import Button
 from src.ui.elements.text import Text
-from src.ui.views.menu.components.canvas import GameCanvas
-from src.ui.views.menu.components.overlay import GameOverOverlay, PauseOverlay
+from src.ui.views.menu.canvas import GameCanvas
+from src.ui.views.menu.overlays.game_over import GameOverOverlay
+from src.ui.views.menu.overlays.pause import PauseOverlay
 
 
 class MenuView(View):
@@ -67,6 +68,9 @@ class MenuView(View):
             footer.add(self._create_menu_button(text, callback))
 
         main_layout.add(header, self.main_content, footer)
+
+        self.overlays = ElementGroup(width="100%", height="100%")
+
         self.add(main_layout)
 
     def on_enter(self) -> None:
@@ -98,9 +102,11 @@ class MenuView(View):
         GameCanvas.unload()
 
         self.main_content.clear()
+        self.overlays.clear()
         self.game = None
 
     def _on_start_game(self) -> None:
+        self.overlays.clear()
         self.main_content.clear()
 
         self.game = JumpOrDie(
@@ -125,16 +131,16 @@ class MenuView(View):
                 },
             ),
         )
+        self.main_content.add(self.overlays)
 
     def _on_pause_toggle(self, paused: bool) -> None:
         if paused:
-            self.main_content.add(PauseOverlay(id="pause"))
+            self.overlays.add(PauseOverlay())
         else:
-            self.main_content.remove("pause")
+            self.overlays.clear()
 
     def _on_game_over(self) -> None:
-        game_over_overlay = GameOverOverlay(on_restart=self._on_start_game)
-        self.main_content.add(game_over_overlay)
+        self.overlays.add(GameOverOverlay(on_restart=self._on_start_game))
 
     def _create_menu_button(
         self,

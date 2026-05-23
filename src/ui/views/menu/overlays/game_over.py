@@ -25,13 +25,13 @@ class GameOverOverlay(VBox):
         self.on_restart = on_restart
 
         title = Text(text="GAME OVER", width="100%")
-        title.properties.font_size = "15%"
+        title.properties.font_size = 40
         title.properties.text_color = pr.RED
         title.properties.text_align = "center"
         self.add(title)
 
         subtitle = Text(text="Press R to restart", width="100%")
-        subtitle.properties.font_size = "8%"
+        subtitle.properties.font_size = 20
         subtitle.properties.text_color = pr.WHITE
         subtitle.properties.text_align = "center"
         self.add(subtitle)
@@ -41,19 +41,3 @@ class GameOverOverlay(VBox):
 
         if pr.is_key_pressed(pr.KeyboardKey.KEY_R):
             self.on_restart()
-
-
-class PauseOverlay(VBox):
-    def __init__(self, **kwargs: Unpack[ElementKwargs]):
-        super().__init__(**kwargs)
-        self.width = "100%"
-        self.height = "100%"
-        self.properties.justify_content = "center"
-        self.properties.align = "center"
-        self.properties.background_color = pr.Color(0, 0, 0, 150)
-
-        title = Text(text="Pause", width="100%")
-        title.properties.font_size = "15%"
-        title.properties.text_color = pr.RED
-        title.properties.text_align = "center"
-        self.add(title)

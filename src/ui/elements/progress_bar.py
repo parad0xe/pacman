@@ -38,7 +38,9 @@ class ProgressBar(ElementGroup):
 
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
-        self.progress_text.properties.text_content = f"{self.current_value:.1f} / {self.max_value:.1f}"
+        self.progress_text.properties.text_content = (
+            f"{self.current_value:.1f} / {self.max_value:.1f}"
+        )
 
     def on_render(self) -> None:
         pr.draw_rectangle_v(

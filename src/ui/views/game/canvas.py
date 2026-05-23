@@ -9,11 +9,11 @@ from src.ui.animation import (
 from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.texture import TextureManager
+from src.ui.views.game.coord_util import MazeCoordinateMapper
 from src.ui.views.game.renderers.ghost import GhostRenderer
 from src.ui.views.game.renderers.maze import MazeRenderer
 from src.ui.views.game.renderers.pacgum import PacgumRenderer
 from src.ui.views.game.renderers.player import PlayerRenderer
-from src.ui.views.game.utils.mapper import MazeCoordinateMapper
 
 
 class GameCanvas(ElementGroup):

@@ -5,7 +5,7 @@ from src.event import Event
 
 @dataclass
 class Config:
-    pass
+    score_file: str = "scores.json"
 
 
 class Context:

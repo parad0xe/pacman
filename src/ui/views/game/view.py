@@ -10,8 +10,9 @@ from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
 from src.ui.elements.text import Text
-from src.ui.views.game.components.canvas import GameCanvas
-from src.ui.views.game.components.overlay import GameOverOverlay
+from src.ui.views.game.canvas import GameCanvas
+from src.ui.views.game.overlays.game_over import GameOverOverlay
+from src.ui.views.game.overlays.select_action import SelectActionOverlay
 
 
 class PacmanView(View):
@@ -23,6 +24,7 @@ class PacmanView(View):
         super().__init__(event=context.event, **kwargs)
         self.properties.background_color = pr.Color(20, 20, 30, 255)
 
+        self.context = context
         self.game: Optional[Game] = None
 
         main_layout = VBox(width="100%", height="100%")
@@ -62,9 +64,12 @@ class PacmanView(View):
         footer.add(self._life_text)
         main_layout.add(footer)
 
-        self.add(main_layout)
+        self.overlays = ElementGroup(width="100%", height="100%")
+
+        self.add(main_layout, self.overlays)
 
     def on_enter(self) -> None:
+        self.overlays.clear()
         self.game_container.clear()
         self.game = Game()
 
@@ -101,9 +106,26 @@ class PacmanView(View):
     def on_exit(self) -> None:
         GameCanvas.unload()
 
+        self.overlays.clear()
         self.game_container.clear()
         self.game = None
 
     def _on_game_over(self) -> None:
-        overlay = GameOverOverlay(on_restart=self.on_enter)
-        self.game_container.add(overlay)
+        if not self.game:
+            return
+
+        overlay = GameOverOverlay(
+            score_file=self.context.config.score_file,
+            score=self.game.score,
+            on_next=self._on_select_action,
+        )
+        self.overlays.add(overlay)
+
+    def _on_select_action(self) -> None:
+        self.overlays.clear()
+        overlay = SelectActionOverlay(
+            on_restart=self.on_enter,
+            on_menu=lambda: self.goto_view("menu"),
+            on_quit=lambda: self.quit(),
+        )
+        self.overlays.add(overlay)

@@ -26,9 +26,6 @@ class Application:
         self.context.event.emit(AppEvent.SWITCH_VIEW, "menu")
 
         while self.is_running and not pr.window_should_close():
-            if pr.is_key_pressed(pr.KeyboardKey.KEY_Q):
-                self.context.event.emit(AppEvent.STOP)
-
             self.view_manager.update(pr.get_frame_time())
             self.view_manager.render()
 

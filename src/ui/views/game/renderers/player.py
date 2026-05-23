@@ -5,7 +5,7 @@ from src.ui.animation import (
     AnimationRegistry,
     AnimationTexture,
 )
-from src.ui.views.game.utils.mapper import MazeCoordinateMapper
+from src.ui.views.game.coord_util import MazeCoordinateMapper
 
 
 class PlayerRenderer:

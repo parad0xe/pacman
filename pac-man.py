@@ -1,9 +1,13 @@
 from src.application import Application
+from src.exceptions.base import PacmanError
 
 
 def main() -> None:
-    app = Application()
-    app.run(1200, 800)
+    try:
+        app = Application()
+        app.run(1200, 800)
+    except PacmanError as e:
+        print(e)
 
 
 if __name__ == "__main__":
