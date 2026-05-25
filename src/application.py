@@ -1,7 +1,8 @@
 import pyray as pr
 
-from src.context import Config, Context
+from src.context import Context
 from src.event import AppEvent
+from src.models.config import load_config
 from src.ui.core.view import ViewManager
 from src.ui.views.game.view import PacmanView
 from src.ui.views.highscores.view import HighscoreView
@@ -9,8 +10,10 @@ from src.ui.views.menu.view import MenuView
 
 
 class Application:
-    def __init__(self) -> None:
-        self.context = Context(config=Config())
+    def __init__(self, config_file_path: str) -> None:
+        config = load_config(config_file_path)
+
+        self.context = Context(config=config)
         self.is_running = True
 
     def run(self, width: int, height: int) -> None:

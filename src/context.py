@@ -1,11 +1,5 @@
-from dataclasses import dataclass
-
 from src.event import Event
-
-
-@dataclass
-class Config:
-    score_file: str = "scores.json"
+from src.models.config import Config
 
 
 class Context:
