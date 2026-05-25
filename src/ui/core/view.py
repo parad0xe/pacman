@@ -62,14 +62,21 @@ class View(ElementGroup, ABC):
                     self._focus_index = i
                     break
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_DOWN) or pr.is_key_pressed(
-            pr.KeyboardKey.KEY_RIGHT
-        ):
-            self._focus_index = (self._focus_index + 1) % len(focusables)
-        elif pr.is_key_pressed(pr.KeyboardKey.KEY_UP) or pr.is_key_pressed(
-            pr.KeyboardKey.KEY_LEFT
+        if (
+            pr.is_key_pressed(pr.KeyboardKey.KEY_UP)
+            or pr.is_key_pressed(pr.KeyboardKey.KEY_LEFT)
+            or (
+                pr.is_key_down(pr.KeyboardKey.KEY_LEFT_SHIFT)
+                and pr.is_key_pressed(pr.KeyboardKey.KEY_TAB)
+            )
         ):
             self._focus_index = (self._focus_index - 1) % len(focusables)
+        elif (
+            pr.is_key_pressed(pr.KeyboardKey.KEY_DOWN)
+            or pr.is_key_pressed(pr.KeyboardKey.KEY_RIGHT)
+            or pr.is_key_pressed(pr.KeyboardKey.KEY_TAB)
+        ):
+            self._focus_index = (self._focus_index + 1) % len(focusables)
 
         for i, element in enumerate(focusables):
             element.is_focused = i == self._focus_index
