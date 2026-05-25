@@ -1,15 +1,10 @@
-import uuid
 from dataclasses import dataclass, field
 from typing import Literal, Optional, TypedDict
 
 import pyray as pr
 
 
-def unique_id() -> str:
-    return str(uuid.uuid4())
-
-
-class UIElementPropertiesDef(TypedDict, total=False):
+class ElementPropertiesDef(TypedDict, total=False):
     origin: pr.Vector2
 
     padding: float
@@ -36,7 +31,7 @@ class UIElementPropertiesDef(TypedDict, total=False):
 
 
 @dataclass
-class UIElementProperties:
+class ElementProperties:
     origin: pr.Vector2 = field(default_factory=lambda: pr.Vector2(0, 0))
 
     padding: float = 0.0
@@ -52,7 +47,7 @@ class UIElementProperties:
     text_content: Optional[str] = None
     text_align: Literal["left", "center", "right"] = "center"
     text_color: pr.Color = pr.Color(40, 40, 40, 255)
-    letter_spacing: float = 2.0
+    letter_spacing: float = 8.0
 
     hover_color: pr.Color = field(default_factory=lambda: pr.Color(0, 0, 0, 0))
 
@@ -63,7 +58,7 @@ class UIElementProperties:
 
 
 @dataclass
-class UIElementBoxes:
+class ElementBoxes:
     margin_box: pr.Rectangle = field(
         default_factory=lambda: pr.Rectangle(0, 0, 0, 0)
     )

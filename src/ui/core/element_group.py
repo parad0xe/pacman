@@ -1,19 +1,20 @@
 from typing_extensions import Unpack
 
-from src.ui.core.element.element import UIElement, UIElementKwargs
+from src.ui.core.element import Element, ElementKwargs
 
 
-class UIElementGroup(UIElement):
+class ElementGroup(Element):
 
-    def __init__(self, **kwargs: Unpack[UIElementKwargs]) -> None:
+    def __init__(self, **kwargs: Unpack[ElementKwargs]) -> None:
         super().__init__(**kwargs)
-        self._children: dict[str, UIElement] = {}
+        self._children: dict[str, Element] = {}
 
         self._is_updating: bool = False
-        self._pending_adds: list[UIElement] = []
+        self._pending_adds: list[Element] = []
+        self._pending_removes: list[str] = []
         self._pending_clear: bool = False
 
-    def add(self, *elements: UIElement) -> None:
+    def add(self, *elements: Element) -> None:
         if self._is_updating:
             self._pending_adds.extend(elements)
             return
@@ -21,6 +22,17 @@ class UIElementGroup(UIElement):
         for element in elements:
             element.parent = self
             self._children[element.id] = element
+
+    def remove(self, *ids: str) -> None:
+        for id in ids:
+            if id not in self._children:
+                continue
+
+            if self._is_updating:
+                self._pending_removes.append(id)
+                continue
+
+            del self._children[id]
 
     def clear(self) -> None:
         if self._is_updating:
@@ -31,20 +43,22 @@ class UIElementGroup(UIElement):
             child.parent = None
         self._children.clear()
 
-    def get_focusables(self) -> list[UIElement]:
-        focusables: list[UIElement] = []
+    def get_focusables(self) -> list[Element]:
+        focusables: list[Element] = []
         for child in self._children.values():
             if child.can_focus:
                 focusables.append(child)
-            if isinstance(child, UIElementGroup):
+            if isinstance(child, ElementGroup):
                 focusables.extend(child.get_focusables())
         return focusables
 
-    def _update_impl(self, dt: float) -> None:
+    def on_update(self, dt: float) -> None:
+        super().on_update(dt)
+
         self._is_updating = True
 
         for child in self._children.values():
-            child.update(dt)
+            child.on_update(dt)
 
         self._is_updating = False
 
@@ -56,18 +70,29 @@ class UIElementGroup(UIElement):
             self.add(*self._pending_adds)
             self._pending_adds.clear()
 
-    def _update_layout_impl(
+        if self._pending_removes:
+            self.remove(*self._pending_removes)
+            self._pending_removes.clear()
+
+    def on_layout(
         self,
-        content_x: float,
-        content_y: float,
-        available_width: float,
-        available_height: float,
+        parent_x: float,
+        parent_y: float,
+        parent_width: float,
+        parent_height: float,
     ) -> None:
+        super().on_layout(parent_x, parent_y, parent_width, parent_height)
+
         max_child_width = 0.0
         max_child_height = 0.0
 
         for child in self._children.values():
-            child.update_layout(0.0, 0.0, available_width, available_height)
+            child.on_layout(
+                0.0,
+                0.0,
+                self.boxes.content_box.width,
+                self.boxes.content_box.height,
+            )
             max_child_width = max(
                 max_child_width, child.x + child.boxes.margin_box.width
             )
@@ -110,13 +135,15 @@ class UIElementGroup(UIElement):
             elif p.align_items == "end":
                 child.y = final_height - child.boxes.margin_box.height
 
-            child.update_layout(
+            child.on_layout(
                 self.boxes.content_box.x,
                 self.boxes.content_box.y,
                 final_width,
                 final_height,
             )
 
-    def _render_impl(self) -> None:
+    def on_render(self) -> None:
+        super().on_render()
+
         for element in self._children.values():
-            element.render()
+            element.on_render()

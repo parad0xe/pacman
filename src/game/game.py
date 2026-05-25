@@ -2,7 +2,7 @@ from typing import Optional
 
 from mazegenerator import mazegenerator
 
-from src.context import Config
+from src.old_core.context import Config
 from src.game.pathfinder import PathFinder
 from src.game.stage import Stage, StagePort
 from src.models.game import GamePort
@@ -46,7 +46,7 @@ class Game(GamePort):
             ghost.reset()
         self.stage.player.pos.x = int(len(self.stage.board[0]) / 2)
         self.stage.player.pos.y = int(len(self.stage.board) / 2)
-        return 0
+        return 2
 
     def ghost_death(self, ghost: GhostPort) -> None:
         ghost.reset()

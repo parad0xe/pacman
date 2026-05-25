@@ -1,140 +1,112 @@
 from abc import ABC
 from dataclasses import replace
-from typing import TYPE_CHECKING, Any, Optional, TypedDict, cast
+from typing import Any, Optional, TYPE_CHECKING, TypedDict, cast
 
 import pyray as pr
 from typing_extensions import Unpack
 
-from src.ui.core.element.base import (
-    UIElementBoxes,
-    UIElementProperties,
-    UIElementPropertiesDef,
-    unique_id,
+from src.ui.core.base import (
+    ElementBoxes,
+    ElementProperties,
+    ElementPropertiesDef,
 )
+from src.ui.core.utils import unique_id
 
 if TYPE_CHECKING:
-    from src.ui.core.element.element_group import UIElementGroup
+    from src.ui.core.element_group import ElementGroup
 
 
-class UIElementKwargs(TypedDict, total=False):
+class ElementKwargs(TypedDict, total=False):
     id: str
     x: float
     y: float
     width: float | str
     height: float | str
-    properties: UIElementPropertiesDef
+    properties: ElementPropertiesDef
 
 
-class UIElement(ABC):
+class Element(ABC):
+    default_font: Optional[pr.Font] = None
 
-    def __init__(self, **kwargs: Unpack[UIElementKwargs]) -> None:
+    def __init__(self, **kwargs: Unpack[ElementKwargs]) -> None:
         self.id = kwargs.get("id") or unique_id()
         self.x = kwargs.get("x") or 0.0
         self.y = kwargs.get("y") or 0.0
+        self.width: float | str = kwargs.get("width") or 0.0
+        self.height: float | str = kwargs.get("height") or 0.0
 
         self.properties = replace(
-            UIElementProperties(), **(kwargs.get("properties") or {})
+            ElementProperties(), **(kwargs.get("properties") or {})
         )
 
         self.is_focused: bool = False
         self.is_hovered: bool = False
+        self.can_focus: bool = False
 
-        self.parent: Optional["UIElementGroup"] = None
-        self.boxes = UIElementBoxes()
-
-        self._req_width: float | str = kwargs.get("width") or 0.0
-        self._req_height: float | str = kwargs.get("height") or 0.0
-        self._req_font_size: float | str = self.properties.font_size
+        self.parent: Optional["ElementGroup"] = None
+        self.boxes = ElementBoxes()
 
         self._resolved_width = 0.0
         self._resolved_height = 0.0
+        self._resolved_font_size = 0.0
 
-    @property
-    def can_focus(self) -> bool:
-        return False
+        self._text_cache: dict[str, Any] = {
+            "text": None,
+            "font": None,
+            "resolved_font_size": -1.0,
+            "letter_spacing": -1.0,
+            "computed_width": 0.0,
+            "computed_height": 0.0,
+        }
 
-    @property
-    def width(self) -> float:
-        return self.boxes.border_box.width
+        if not self.properties.font and not Element.default_font:
+            Element.default_font = pr.load_font(
+                "assets/fonts/pixel-medium.ttf"
+            )
 
-    @width.setter
-    def width(self, value: float) -> None:
-        self._req_width = value
-
-    @property
-    def height(self) -> float:
-        return self.boxes.border_box.height
-
-    @height.setter
-    def height(self, value: float) -> None:
-        self._req_height = value
-
-    def set_position(self, x: float, y: float) -> None:
-        self.x = x
-        self.y = y
-
-    # --- Update ---
-
-    def update(self, dt: float) -> None:
+    def on_update(self, dt: float) -> None:
         self.is_hovered = pr.check_collision_point_rec(
             pr.get_mouse_position(), self.boxes.border_box
         )
-        self._update_impl(dt)
 
-    def _update_impl(self, dt: float) -> None:
-        pass
-
-    # --- Shape ---
-
-    def update_layout(
+    def on_layout(
         self,
-        parent_x: float = 0.0,
-        parent_y: float = 0.0,
-        parent_width: float = 0.0,
-        parent_height: float = 0.0,
+        parent_x: float,
+        parent_y: float,
+        parent_width: float,
+        parent_height: float,
     ) -> None:
         start_x = parent_x + self.x + self.properties.origin.x
         start_y = parent_y + self.y + self.properties.origin.y
 
-        self._resolved_width = self._resolve_size(
-            self._req_width, parent_width
-        )
-        self._resolved_height = self._resolve_size(
-            self._req_height, parent_height
-        )
+        self._resolved_width = self._resolve_size(self.width, parent_width)
+        self._resolved_height = self._resolve_size(self.height, parent_height)
 
         min_parent_dim = min(parent_width, parent_height)
-        self.properties.font_size = self._resolve_size(
-            self._req_font_size, min_parent_dim
+        self._resolved_font_size = self._resolve_size(
+            self.properties.font_size, min_parent_dim
         )
 
         content_width, content_height = 0.0, 0.0
         if self.properties.text_content:
-            font = self.properties.font or pr.get_font_default()
-            size = pr.measure_text_ex(
-                font,
-                self.properties.text_content,
-                self.properties.font_size,
-                self.properties.letter_spacing,
-            )
-            content_width, content_height = size.x, size.y
+            content_width, content_height = self._measure_text()
 
-        final_width = self._resolved_width
         if self._resolved_width <= 0:
             final_width = (
-                content_width + (self.properties.padding * 2) +
-                (self.properties.border * 2)
+                content_width
+                + (self.properties.padding * 2)
+                + (self.properties.border * 2)
             )
         else:
             final_width = max(
                 0.0, self._resolved_width - (self.properties.margin * 2)
             )
 
-        final_height = self._resolved_height
         if self._resolved_height <= 0:
             final_height = (
-                content_height + (self.properties.padding * 2) +
-                (self.properties.border * 2)
+                content_height
+                + (self.properties.padding * 2)
+                + (self.properties.border * 2)
             )
         else:
             final_height = max(
@@ -167,27 +139,11 @@ class UIElement(ABC):
             0.0, self.boxes.padding_box.height - p.padding * 2
         )
 
-        self._update_layout_impl(
-            self.boxes.content_box.x,
-            self.boxes.content_box.y,
-            self.boxes.content_box.width,
-            self.boxes.content_box.height,
-        )
-
-    def _update_layout_impl(
-        self,
-        content_x: float,
-        content_y: float,
-        available_width: float,
-        available_height: float,
-    ) -> None:
-        pass
-
-    # --- Render ---
-
-    def render(self) -> None:
-        if (self.boxes.border_box.width <= 0 or
-                self.boxes.border_box.height <= 0):
+    def on_render(self) -> None:
+        if (
+            self.boxes.border_box.width <= 0
+            or self.boxes.border_box.height <= 0
+        ):
             return
 
         if self.properties.background_color:
@@ -207,45 +163,37 @@ class UIElement(ABC):
                 self.properties.border_color,
             )
 
-        if (self.properties.text_content and
-                float(self.properties.font_size) > 0):
-            font = self.properties.font or pr.get_font_default()
-            text_size = pr.measure_text_ex(
-                font,
-                self.properties.text_content,
-                float(self.properties.font_size),
-                self.properties.letter_spacing,
-            )
-
+        if (
+            self.properties.text_content
+            and float(self._resolved_font_size) > 0
+        ):
+            text_width, text_height = self._measure_text()
             text_pos_x = self.boxes.content_box.x
+
             if self.properties.text_align == "center":
-                text_pos_x += (self.boxes.content_box.width - text_size.x) / 2
+                text_pos_x += (self.boxes.content_box.width - text_width) / 2
+
             elif self.properties.text_align == "right":
-                text_pos_x += self.boxes.content_box.width - text_size.x
+                text_pos_x += self.boxes.content_box.width - text_width
 
             text_pos_y = (
-                self.boxes.content_box.y +
-                (self.boxes.content_box.height - text_size.y) / 2
+                self.boxes.content_box.y
+                + (self.boxes.content_box.height - text_height) / 2
             )
+
+            font = self.properties.font or Element.default_font
 
             pr.draw_text_ex(
                 font,
                 self.properties.text_content,
                 pr.Vector2(text_pos_x, text_pos_y),
-                float(self.properties.font_size),
+                float(self._resolved_font_size),
                 self.properties.letter_spacing,
                 self.properties.text_color,
             )
 
-        self._render_impl()
-
-    def _render_impl(self) -> None:
-        pass
-
-    # --- Utils ---
-
     def _default_properties(
-        self, base: Optional[UIElementPropertiesDef], kwargs: UIElementKwargs
+        self, base: Optional[ElementPropertiesDef], kwargs: ElementKwargs
     ) -> None:
         if base is None:
             return
@@ -253,7 +201,9 @@ class UIElement(ABC):
         for key, value in base.items():
             if key not in properties:
                 properties[key] = value
-        kwargs["properties"] = cast(UIElementPropertiesDef, properties)
+        kwargs["properties"] = cast(
+            ElementPropertiesDef, cast(object, properties)
+        )
 
     def _resolve_size(self, size: float | str, parent_size: float) -> float:
         if isinstance(size, str) and size.endswith("%"):
@@ -262,3 +212,40 @@ class UIElement(ABC):
             return float(size)
         except ValueError:
             raise Exception(f"Invalid element size: <{size}>")
+
+    def _measure_text(self) -> tuple[float, float]:
+        text = self.properties.text_content
+
+        if not text:
+            return 0.0, 0.0
+
+        font = self.properties.font or Element.default_font
+
+        cache_valid = (
+            self._text_cache["text"] == text
+            and self._text_cache["font"] == font
+            and self._text_cache["resolved_font_size"]
+            == self._resolved_font_size
+            and self._text_cache["letter_spacing"]
+            == self.properties.letter_spacing
+        )
+
+        if not cache_valid:
+            size = pr.measure_text_ex(
+                font,
+                text,
+                float(self._resolved_font_size),
+                self.properties.letter_spacing,
+            )
+
+            self._text_cache["text"] = text
+            self._text_cache["font"] = font
+            self._text_cache["resolved_font_size"] = self._resolved_font_size
+            self._text_cache["letter_spacing"] = self.properties.letter_spacing
+            self._text_cache["computed_width"] = size.x
+            self._text_cache["computed_height"] = size.y
+
+        return (
+            self._text_cache["computed_width"],
+            self._text_cache["computed_height"],
+        )
