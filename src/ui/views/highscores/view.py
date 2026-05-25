@@ -5,7 +5,6 @@ from typing_extensions import Unpack
 
 from src.context import Context
 from src.models.score import Highscores, load_highscores
-from src.ui.core.base import ElementPropertiesDef
 from src.ui.core.element import ElementKwargs
 from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
@@ -70,6 +69,18 @@ class HighscoreView(View):
         self.highscores = load_highscores(
             file_path=self.context.config.score_file
         )
+
+        if not self.highscores.scores:
+            self.score_content.add(
+                Text(
+                    text="No highscores.",
+                    properties={
+                        "font_size": 35,
+                        "text_color": pr.WHITE,
+                    },
+                )
+            )
+            return
 
         table = VBox(width="100%")
         table.properties.align_items = "center"
