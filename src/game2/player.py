@@ -33,8 +33,9 @@ class Player:
                 abs(self.pos.y - round(self.pos.y)) < 0.001)
 
     def has_moved(self) -> bool:
-        return not self.on_cell() or \
-        not (self.maze[self.cell()[1]][self.cell()[0]] & self.direction.value)
+        return (not self.on_cell() or \
+            not (self.maze[self.cell()[1]][self.cell()[0]] & self.direction.value))\
+            and not self.direction == Direction.IDLE
 
     def reset(self) -> None:
         self.state = PlayerState.NORMAL

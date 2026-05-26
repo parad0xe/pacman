@@ -77,13 +77,13 @@ class PlayerRenderer:
     def is_death_done(self) -> bool:
         return self.animations.animations["death"].done
 
-    def on_update(self, dt: float, game_event: GameEvent) -> None:
-        if game_event == GameEvent.GAME_OVER:
-            self.animations.switch_to("death")
-            self.animations.next(dt)
-            return
-        elif game_event == GameEvent.PLAYER_DEATH:
-            self._game_started = False
+    def on_update(self, dt: float) -> None:
+        #if game_event == GameEvent.GAME_OVER:
+        #    self.animations.switch_to("death")
+        #    self.animations.next(dt)
+        #    return
+        #elif game_event == GameEvent.PLAYER_DEATH:
+        #    self._game_started = False
 
         if not self._game_started and self.player.has_moved():
             self._game_started = True

@@ -23,13 +23,10 @@ class GameCanvas(ElementGroup):
         self,
         *,
         game: Game,
-        on_game_over: Callable[[], None] | None = None,
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
         super().__init__(**kwargs)
         self.game = game
-        self.on_game_over = on_game_over
-        self.is_game_over_done = False
 
         self.coord_mapper = MazeCoordinateMapper(self.boxes.content_box, game)
 
@@ -63,14 +60,9 @@ class GameCanvas(ElementGroup):
         super().on_update(dt)
         self.coord_mapper.on_update()
 
-        game_event = self.game.update(dt)
+        self.game.update(dt)
 
-        self.player.on_update(dt, game_event=game_event)
-
-        if not self.is_game_over_done:
-            if game_event == GameEvent.GAME_OVER and self.player.is_death_done:
-                self.on_game_over()
-                self.is_game_over_done = True
+        self.player.on_update(dt)
 
         if self.game.is_over:
             return

@@ -4,7 +4,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.context import Context
-from src.mock.pacman import Game
+from src.game2.game import Game, GameEvent
 from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox
@@ -71,12 +71,12 @@ class PacmanView(View):
     def on_enter(self) -> None:
         self.overlays.clear()
         self.game_container.clear()
-        self.game = Game()
-
+        self.game = Game(config=self.context.config)
+        self.game.event.subscribe(GameEvent.GAME_OVER, self._on_game_over)
+        self.game.event.subscribe(GameEvent.PAUSE, self._on_pause)
         self.game_container.add(
             GameCanvas(
                 game=self.game,
-                on_game_over=self._on_game_over,
                 width="100%",
                 height="100%",
                 properties={
@@ -93,13 +93,6 @@ class PacmanView(View):
 
         if not self.game:
             return
-
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
-            self.game.is_paused = not self.game.is_paused
-            if self.game.is_paused:
-                self._on_select_action()
-            else:
-                self.overlays.clear()
 
         self._life_text.properties.text_content = f"Life: {self.game.life}"
         self._time_text.properties.text_content = (
@@ -127,6 +120,12 @@ class PacmanView(View):
             on_next=self._on_select_action,
         )
         self.overlays.add(overlay)
+
+    def _on_pause(self, is_paused: bool) -> None:
+        if is_paused:
+            self._on_select_action()
+        else:
+            self.overlays.clear()
 
     def _on_select_action(self) -> None:
         self.overlays.clear()

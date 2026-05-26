@@ -7,10 +7,10 @@ from src.game2.pathfinder import PathFinder
 from src.game2.player import Player, PlayerState
 
 class GhostID(Enum):
-    BLINKY = auto()
-    PINKY = auto()
-    INKY = auto()
-    CLYDE = auto()
+    BLINKY = 0
+    PINKY = 1
+    INKY = 2
+    CLYDE = 3
 
 
 class GhostState(Enum):

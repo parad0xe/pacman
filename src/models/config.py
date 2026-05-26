@@ -10,6 +10,15 @@ class Config(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     score_file: str = "scores.json"
+    life: int = 3
+    width: int = 15
+    height: int = 15
+    seed: int = -1
+    time: int = 90
+    pacgum: int = 10
+    super_pacgum: int = 50
+    ghost: int = 250
+
 
 
 def load_config(file_path: str | Path) -> Config:
