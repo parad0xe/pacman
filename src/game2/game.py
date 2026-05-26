@@ -33,10 +33,12 @@ class Game:
         self.level = 0
         self.score = 0
         self.life = config.life
-        self.newstage()
 
+        self.wait_timer = 0
         self.is_over = 0
         self.is_paused = 0
+
+        self.newstage()
 
     def newstage(self) -> None:
         seed = self.config.seed \
@@ -46,9 +48,11 @@ class Game:
         self.level += 1
         self.stage = Stage(self.mazegenerator.maze, self.path_finder,
                            self.level, self.config)
+        self.wait_timer = 1.5
 
     def player_death(self):
         self.stage.reset_all()
+        self.wait_timer = 1
         self.life -= 1
 
     def eat_ghost(self, ghost: Ghost) -> None:
@@ -57,6 +61,8 @@ class Game:
 
     def ghosts_collisions(self) -> None:
         for ghost in self.stage.ghosts:
+            if not ghost.can_interact():
+                continue
             if (abs(ghost.pos.x - self.stage.player.pos.x) < 0.75 and
                     abs(ghost.pos.y - self.stage.player.pos.y) < 0.75):
                 if self.stage.player.state == PlayerState.NORMAL:
@@ -84,6 +90,9 @@ class Game:
     def update(self, dt: float) -> None:
         self.check_pause()
         if self.is_paused or self.is_over:
+            return
+        if self.wait_timer > 0:
+            self.wait_timer = max(0, self.wait_timer - dt)
             return
         self.stage.remaining -= dt
         while dt:

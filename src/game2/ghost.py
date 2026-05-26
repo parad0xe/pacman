@@ -36,7 +36,10 @@ class Ghost:
         self.speed = 1.5
         self.retreat_timer = 0.0
         self.wait_timer = self.id.value
+        self.interact = True
 
+    def can_interact(self) -> bool:
+        return self.interact and self.wait_timer == 0
 
     def reset(self) -> None:
         self.direction = Direction.IDLE
@@ -57,7 +60,7 @@ class Ghost:
         )
 
     def has_moved(self) -> bool:
-        return True
+        return bool(self.direction.value)
 
     def snap(self) -> None:
         self.pos.x = round(self.pos.x)
@@ -106,7 +109,6 @@ class Ghost:
                 dist = min(self.next_cell_dist(), self.speed * dt)
                 self.add_dist(dist)
                 dt -= dist / self.speed
-                print(dt)
 
 
     def hunt(self, player: Player) -> None:
