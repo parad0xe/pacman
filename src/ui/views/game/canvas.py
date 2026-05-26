@@ -89,8 +89,9 @@ class GameCanvas(ElementGroup):
         self.pacgums_renderer.on_render()
         self.player.on_render()
 
-        for ghost_renderer in self.ghosts:
-            ghost_renderer.on_render()
+        if not self.game.is_over:
+            for ghost_renderer in self.ghosts:
+                ghost_renderer.on_render()
 
     @staticmethod
     def unload() -> None:
