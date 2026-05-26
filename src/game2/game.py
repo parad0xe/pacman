@@ -114,3 +114,42 @@ class Game:
             if dt < 0.0001:
                 dt = 0
         self.check_state()
+
+    def cheat_next_stage(self) -> None:
+        self.newstage()
+
+    def cheat_extra_life(self) -> None:
+        self.life += 1
+
+    def cheat_extra_time(self) -> None:
+        self.stage.remaining += 30
+
+    def cheat_stop_ghosts(self) -> None:
+        for ghost in self.stage.ghosts:
+            if ghost.wait_timer != float('inf'):
+                ghost.wait_timer = float('inf')
+            else:
+                ghost.wait_timer = 0
+
+    def cheat_intangible_ghosts(self) -> None:
+        for ghost in self.stage.ghosts:
+            ghost.interact = not ghost.interact
+
+    def cheat_speed(self, sign: int) -> None:
+        speed_mod = 1.1
+        if sign == -1:
+            self.stage.player.speed /= speed_mod
+        else:
+            self.stage.player.speed *= speed_mod
+
+    def cheat_game_speed(self, sign: int) -> None:
+        speed_mod = 1.1
+        for ghost in self.stage.ghosts:
+            if sign == -1:
+                ghost.speed /= speed_mod
+            else:
+                ghost.speed *= speed_mod
+        if sign == -1:
+            self.stage.player.speed /= speed_mod
+        else:
+            self.stage.player.speed *= speed_mod

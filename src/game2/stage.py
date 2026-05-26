@@ -43,11 +43,10 @@ class Stage():
     def reset_all(self) -> None:
         self.player.reset()
         for ghost in self.ghosts:
-            ghost.reset()
-            ghost.wait_timer = ghost.id.value
+            ghost.reset(ghost.id.value)
 
     def update_pacgums(self) -> int:
-        if not self.player.on_cell():
+        if self.player.next_cell_dist() > 0.25:
             return 0
 
         cell = self.player.cell()

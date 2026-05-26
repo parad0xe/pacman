@@ -21,7 +21,7 @@ class Player:
 
         self.direction: Direction = Direction.IDLE
         self.key_buffer: Optional[int] = None
-        self.speed = 3
+        self.speed = 3.0
 
     def cell(self) -> tuple[int, int]:
         """Current cell the player is on or nearest to."""
