@@ -13,10 +13,12 @@ from src.game2.ghost import Ghost
 from src.game2.player import PlayerState
 from src.event import Event
 
+
 class GameEvent(Enum):
     GAME_OVER = auto()
     VICTORY = auto()
     PAUSE = auto()
+    NEW_STAGE = auto()
 
 
 class Game:
@@ -41,14 +43,18 @@ class Game:
         self.newstage()
 
     def newstage(self) -> None:
-        seed = self.config.seed \
-               if self.config.seed != -1 and self.level == 0 \
-               else randint(0, 100000)
+        seed = (
+            self.config.seed
+            if self.config.seed != -1 and self.level == 0
+            else randint(0, 100000)
+        )
         self.mazegenerator.generate(seed)
         self.level += 1
-        self.stage = Stage(self.mazegenerator.maze, self.path_finder,
-                           self.level, self.config)
+        self.stage = Stage(
+            self.mazegenerator.maze, self.path_finder, self.level, self.config
+        )
         self.wait_timer = 1.5
+        self.event.emit(GameEvent.NEW_STAGE)
 
     def player_death(self):
         self.life -= 1
@@ -65,8 +71,10 @@ class Game:
         for ghost in self.stage.ghosts:
             if not ghost.can_interact():
                 continue
-            if (abs(ghost.pos.x - self.stage.player.pos.x) < 0.75 and
-                    abs(ghost.pos.y - self.stage.player.pos.y) < 0.75):
+            if (
+                abs(ghost.pos.x - self.stage.player.pos.x) < 0.75
+                and abs(ghost.pos.y - self.stage.player.pos.y) < 0.75
+            ):
                 if self.stage.player.state == PlayerState.NORMAL:
                     return self.player_death()
                 else:
@@ -106,5 +114,3 @@ class Game:
             if dt < 0.0001:
                 dt = 0
         self.check_state()
-
-    

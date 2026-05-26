@@ -14,6 +14,7 @@ from src.ui.elements.text import Text
 from src.ui.views.game.canvas import GameCanvas
 from src.ui.views.game.overlays.game_over import GameOverOverlay
 from src.ui.views.game.overlays.select_action import SelectActionOverlay
+from src.ui.views.game.overlays.start_timer import StartTimerOverlay
 
 
 class PacmanView(View):
@@ -75,6 +76,7 @@ class PacmanView(View):
 
         self.game = Game(config=self.context.config)
         self.game.event.subscribe(GameEvent.PAUSE, self._on_pause)
+        self.game.event.subscribe(GameEvent.NEW_STAGE, self._on_new_stage)
 
         self.game_container.add(
             GameCanvas(
@@ -87,6 +89,8 @@ class PacmanView(View):
                 },
             )
         )
+
+        self._on_new_stage()
 
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
@@ -112,6 +116,14 @@ class PacmanView(View):
         self.overlays.clear()
         self.game_container.clear()
         self.game = None
+
+    def _on_new_stage(self) -> None:
+        self.overlays.add(
+            StartTimerOverlay(
+                game=self.game,
+                on_timer_end=lambda: self.overlays.clear(),
+            )
+        )
 
     def _on_game_over(self) -> None:
         if not self.game:
