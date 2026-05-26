@@ -81,8 +81,8 @@ class Game:
                     self.eat_ghost(ghost)
 
     def check_state(self) -> None:
-        if self.stage.is_done():
-            if self.level == 10:
+        if self.stage.is_done() or self.level > 10:
+            if self.level >= 10:
                 self.event.emit(GameEvent.VICTORY)
                 self.is_over = 1
             else:
@@ -126,8 +126,8 @@ class Game:
 
     def cheat_stop_ghosts(self) -> None:
         for ghost in self.stage.ghosts:
-            if ghost.wait_timer != float('inf'):
-                ghost.wait_timer = float('inf')
+            if ghost.wait_timer != float("inf"):
+                ghost.wait_timer = float("inf")
             else:
                 ghost.wait_timer = 0
 

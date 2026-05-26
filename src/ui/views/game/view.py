@@ -15,6 +15,7 @@ from src.ui.views.game.canvas import GameCanvas
 from src.ui.views.game.overlays.game_over import GameOverOverlay
 from src.ui.views.game.overlays.select_action import SelectActionOverlay
 from src.ui.views.game.overlays.start_timer import StartTimerOverlay
+from src.ui.views.game.overlays.win import WinOverlay
 
 
 class PacmanView(View):
@@ -77,18 +78,7 @@ class PacmanView(View):
         self.game = Game(config=self.context.config)
         self.game.event.subscribe(GameEvent.PAUSE, self._on_pause)
         self.game.event.subscribe(GameEvent.NEW_STAGE, self._on_new_stage)
-
-        self.game_container.add(
-            GameCanvas(
-                game=self.game,
-                on_game_over=self._on_game_over,
-                width="100%",
-                height="100%",
-                properties={
-                    "padding": 2,
-                },
-            )
-        )
+        self.game.event.subscribe(GameEvent.VICTORY, self._on_win)
 
         self._on_new_stage()
 
@@ -100,6 +90,9 @@ class PacmanView(View):
 
         if not self.game:
             return
+
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_C):
+            self.game.cheat_next_stage()
 
         self._life_text.properties.text_content = f"Life: {self.game.life}"
         self._time_text.properties.text_content = (
@@ -118,12 +111,38 @@ class PacmanView(View):
         self.game = None
 
     def _on_new_stage(self) -> None:
+        self.overlays.clear()
+
+        self.game_container.add(
+            GameCanvas(
+                id="canvas",
+                game=self.game,
+                on_game_over=self._on_game_over,
+                width="100%",
+                height="100%",
+                properties={
+                    "padding": 2,
+                },
+            )
+        )
+
         self.overlays.add(
             StartTimerOverlay(
                 game=self.game,
                 on_timer_end=lambda: self.overlays.clear(),
             )
         )
+
+    def _on_win(self) -> None:
+        if not self.game:
+            return
+
+        overlay = WinOverlay(
+            score_file=self.context.config.score_file,
+            score=self.game.score,
+            on_next=self._on_select_action,
+        )
+        self.overlays.add(overlay)
 
     def _on_game_over(self) -> None:
         if not self.game:
