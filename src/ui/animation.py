@@ -78,7 +78,12 @@ class AnimationTexture:
     ) -> None:
         self.texture = texture
 
-    def render(self, animation: Animation, dest: pr.Rectangle) -> None:
+    def render(
+        self,
+        animation: Animation,
+        dest: pr.Rectangle,
+        opacity: int = 255,
+    ) -> None:
         if animation.done:
             return
 
@@ -88,7 +93,7 @@ class AnimationTexture:
             dest,
             pr.Vector2(0, 0),
             0.0,
-            pr.WHITE,
+            pr.Color(255, 255, 255, opacity),
         )
 
 
@@ -108,11 +113,12 @@ class AnimationRegistry:
         if self.current_animation:
             self.animations[self.current_animation].next(dt)
 
-    def render(self, dest: pr.Rectangle) -> None:
+    def render(self, dest: pr.Rectangle, opacity: int = 255) -> None:
         if self.current_animation:
             self.animation_texture.render(
                 self.animations[self.current_animation],
                 dest,
+                opacity=opacity,
             )
 
     def switch_to(self, name: str | int) -> None:

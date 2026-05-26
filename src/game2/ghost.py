@@ -1,10 +1,12 @@
 from enum import Enum, auto
 from math import ceil, floor
+from random import shuffle
 import pyray as rl
 
 from src.game2.direction import Direction
 from src.game2.pathfinder import PathFinder
 from src.game2.player import Player, PlayerState
+
 
 class GhostID(Enum):
     BLINKY = 0
@@ -20,8 +22,14 @@ class GhostState(Enum):
     RETREAT = auto()
     DEAD = auto()
 
+
 class Ghost:
-    def __init__(self,id: GhostID, path_finder: PathFinder, pos: tuple[int, int] = (0, 0)) -> None:
+    def __init__(
+        self,
+        id: GhostID,
+        path_finder: PathFinder,
+        pos: tuple[int, int] = (0, 0),
+    ) -> None:
         self.id = id
 
         self.pos = rl.Vector2(pos[1], pos[0])
@@ -41,12 +49,12 @@ class Ghost:
     def can_interact(self) -> bool:
         return self.interact and self.wait_timer == 0
 
-    def reset(self) -> None:
+    def reset(self, wait_timer: float) -> None:
         self.direction = Direction.IDLE
         self.current_path = []
         self.pos.x = self.corner.x
         self.pos.y = self.corner.y
-        self.wait_timer = 3
+        self.wait_timer = wait_timer
 
     def cell(self) -> tuple[int, int]:
         """Current cell the ghost is on or nearest to."""
@@ -55,8 +63,8 @@ class Ghost:
     def on_cell(self) -> bool:
         """True if the ghost is aligned on a cell."""
         return (
-            abs(self.pos.x - round(self.pos.x)) < 0.0001 and
-            abs(self.pos.y - round(self.pos.y)) < 0.0001
+            abs(self.pos.x - round(self.pos.x)) < 0.0001
+            and abs(self.pos.y - round(self.pos.y)) < 0.0001
         )
 
     def has_moved(self) -> bool:
@@ -66,22 +74,20 @@ class Ghost:
         self.pos.x = round(self.pos.x)
         self.pos.y = round(self.pos.y)
 
-
     def next_cell_dist(self) -> float:
         if self.direction == Direction.EAST:
-             dist = ceil(self.pos.x) - self.pos.x
-             return dist if dist > 0.0001 else 1
+            dist = ceil(self.pos.x) - self.pos.x
+            return dist if dist > 0.0001 else 1
         if self.direction == Direction.WEST:
-             dist = self.pos.x - floor(self.pos.x)
-             return dist if dist > 0.0001 else 1
+            dist = self.pos.x - floor(self.pos.x)
+            return dist if dist > 0.0001 else 1
         if self.direction == Direction.NORTH:
-             dist = self.pos.y - floor(self.pos.y)
-             return dist if dist > 0.0001 else 1
+            dist = self.pos.y - floor(self.pos.y)
+            return dist if dist > 0.0001 else 1
         if self.direction == Direction.SOUTH:
-             dist = ceil(self.pos.y) - self.pos.y
-             return dist if dist > 0.0001 else 1
+            dist = ceil(self.pos.y) - self.pos.y
+            return dist if dist > 0.0001 else 1
         return 0
-
 
     def add_dist(self, dist: float) -> None:
         if self.direction == Direction.NORTH:
@@ -91,7 +97,7 @@ class Ghost:
         elif self.direction == Direction.EAST:
             self.pos.x += dist
         elif self.direction == Direction.WEST:
-             self.pos.x -= dist
+            self.pos.x -= dist
 
     def follow_current_path(self, dt: float, player: Player) -> None:
         """Move the ghost along current_path."""
@@ -110,7 +116,6 @@ class Ghost:
                 self.add_dist(dist)
                 dt -= dist / self.speed
 
-
     def hunt(self, player: Player) -> None:
         """Chase the player directly."""
         start = self.cell()
@@ -123,18 +128,22 @@ class Ghost:
         cell = self.cell()
 
         neighbors = self.path_finder.neighbors(cell)
+        shuffle(neighbors)
         if not neighbors:
             return
 
-        farthest = max(neighbors, key=lambda n: PathFinder.dist(n, player.cell()))
+        farthest = max(
+            neighbors, key=lambda n: PathFinder.dist(n, player.cell())
+        )
         self.current_path = [self.path_finder.dir(cell, farthest)]
         self.state = GhostState.FLEE
 
     def retreat(self) -> None:
         """Return to the ghost's corner."""
         start = self.cell()
-        self.current_path = self.path_finder.search(start,
-            (int(self.corner.x), int(self.corner.y)))
+        self.current_path = self.path_finder.search(
+            start, (int(self.corner.x), int(self.corner.y))
+        )
         self.state = GhostState.RETREAT
 
     def recalculate_path(self, player: Player) -> None:
@@ -155,9 +164,11 @@ class Ghost:
         if player.state == PlayerState.SUPER:
             self.state = GhostState.FLEE
 
-        elif self.state == GhostState.RETREAT \
-         and self.pos.x == self.corner.x \
-         and self.pos.y == self.corner.y:
+        elif (
+            self.state == GhostState.RETREAT
+            and self.pos.x == self.corner.x
+            and self.pos.y == self.corner.y
+        ):
             self.state = GhostState.HUNT
             self.retreat_timer = 0
 

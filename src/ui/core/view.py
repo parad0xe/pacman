@@ -104,7 +104,10 @@ class ViewManager:
         if self.current_view:
             pr.begin_drawing()
             self.current_view.on_render()
-            pr.draw_fps(10, 10)
+            pr.draw_fps(
+                pr.get_screen_width() - 90,
+                pr.get_screen_height() - 30,
+            )
             pr.end_drawing()
 
     def quit(self) -> None:

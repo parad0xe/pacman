@@ -51,12 +51,14 @@ class Game:
         self.wait_timer = 1.5
 
     def player_death(self):
+        self.life -= 1
+        if not self.life:
+            return
         self.stage.reset_all()
         self.wait_timer = 1
-        self.life -= 1
 
     def eat_ghost(self, ghost: Ghost) -> None:
-        ghost.reset()
+        ghost.reset(self.stage.player.super_timer)
         self.score += self.config.ghost
 
     def ghosts_collisions(self) -> None:
@@ -104,3 +106,5 @@ class Game:
             if dt < 0.0001:
                 dt = 0
         self.check_state()
+
+    
