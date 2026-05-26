@@ -96,8 +96,10 @@ class GhostRenderer:
             self.animations.next(dt)
 
     def on_render(self) -> None:
+        opacity = 255 if self.ghost.can_interact() else 90
         self.animations.render(
             self.coord_mapper.to_real_coords(
                 self.ghost.pos.x, self.ghost.pos.y
-            )
+            ),
+            opacity=opacity,
         )

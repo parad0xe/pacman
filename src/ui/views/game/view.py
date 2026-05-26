@@ -1,3 +1,4 @@
+import math
 from typing import ClassVar, Optional
 
 import pyray as pr
@@ -71,12 +72,14 @@ class PacmanView(View):
     def on_enter(self) -> None:
         self.overlays.clear()
         self.game_container.clear()
+
         self.game = Game(config=self.context.config)
-        self.game.event.subscribe(GameEvent.GAME_OVER, self._on_game_over)
         self.game.event.subscribe(GameEvent.PAUSE, self._on_pause)
+
         self.game_container.add(
             GameCanvas(
                 game=self.game,
+                on_game_over=self._on_game_over,
                 width="100%",
                 height="100%",
                 properties={
@@ -96,7 +99,7 @@ class PacmanView(View):
 
         self._life_text.properties.text_content = f"Life: {self.game.life}"
         self._time_text.properties.text_content = (
-            f"Time: {int(self.game.stage.remaining)}s"
+            f"Time: {math.ceil(self.game.stage.remaining)}s"
         )
         self._level_text.properties.text_content = (
             f"Level: {self.game.stage.level}"
