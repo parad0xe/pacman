@@ -17,7 +17,6 @@ class GhostRenderer:
         self.ghost = ghost
         self.animation_texture = animation_texture
         self.coord_mapper = coord_mapper
-        self._game_started = False
 
         animation_frame_width = self.animation_texture.texture.width / 14
         animation_frame_height = self.animation_texture.texture.height / 10
@@ -27,6 +26,13 @@ class GhostRenderer:
         self.animations = AnimationRegistry(
             animation_texture=self.animation_texture,
             animations={
+                Direction.IDLE.name: Animation(
+                    frame_width=animation_frame_width,
+                    frame_height=animation_frame_height,
+                    max_frames=8,
+                    offset_y=animation_offset_y,
+                    fps=animation_fps,
+                ),
                 Direction.EAST.name: Animation(
                     frame_width=animation_frame_width,
                     frame_height=animation_frame_height,

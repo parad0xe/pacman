@@ -61,7 +61,6 @@ class GameCanvas(ElementGroup):
         self.coord_mapper.on_update()
 
         self.game.update(dt)
-
         self.player.on_update(dt)
 
         if self.game.is_over:

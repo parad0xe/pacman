@@ -19,7 +19,6 @@ class PlayerRenderer:
         self.player = player
         self.animation_texture = animation_texture
         self.coord_mapper = coord_mapper
-        self._game_started = False
 
         animation_frame_width = self.animation_texture.texture.width / 14
         animation_frame_height = self.animation_texture.texture.height / 10
@@ -78,21 +77,14 @@ class PlayerRenderer:
         return self.animations.animations["death"].done
 
     def on_update(self, dt: float) -> None:
-        #if game_event == GameEvent.GAME_OVER:
+        # if game_event == GameEvent.GAME_OVER:
         #    self.animations.switch_to("death")
         #    self.animations.next(dt)
         #    return
-        #elif game_event == GameEvent.PLAYER_DEATH:
+        # elif game_event == GameEvent.PLAYER_DEATH:
         #    self._game_started = False
 
-        if not self._game_started and self.player.has_moved():
-            self._game_started = True
-
-        if self._game_started:
-            if not self.player.direction == Direction.IDLE:
-                self.animations.switch_to(self.player.direction.name)
-        else:
-            self.animations.switch_to(Direction.IDLE.name)
+        self.animations.switch_to(self.player.direction.name)
 
         if self.player.has_moved():
             self.animations.next(dt)

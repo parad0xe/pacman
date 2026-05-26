@@ -35,15 +35,15 @@ class PacmanView(View):
         header.properties.gap = 50.0
         main_layout.add(header)
 
-        self._score_text = Text(text="Score: 0")
+        self._score_text = Text(text="Score: 0", width="33.33%")
         self._score_text.properties.text_color = pr.RED
         self._score_text.properties.font_size = "35%"
 
-        self._level_text = Text(text="Level: 1")
+        self._level_text = Text(text="Level: 1", width="33.33%")
         self._level_text.properties.text_color = pr.RED
         self._level_text.properties.font_size = "35%"
 
-        self._time_text = Text(text="Time: 0s")
+        self._time_text = Text(text="Time: 0s", width="33.33%")
         self._time_text.properties.text_color = pr.RED
         self._time_text.properties.font_size = "35%"
 
@@ -96,7 +96,7 @@ class PacmanView(View):
 
         self._life_text.properties.text_content = f"Life: {self.game.life}"
         self._time_text.properties.text_content = (
-            f"Time: {self.game.stage.remaining}s"
+            f"Time: {int(self.game.stage.remaining)}s"
         )
         self._level_text.properties.text_content = (
             f"Level: {self.game.stage.level}"
