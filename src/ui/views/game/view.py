@@ -79,6 +79,9 @@ class PacmanView(View):
         self.game.event.subscribe(GameEvent.PAUSE, self._on_pause)
         self.game.event.subscribe(GameEvent.NEW_STAGE, self._on_new_stage)
         self.game.event.subscribe(GameEvent.VICTORY, self._on_win)
+        self.game.event.subscribe(
+            GameEvent.GAME_OVER, lambda: self.overlays.clear()
+        )
 
         self._on_new_stage()
 
@@ -90,9 +93,6 @@ class PacmanView(View):
 
         if not self.game:
             return
-
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_C):
-            self.game.cheat_next_stage()
 
         self._life_text.properties.text_content = f"Life: {self.game.life}"
         self._time_text.properties.text_content = (
@@ -137,6 +137,8 @@ class PacmanView(View):
         if not self.game:
             return
 
+        self.overlays.clear()
+
         overlay = WinOverlay(
             score_file=self.context.config.score_file,
             score=self.game.score,
@@ -147,6 +149,8 @@ class PacmanView(View):
     def _on_game_over(self) -> None:
         if not self.game:
             return
+
+        self.overlays.clear()
 
         overlay = GameOverOverlay(
             score_file=self.context.config.score_file,
