@@ -93,7 +93,7 @@ class Game:
             self.event.emit(GameEvent.GAME_OVER)
 
     def check_pause(self) -> None:
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_P):
+        if rl.is_key_pressed(rl.KeyboardKey.KEY_P) and not self.is_over:
             self.is_paused = not self.is_paused
             self.event.emit(GameEvent.PAUSE, self.is_paused)
 
