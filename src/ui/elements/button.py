@@ -19,7 +19,7 @@ class Button(Element):
                 "border": 3,
                 "border_color": pr.Color(29, 29, 36, 255),
                 "background_color": pr.Color(39, 39, 48, 255),
-                "hover_color": pr.Color(54, 193, 231, 150),
+                "hover_color": pr.Color(54, 100, 150, 255),
                 "text_color": pr.Color(200, 200, 200, 255),
                 "padding": 12.0,
                 "border_radius": 1.0,
@@ -41,14 +41,3 @@ class Button(Element):
 
         if self.is_focused and pr.is_key_pressed(pr.KeyboardKey.KEY_ENTER):
             self.onclick()
-
-    def on_render(self) -> None:
-        super().on_render()
-
-        if self.is_focused:
-            pr.draw_rectangle_rounded(
-                self.boxes.padding_box,
-                self.properties.border_radius,
-                36,
-                self.properties.hover_color,
-            )

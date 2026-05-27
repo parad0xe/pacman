@@ -5,6 +5,7 @@ from typing_extensions import Unpack
 
 from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
+from src.ui.core.layout import VBox
 from src.ui.elements.text import Text
 
 
@@ -17,7 +18,7 @@ class InputText(ElementGroup):
         label_background_color: pr.Color,
         max_length: int,
         on_submit: Callable[[], None],
-        focus_color: pr.Color = pr.Color(54, 193, 231, 150),
+        focus_color: pr.Color = pr.Color(54, 100, 150, 255),
         label_color: pr.Color = pr.WHITE,
         **kwargs: Unpack[ElementKwargs],
     ):
@@ -27,6 +28,8 @@ class InputText(ElementGroup):
                 "padding": 10,
                 "border_radius": 0.2,
                 "text_color": pr.LIGHTGRAY,
+                "background_color": label_background_color,
+                "hover_color": label_background_color,
             },
             kwargs,
         )
@@ -36,6 +39,7 @@ class InputText(ElementGroup):
         self.properties.text_content = ""
         self.properties.border_color = label_color
         self.can_focus = True
+        self.is_typing_target = True
 
         self.max_length: int = max_length
         self.focus_color = focus_color
@@ -45,13 +49,7 @@ class InputText(ElementGroup):
         self.underline_dt: float = 0.0
         self.blink_speed: float = 0.5
 
-        self.input = Text(text="", height="100%")
-        self.input.properties.font_size = 20
-
-        self.input.properties.text_color = pr.LIGHTGRAY
-        self.input.properties.background_color = label_background_color
-        self.input.properties.padding = 10
-        self.add(self.input)
+        self.main_content = VBox()
 
         self.label = Text(text=label)
         self.label.properties.font_size = 20
@@ -60,9 +58,21 @@ class InputText(ElementGroup):
         self.label.properties.padding = 10
         self.add(self.label)
 
+        self.input = Text(text="")
+        self.input.properties.font_size = 20
+        self.input.properties.text_color = pr.LIGHTGRAY
+        self.input.properties.padding = 10
+        self.main_content.add(self.input)
+
+        self.add(self.main_content)
+
     @property
     def value(self) -> str:
         return self.input.properties.text_content
+
+    @value.setter
+    def value(self, text: str) -> None:
+        self.input.properties.text_content = text
 
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
@@ -71,7 +81,7 @@ class InputText(ElementGroup):
             self.on_submit()
 
         self.label.y = (
-            self.y
+            self.main_content.y
             - self.label.boxes.border_box.height
             + self.label.boxes.content_box.height / 2
         )

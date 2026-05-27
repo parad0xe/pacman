@@ -66,13 +66,13 @@ class GameOverOverlay(VBox):
                 new_highscore_text.properties.text_align = "center"
                 header.add(new_highscore_text)
 
-        main_content = VBox()
+        main_content = VBox(width=350)
         main_content.properties.justify_content = "center"
         main_content.properties.align_items = "center"
         main_content.properties.gap = 30
 
         self.input_text = InputText(
-            label="Enter your pseudo",
+            label="Username",
             max_length=10,
             label_color=PacmanViewTheme.TEXT_COLOR_DEFAULT,
             label_background_color=PacmanViewTheme.BACKGROUND_COLOR,

@@ -4,7 +4,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.context import Context
-from src.models.score import Highscores, load_highscores
+from src.models.score import Highscores, MAX_HIGHSCORES, load_highscores
 from src.ui.core.element import ElementKwargs
 from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
@@ -124,7 +124,7 @@ class HighscoreView(View):
 
         for index, score in enumerate(
             sorted(
-                self.highscores.scores[:10],
+                self.highscores.scores[:MAX_HIGHSCORES],
                 key=lambda x: x.score,
                 reverse=True,
             )

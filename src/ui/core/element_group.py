@@ -1,10 +1,11 @@
+from typing import Optional
+
 from typing_extensions import Unpack
 
 from src.ui.core.element import Element, ElementKwargs
 
 
 class ElementGroup(Element):
-
     def __init__(self, **kwargs: Unpack[ElementKwargs]) -> None:
         super().__init__(**kwargs)
         self._children: dict[str, Element] = {}

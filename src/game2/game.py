@@ -92,13 +92,12 @@ class Game:
             self.is_over = 1
             self.event.emit(GameEvent.GAME_OVER)
 
-    def check_pause(self) -> None:
-        if rl.is_key_pressed(rl.KeyboardKey.KEY_P) and not self.is_over:
+    def toggle_pause(self) -> None:
+        if not self.is_over:
             self.is_paused = not self.is_paused
             self.event.emit(GameEvent.PAUSE, self.is_paused)
 
     def update(self, dt: float) -> None:
-        self.check_pause()
         if self.is_paused or self.is_over:
             return
         if self.wait_timer > 0:
@@ -116,6 +115,8 @@ class Game:
         self.check_state()
 
     def cheat_next_stage(self) -> None:
+        if self.is_paused:
+            self.toggle_pause()
         self.newstage()
 
     def cheat_extra_life(self) -> None:

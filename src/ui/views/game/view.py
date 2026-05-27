@@ -12,6 +12,7 @@ from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
 from src.ui.elements.text import Text
 from src.ui.views.game.canvas import GameCanvas
+from src.ui.views.game.overlays.cheats import CheatsOverlay
 from src.ui.views.game.overlays.game_over import GameOverOverlay
 from src.ui.views.game.overlays.select_action import SelectActionOverlay
 from src.ui.views.game.overlays.start_timer import StartTimerOverlay
@@ -81,7 +82,7 @@ class PacmanView(View):
         self._life_text = _Layout.text("Life: 3", "100%")
         footer.add(self._life_text)
 
-        self.overlays = ElementGroup(width="100%", height="100%")
+        self.overlays = HBox(width="100%", height="100%")
 
         self.add(main_layout, self.overlays)
 
@@ -97,10 +98,14 @@ class PacmanView(View):
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_ZERO):
+        if self.is_key_pressed(pr.KeyboardKey.KEY_ZERO):
             self.goto_view("menu")
 
         if not self.game:
+            return
+
+        if self.is_key_pressed(pr.KeyboardKey.KEY_P):
+            self.game.toggle_pause()
             return
 
         self._life_text.properties.text_content = f"Life: {self.game.life}"
@@ -123,12 +128,16 @@ class PacmanView(View):
 
     def on_exit(self) -> None:
         GameCanvas.unload()
+        CheatsOverlay.unload()
 
         self.overlays.clear()
         self.game_container.clear()
         self.game = None
 
     def _on_new_stage(self) -> None:
+        if not self.game:
+            return
+
         self.game_container.add(
             GameCanvas(
                 id="canvas",
@@ -174,23 +183,32 @@ class PacmanView(View):
         )
 
     def _on_pause(self, is_paused: bool) -> None:
-        if self.game.wait_timer > 0:
+        if not self.game or self.game.wait_timer > 0:
             return
 
         if is_paused:
-            self._on_select_action()
+            self._on_select_action(with_cheats=True)
         else:
             self.overlays.clear()
 
-    def _on_select_action(self) -> None:
+    def _on_select_action(self, with_cheats: bool = False) -> None:
         self._set_overlay(
             SelectActionOverlay(
+                width="50%" if with_cheats else "100%",
                 on_restart=self.on_enter,
                 on_menu=lambda: self.goto_view("menu"),
                 on_toggle_fps=self._on_toggle_fps,
                 on_quit=lambda: self.quit(),
             )
         )
+
+        if with_cheats and self.game:
+            self.overlays.add(
+                CheatsOverlay(
+                    width="50%",
+                    game=self.game,
+                ),
+            )
 
     def _on_toggle_fps(self) -> None:
         self.show_fps_counter = not self.show_fps_counter

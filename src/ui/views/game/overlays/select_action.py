@@ -18,9 +18,9 @@ class SelectActionOverlay(VBox):
         on_toggle_fps: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        kwargs.setdefault("width", "100%")
+        kwargs.setdefault("height", "100%")
         super().__init__(**kwargs)
-        self.width = "100%"
-        self.height = "100%"
         self.properties.justify_content = "center"
         self.properties.align_items = "center"
         self.properties.gap = 40

@@ -33,6 +33,19 @@ class View(ElementGroup, ABC):
     @abstractmethod
     def on_exit(self) -> None: ...
 
+    def is_key_pressed(self, key: int) -> bool:
+        return pr.is_key_pressed(key) and not self.has_typing_focus
+
+    def is_key_down(self, key: int) -> bool:
+        return pr.is_key_down(key) and not self.has_typing_focus
+
+    @property
+    def has_typing_focus(self) -> bool:
+        focusables = self.get_focusables()
+        if focusables and 0 <= self._focus_index < len(focusables):
+            return focusables[self._focus_index].is_typing_target
+        return False
+
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
         self._update_focus()

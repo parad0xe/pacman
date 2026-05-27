@@ -42,6 +42,7 @@ class Element(ABC):
         self.is_focused: bool = False
         self.is_hovered: bool = False
         self.can_focus: bool = False
+        self.is_typing_target: bool = False
 
         self.parent: Optional["ElementGroup"] = None
         self.boxes = ElementBoxes()
@@ -146,13 +147,22 @@ class Element(ABC):
         ):
             return
 
-        if self.properties.background_color:
+        if self.properties.background_color and not self.is_focused:
             pr.draw_rectangle_rounded(
                 self.boxes.border_box,
                 self.properties.border_radius,
                 36,
                 self.properties.background_color,
             )
+
+        if self.can_focus and self.is_focused:
+            if self.is_focused:
+                pr.draw_rectangle_rounded(
+                    self.boxes.padding_box,
+                    self.properties.border_radius,
+                    36,
+                    self.properties.hover_color,
+                )
 
         if self.properties.border > 0:
             pr.draw_rectangle_rounded_lines_ex(

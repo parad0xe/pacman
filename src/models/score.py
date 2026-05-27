@@ -5,6 +5,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from src.exceptions.schema import SchemaValidationError
 from src.utils.file import file_load_json, file_write_json
 
+MAX_HIGHSCORES = 10
+
 
 class Score(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -23,7 +25,7 @@ def save_highscores(file_path: str | Path, scores: Highscores) -> None:
     if isinstance(file_path, str):
         file_path = Path(file_path)
 
-    scores.scores = scores.scores[:20]
+    scores.scores = scores.scores[-MAX_HIGHSCORES:]
 
     try:
         file_write_json(file_path, scores.model_dump())
