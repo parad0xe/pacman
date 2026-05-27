@@ -2,7 +2,7 @@ from typing import Callable, ClassVar
 
 from typing_extensions import Unpack
 
-from src.mock.pacman import Game, GameEvent
+from src.game2.game import Game, GameEvent
 from src.ui.animation import (
     AnimationTexture,
 )

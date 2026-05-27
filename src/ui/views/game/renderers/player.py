@@ -1,4 +1,5 @@
-from src.mock.pacman import Direction, Player
+from src.game2.direction import Direction
+from src.game2.player import Player
 from src.ui.animation import (
     Animation,
     AnimationMode,
@@ -67,7 +68,7 @@ class PlayerRenderer:
                     frame_height=animation_frame_height,
                     max_frames=12,
                     offset_x=2,
-                    fps=animation_fps,
+                    fps=0.09,
                     mode=AnimationMode.ONCE,
                 ),
             },

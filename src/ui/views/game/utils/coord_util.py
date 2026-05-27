@@ -1,6 +1,6 @@
 import pyray as pr
 
-from src.mock.pacman import Game
+from src.game2.game import Game
 
 
 class MazeCoordinateMapper:

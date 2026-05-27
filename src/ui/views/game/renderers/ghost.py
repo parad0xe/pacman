@@ -1,4 +1,6 @@
-from src.mock.pacman import Direction, Ghost, GhostState, Player
+from src.game2.direction import Direction
+from src.game2.ghost import Ghost, GhostState
+from src.game2.player import Player
 from src.ui.animation import Animation, AnimationRegistry, AnimationTexture
 from src.ui.views.game.utils.coord_util import MazeCoordinateMapper
 
