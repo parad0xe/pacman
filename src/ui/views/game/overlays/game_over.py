@@ -1,6 +1,5 @@
 from typing import Callable
 
-import pyray as pr
 from pydantic import ValidationError
 from typing_extensions import Unpack
 
@@ -11,6 +10,7 @@ from src.ui.core.layout import VBox
 from src.ui.elements.button import Button
 from src.ui.elements.input_text import InputText
 from src.ui.elements.text import Text
+from src.ui.views.game.theme import PacmanViewTheme
 
 
 class GameOverOverlay(VBox):
@@ -28,7 +28,9 @@ class GameOverOverlay(VBox):
         self.properties.justify_content = "center"
         self.properties.align_items = "center"
         self.properties.gap = 120
-        self.properties.background_color = pr.Color(20, 20, 30, 230)
+        self.properties.background_color = (
+            PacmanViewTheme.BACKGROUND_COLOR_TRANSPARENCY
+        )
 
         self.score_file = score_file
         self.score = score
@@ -43,7 +45,7 @@ class GameOverOverlay(VBox):
 
         title = Text(text="GAME OVER")
         title.properties.font_size = 60
-        title.properties.text_color = pr.RED
+        title.properties.text_color = PacmanViewTheme.TEXT_COLOR_PRIMARY
         title.properties.text_align = "center"
         header.add(title)
 
@@ -58,7 +60,9 @@ class GameOverOverlay(VBox):
                     text=f"Congratulation, New highscore ! ({score})"
                 )
                 new_highscore_text.properties.font_size = 20
-                new_highscore_text.properties.text_color = pr.GRAY
+                new_highscore_text.properties.text_color = (
+                    PacmanViewTheme.TEXT_COLOR_DEFAULT
+                )
                 new_highscore_text.properties.text_align = "center"
                 header.add(new_highscore_text)
 
@@ -70,8 +74,8 @@ class GameOverOverlay(VBox):
         self.input_text = InputText(
             label="Enter your pseudo",
             max_length=10,
-            label_color=pr.GRAY,
-            label_background_color=pr.Color(20, 20, 30, 255),
+            label_color=PacmanViewTheme.TEXT_COLOR_DEFAULT,
+            label_background_color=PacmanViewTheme.BACKGROUND_COLOR,
             on_submit=self._on_submit,
         )
         main_content.add(self.input_text)

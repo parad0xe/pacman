@@ -2,8 +2,8 @@ from random import randint
 from time import time
 
 import pyray as rl
-
 from src.game.pathfinder import PathFinder
+
 from src.game2.direction import Direction
 from src.models.ghost import GhostPort, GhostState
 from src.models.player import PlayerPort, PlayerState
@@ -75,8 +75,8 @@ class Ghost(GhostPort):
     def on_cell(self) -> bool:
         """True if the ghost is aligned on a cell."""
         return (
-            abs(self._pos.x - round(self._pos.x)) < self.speed and
-            abs(self._pos.y - round(self._pos.y)) < self.speed
+            abs(self._pos.x - round(self._pos.x)) < self.speed
+            and abs(self._pos.y - round(self._pos.y)) < self.speed
         )
 
     def follow_current_path(self) -> None:
@@ -137,8 +137,10 @@ class Ghost(GhostPort):
             self._state = GhostState.FLEE
             self.flee(player)
 
-        elif (self.state == GhostState.RETREAT and
-              time() - self.retreat_timer < 5):
+        elif (
+            self.state == GhostState.RETREAT
+            and time() - self.retreat_timer < 5
+        ):
             self.retreat()
 
         elif randint(1, 1000) == 999:

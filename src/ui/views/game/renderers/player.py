@@ -1,11 +1,11 @@
-from src.mock.pacman import Direction, GameEvent, Player
+from src.mock.pacman import Direction, Player
 from src.ui.animation import (
     Animation,
     AnimationMode,
     AnimationRegistry,
     AnimationTexture,
 )
-from src.ui.views.game.coord_util import MazeCoordinateMapper
+from src.ui.views.game.utils.coord_util import MazeCoordinateMapper
 
 
 class PlayerRenderer:

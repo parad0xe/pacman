@@ -1,9 +1,9 @@
 from typing import Optional
 
 from mazegenerator import mazegenerator
-
-from src.old_core.context import Config
 from src.game.pathfinder import PathFinder
+from src.old_core.context import Config
+
 from src.game.stage import Stage, StagePort
 from src.models.game import GamePort
 from src.models.ghost import GhostPort
@@ -34,8 +34,9 @@ class Game(GamePort):
     @property
     def is_over(self) -> bool:
         return (
-            self.life <= 0 or self.stage.remaining <= 0 or
-            not any([any(row) for row in self.stage.pacgums])
+            self.life <= 0
+            or self.stage.remaining <= 0
+            or not any([any(row) for row in self.stage.pacgums])
         )
 
     def player_death(self) -> int:
@@ -70,8 +71,10 @@ class Game(GamePort):
         for ghost in self.stage.ghosts:
             ghost.update(self.stage.player)
 
-            if (abs(ghost.pos.x - self.stage.player.pos.x) < 0.5 and
-                    abs(ghost.pos.y - self.stage.player.pos.y) < 0.5):
+            if (
+                abs(ghost.pos.x - self.stage.player.pos.x) < 0.5
+                and abs(ghost.pos.y - self.stage.player.pos.y) < 0.5
+            ):
                 if self.stage.player.state == PlayerState.NORMAL:
                     return self.player_death()
                 else:

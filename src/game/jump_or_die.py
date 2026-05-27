@@ -90,7 +90,9 @@ class JumpOrDie:
 
         self.spawn_timer += dt
         if self.spawn_timer >= self.time_to_next_spawn:
-            self.cacs.append((float(width - self.radius), random.uniform(3.0, 5.0)))
+            self.cacs.append(
+                (float(width - self.radius), random.uniform(3.0, 5.0))
+            )
             self.spawn_timer = 0.0
             self.time_to_next_spawn = random.uniform(0.4, 2.0)
 
@@ -98,7 +100,11 @@ class JumpOrDie:
         if pr.is_key_down(pr.KeyboardKey.KEY_SPACE) and self.energy > 0:
             self.v = -self.jump_speed
             self.energy -= self.energy_consume_per_sec * dt
-        elif self.v == 0.0 and self.ball_y == floor_y and self.energy < self.energy_max:
+        elif (
+            self.v == 0.0
+            and self.ball_y == floor_y
+            and self.energy < self.energy_max
+        ):
             self.energy += self.energy_refill_per_sec * dt
 
         if self.energy < 0:

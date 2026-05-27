@@ -1,7 +1,8 @@
 from enum import Enum, auto
-import pyray as rl
-from typing import Optional
 from math import ceil, floor
+from typing import Optional
+
+import pyray as rl
 
 from src.game2.direction import Direction
 
@@ -9,6 +10,7 @@ from src.game2.direction import Direction
 class PlayerState(Enum):
     NORMAL = auto()
     SUPER = auto()
+
 
 class Player:
     def __init__(self, pos: tuple[int, int], maze: list[list[int]]) -> None:
@@ -29,13 +31,19 @@ class Player:
 
     def on_cell(self) -> bool:
         """True if the player is aligned on a cell."""
-        return (abs(self.pos.x - round(self.pos.x)) < 0.001 and
-                abs(self.pos.y - round(self.pos.y)) < 0.001)
+        return (
+            abs(self.pos.x - round(self.pos.x)) < 0.001
+            and abs(self.pos.y - round(self.pos.y)) < 0.001
+        )
 
     def has_moved(self) -> bool:
-        return (not self.on_cell() or \
-            not (self.maze[self.cell()[1]][self.cell()[0]] & self.direction.value))\
-            and not self.direction == Direction.IDLE
+        return (
+            not self.on_cell()
+            or not (
+                self.maze[self.cell()[1]][self.cell()[0]]
+                & self.direction.value
+            )
+        ) and not self.direction == Direction.IDLE
 
     def reset(self) -> None:
         self.state = PlayerState.NORMAL
@@ -77,17 +85,22 @@ class Player:
 
     def is_key_turnaround(self) -> bool:
         return (
-            (self.direction == Direction.NORTH
-                and self.key_buffer == rl.KeyboardKey.KEY_DOWN)
-            or
-            (self.direction == Direction.EAST
-                and self.key_buffer == rl.KeyboardKey.KEY_LEFT)
-            or
-            (self.direction == Direction.SOUTH
-                and self.key_buffer == rl.KeyboardKey.KEY_UP)
-            or
-            (self.direction == Direction.WEST
-                and self.key_buffer == rl.KeyboardKey.KEY_RIGHT)
+            (
+                self.direction == Direction.NORTH
+                and self.key_buffer == rl.KeyboardKey.KEY_DOWN
+            )
+            or (
+                self.direction == Direction.EAST
+                and self.key_buffer == rl.KeyboardKey.KEY_LEFT
+            )
+            or (
+                self.direction == Direction.SOUTH
+                and self.key_buffer == rl.KeyboardKey.KEY_UP
+            )
+            or (
+                self.direction == Direction.WEST
+                and self.key_buffer == rl.KeyboardKey.KEY_RIGHT
+            )
         )
 
     def update_direction(self) -> None:
@@ -99,7 +112,10 @@ class Player:
 
         if self.on_cell():
             cell = self.cell()
-            if not (self.maze[cell[1]][cell[0]] & self.key_to_direction(self.key_buffer).value):
+            if not (
+                self.maze[cell[1]][cell[0]]
+                & self.key_to_direction(self.key_buffer).value
+            ):
                 self.direction = self.key_to_direction(self.key_buffer)
 
     def snap(self) -> None:
@@ -108,17 +124,17 @@ class Player:
 
     def next_cell_dist(self) -> float:
         if self.direction == Direction.EAST:
-             dist = ceil(self.pos.x) - self.pos.x
-             return dist if dist > 0.0001 else 1
+            dist = ceil(self.pos.x) - self.pos.x
+            return dist if dist > 0.0001 else 1
         if self.direction == Direction.WEST:
-             dist = self.pos.x - floor(self.pos.x)
-             return dist if dist > 0.0001 else 1
+            dist = self.pos.x - floor(self.pos.x)
+            return dist if dist > 0.0001 else 1
         if self.direction == Direction.NORTH:
-             dist = self.pos.y - floor(self.pos.y)
-             return dist if dist > 0.0001 else 1
+            dist = self.pos.y - floor(self.pos.y)
+            return dist if dist > 0.0001 else 1
         if self.direction == Direction.SOUTH:
-             dist = ceil(self.pos.y) - self.pos.y
-             return dist if dist > 0.0001 else 1
+            dist = ceil(self.pos.y) - self.pos.y
+            return dist if dist > 0.0001 else 1
         return 0
 
     def add_dist(self, dist: float) -> None:
@@ -129,7 +145,7 @@ class Player:
         elif self.direction == Direction.EAST:
             self.pos.x += dist
         elif self.direction == Direction.WEST:
-             self.pos.x -= dist
+            self.pos.x -= dist
 
     def update_pos(self, dt: float = 0) -> float:
         """moves the player depending on the dt and returns the

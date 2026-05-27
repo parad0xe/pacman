@@ -1,9 +1,9 @@
+from heapq import heappop, heappush
+
 from src.game2.direction import Direction
 
-from heapq import heappush, heappop
 
-
-class PathFinder():
+class PathFinder:
     def __init__(self, maze: list[list[int]] = []) -> None:
         self.maze = maze
 
@@ -20,8 +20,7 @@ class PathFinder():
         """
         return abs(src[0] - dest[0]) + abs(src[1] - dest[1])
 
-    def neighbors(self, pos: tuple[int, int]) \
-            -> list[tuple[int, int]]:
+    def neighbors(self, pos: tuple[int, int]) -> list[tuple[int, int]]:
         """
         return the coordinate of the avaible neighbors from 'pos' cell
         """
@@ -49,9 +48,9 @@ class PathFinder():
             return Direction.NORTH
         return Direction.IDLE
 
-    def reconstruct(self, came_from: dict,
-                    start: tuple[int, int],
-                    end: tuple[int, int]) -> list[Direction]:
+    def reconstruct(
+        self, came_from: dict, start: tuple[int, int], end: tuple[int, int]
+    ) -> list[Direction]:
         path: list[Direction] = []
         cur = end
         while cur != start:
@@ -61,8 +60,9 @@ class PathFinder():
         path.reverse()
         return path
 
-    def search(self, start: tuple[int, int], end: tuple[int, int])\
-            -> list[Direction]:
+    def search(
+        self, start: tuple[int, int], end: tuple[int, int]
+    ) -> list[Direction]:
         open_heap: list[tuple[int, int, tuple[int, int]]] = []
         heappush(open_heap, (self.dist(start, end), 0, start))
 
@@ -84,7 +84,7 @@ class PathFinder():
                 if neighbor in closed:
                     continue
                 g_new = g_cur + 1
-                if g_new < g.get(neighbor, float('inf')):
+                if g_new < g.get(neighbor, float("inf")):
                     g[neighbor] = g_new
                     f_new = g_new + self.dist(neighbor, end)
                     came_from[neighbor] = cur

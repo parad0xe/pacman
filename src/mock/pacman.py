@@ -1,18 +1,4 @@
-import random
 from enum import Enum, auto
-from heapq import heappop, heappush
-from typing import Optional
-
-import pyray as rl
-from mazegenerator import mazegenerator
-
-
-from src.game2.game import Game
-from src.game2.player import Player, PlayerState
-from src.game2.ghost import Ghost, GhostState
-from src.game2.pathfinder import PathFinder
-from src.game2.stage import Stage
-from src.game2.direction import Direction
 
 # class Config:
 #     def __init__(self) -> None:

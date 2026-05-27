@@ -1,14 +1,10 @@
-import pyray as rl
-from mazegenerator.mazegenerator import MazeGenerator
-
-from src.game.ghosts import Ghost, GhostPort
 from src.game.pathfinder import PathFinder
-from src.game.player import Player, PlayerPort
-from src.models.game import StagePort
+
+from src.game.ghosts import GhostPort
+from src.game.player import PlayerPort
 
 
-
-    @property
+@property
     def level(self) -> int:
         return self._level
 

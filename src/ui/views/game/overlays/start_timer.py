@@ -6,8 +6,7 @@ from src.game2.game import Game
 from src.ui.core.element import ElementKwargs
 from src.ui.core.layout import VBox
 from src.ui.elements.text import Text
-
-import pyray as pr
+from src.ui.views.game.theme import PacmanViewTheme
 
 
 class StartTimerOverlay(VBox):
@@ -22,7 +21,9 @@ class StartTimerOverlay(VBox):
         self.height = "100%"
         self.properties.justify_content = "center"
         self.properties.align_items = "center"
-        self.properties.background_color = pr.Color(20, 20, 30, 230)
+        self.properties.background_color = (
+            PacmanViewTheme.BACKGROUND_COLOR_TRANSPARENCY
+        )
 
         self.game = game
         self.on_timer_end = on_timer_end
@@ -34,7 +35,7 @@ class StartTimerOverlay(VBox):
             properties={
                 "justify_content": "center",
                 "align_items": "center",
-                "text_color": pr.RED,
+                "text_color": PacmanViewTheme.TEXT_COLOR_PRIMARY,
                 "font_size": 200,
             },
         )

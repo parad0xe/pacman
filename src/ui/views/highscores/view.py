@@ -10,6 +10,7 @@ from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
 from src.ui.elements.button import Button
 from src.ui.elements.text import Text
+from src.ui.views.highscores.theme import HighscoresViewTheme
 
 
 class HighscoreView(View):
@@ -19,7 +20,7 @@ class HighscoreView(View):
         self, *, context: Context, **kwargs: Unpack[ElementKwargs]
     ) -> None:
         super().__init__(event=context.event, **kwargs)
-        self.properties.background_color = pr.Color(20, 20, 30, 255)
+        self.properties.background_color = HighscoresViewTheme.BACKGROUND_COLOR
         self.properties.padding = 80
 
         self.context: Context = context
@@ -32,7 +33,10 @@ class HighscoreView(View):
         main_layout.add(
             Text(
                 text="Highscores",
-                properties={"font_size": 40, "text_color": pr.RED},
+                properties={
+                    "font_size": 40,
+                    "text_color": HighscoresViewTheme.TEXT_COLOR_PRIMARY,
+                },
             )
         )
 
@@ -76,7 +80,7 @@ class HighscoreView(View):
                     text="No highscores.",
                     properties={
                         "font_size": 35,
-                        "text_color": pr.WHITE,
+                        "text_color": HighscoresViewTheme.TEXT_COLOR_NO_HIGHSCORES,
                     },
                 )
             )
@@ -94,7 +98,7 @@ class HighscoreView(View):
                 properties={
                     "text_align": "left",
                     "font_size": 35,
-                    "text_color": pr.YELLOW,
+                    "text_color": HighscoresViewTheme.TEXT_COLOR_TABLE_HEADER,
                 },
             ),
             Text(
@@ -103,7 +107,7 @@ class HighscoreView(View):
                 properties={
                     "text_align": "left",
                     "font_size": 35,
-                    "text_color": pr.YELLOW,
+                    "text_color": HighscoresViewTheme.TEXT_COLOR_TABLE_HEADER,
                 },
             ),
             Text(
@@ -112,7 +116,7 @@ class HighscoreView(View):
                 properties={
                     "text_align": "right",
                     "font_size": 35,
-                    "text_color": pr.YELLOW,
+                    "text_color": HighscoresViewTheme.TEXT_COLOR_TABLE_HEADER,
                 },
             ),
         )
@@ -125,14 +129,14 @@ class HighscoreView(View):
                 reverse=True,
             )
         ):
-            color = pr.GRAY
+            color = HighscoresViewTheme.TEXT_RANK_DEFAULT
 
             if index == 0:
-                color = pr.GOLD
+                color = HighscoresViewTheme.TEXT_RANK_1
             elif index == 1:
-                color = pr.LIGHTGRAY
+                color = HighscoresViewTheme.TEXT_RANK_2
             elif index == 2:
-                color = pr.BROWN
+                color = HighscoresViewTheme.TEXT_RANK_3
 
             row = HBox()
             row.add(

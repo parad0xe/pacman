@@ -1,12 +1,12 @@
 from typing import Callable
 
-import pyray as pr
 from typing_extensions import Unpack
 
 from src.ui.core.base import ElementPropertiesDef
 from src.ui.core.element import ElementKwargs
 from src.ui.core.layout import VBox
 from src.ui.elements.button import Button
+from src.ui.views.game.theme import PacmanViewTheme
 
 
 class SelectActionOverlay(VBox):
@@ -24,7 +24,9 @@ class SelectActionOverlay(VBox):
         self.properties.justify_content = "center"
         self.properties.align_items = "center"
         self.properties.gap = 40
-        self.properties.background_color = pr.Color(20, 20, 30, 200)
+        self.properties.background_color = (
+            PacmanViewTheme.BACKGROUND_COLOR_TRANSPARENCY
+        )
 
         button_width = 300
         button_props: ElementPropertiesDef = {

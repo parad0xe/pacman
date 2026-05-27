@@ -1,6 +1,7 @@
 from enum import Enum, auto
 from math import ceil, floor
 from random import shuffle
+
 import pyray as rl
 
 from src.game2.direction import Direction

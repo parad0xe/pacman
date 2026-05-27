@@ -5,7 +5,7 @@ from typing_extensions import Unpack
 
 from src.context import Context
 from src.game.jump_or_die import JumpOrDie, JumpOrDieEvent
-from src.ui.core.element import ElementKwargs
+from src.ui.core.element import Element, ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
@@ -14,6 +14,55 @@ from src.ui.elements.text import Text
 from src.ui.views.menu.canvas import GameCanvas
 from src.ui.views.menu.overlays.game_over import GameOverOverlay
 from src.ui.views.menu.overlays.pause import PauseOverlay
+from src.ui.views.menu.theme import MenuTheme
+
+
+class _Layout:
+    @staticmethod
+    def header() -> VBox:
+        header = VBox(width="100%", height="25%")
+        header.properties.justify_content = "center"
+        header.properties.padding = 20
+
+        header_title = Text(text="Pac-Man", width="100%")
+        header_title.properties.font_size = "50%"
+        header_title.properties.text_color = MenuTheme.HEADER_TITLE_COLOR
+        header_title.properties.letter_spacing = 12
+        header.add(header_title)
+
+        header_subtitle = Text(text="(menu)", width="100%")
+        header_subtitle.properties.font_size = "15%"
+        header_subtitle.properties.text_color = MenuTheme.TEXT_COLOR_DEFAULT
+        header_subtitle.properties.letter_spacing = 12
+        header.add(header_subtitle)
+
+        return header
+
+    @staticmethod
+    def main_content() -> ElementGroup:
+        main_content = ElementGroup(width="100%", height="50%")
+        main_content.properties.justify_content = "center"
+        main_content.properties.margin = 10
+        main_content.properties.border = 2
+
+        return main_content
+
+    @staticmethod
+    def footer() -> HBox:
+        footer = HBox(width="100%", height="25%")
+        footer.properties.padding = 20
+        footer.properties.gap = 10
+        footer.properties.justify_content = "center"
+        footer.properties.align_items = "center"
+
+        return footer
+
+    @staticmethod
+    def create_menu_button(text: str, action: Callable) -> Button:
+        button = Button(text=text, width="33.33%", onclick=action)
+        button.properties.font_size = 24
+        button.properties.padding = 10
+        return button
 
 
 class MenuView(View):
@@ -23,7 +72,7 @@ class MenuView(View):
         self, *, context: Context, **kwargs: Unpack[ElementKwargs]
     ) -> None:
         super().__init__(event=context.event, **kwargs)
-        self.properties.background_color = pr.Color(20, 20, 30, 255)
+        self.properties.background_color = MenuTheme.BACKGROUND_COLOR
         self.properties.justify_content = "center"
 
         self.game: Optional[JumpOrDie] = None
@@ -31,32 +80,14 @@ class MenuView(View):
         main_layout = VBox(width="80%", height="100%")
         main_layout.properties.align_items = "center"
 
-        header = VBox(width="100%", height="25%")
-        header.properties.justify_content = "center"
-        header.properties.padding = 20
+        header = _Layout.header()
+        main_layout.add(header)
 
-        header_title = Text(text="Pac-Man", width="100%")
-        header_title.properties.font_size = "50%"
-        header_title.properties.text_color = pr.Color(54, 193, 231, 255)
-        header_title.properties.letter_spacing = 12
-        header.add(header_title)
+        self.main_content = _Layout.main_content()
+        main_layout.add(self.main_content)
 
-        header_subtitle = Text(text="(menu)", width="100%")
-        header_subtitle.properties.font_size = "15%"
-        header_subtitle.properties.text_color = pr.GRAY
-        header_subtitle.properties.letter_spacing = 12
-        header.add(header_subtitle)
-
-        self.main_content = ElementGroup(width="100%", height="50%")
-        self.main_content.properties.justify_content = "center"
-        self.main_content.properties.margin = 10
-        self.main_content.properties.border = 2
-
-        footer = HBox(width="100%", height="25%")
-        footer.properties.padding = 20
-        footer.properties.gap = 10
-        footer.properties.justify_content = "center"
-        footer.properties.align_items = "center"
+        footer = _Layout.footer()
+        main_layout.add(footer)
 
         footer_buttons = [
             ("Play (M)", lambda: self.goto_view("game")),
@@ -65,12 +96,13 @@ class MenuView(View):
         ]
 
         for text, callback in footer_buttons:
-            footer.add(self._create_menu_button(text, callback))
+            footer.add(_Layout.create_menu_button(text, callback))
 
-        main_layout.add(header, self.main_content, footer)
-
-        self.overlays = ElementGroup(width="100%", height="100%")
-
+        self.overlays = ElementGroup(
+            id="overlays",
+            width="100%",
+            height="100%",
+        )
         self.add(main_layout)
 
     def on_enter(self) -> None:
@@ -80,7 +112,7 @@ class MenuView(View):
                 height="100%",
                 properties={
                     "font_size": "10%",
-                    "text_color": pr.GRAY,
+                    "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
                 },
             )
         )
@@ -106,20 +138,19 @@ class MenuView(View):
     def on_exit(self) -> None:
         GameCanvas.unload()
 
+        self._set_overlay()
         self.main_content.clear()
-        self.overlays.clear()
         self.game = None
 
     def _on_start_game(self) -> None:
-        self.overlays.clear()
+        self._set_overlay()
         self.main_content.clear()
 
         self.game = JumpOrDie(
             self.boxes.content_box.width,
             self.boxes.content_box.height,
         )
-        self.game.event.subscribe(JumpOrDieEvent.PAUSE, self._on_pause_toggle)
-        self.game.event.subscribe(JumpOrDieEvent.GAME_OVER, self._on_game_over)
+        self._subscribe_to_events()
 
         helper = HBox(y=self.main_content.boxes.border_box.height)
         helper.properties.gap = 20
@@ -128,14 +159,14 @@ class MenuView(View):
                 text="Press SPACE to jump",
                 properties={
                     "padding": 20,
-                    "text_color": pr.GRAY,
+                    "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
                 },
             ),
             Text(
                 text="Press P to pause",
                 properties={
                     "padding": 20,
-                    "text_color": pr.GRAY,
+                    "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
                 },
             ),
         )
@@ -152,19 +183,22 @@ class MenuView(View):
 
     def _on_pause_toggle(self, paused: bool) -> None:
         if paused:
-            self.overlays.add(PauseOverlay())
+            self._set_overlay(PauseOverlay())
         else:
-            self.overlays.clear()
+            self._set_overlay()
 
     def _on_game_over(self) -> None:
         self.overlays.add(GameOverOverlay(on_restart=self._on_start_game))
 
-    def _create_menu_button(
-        self,
-        text: str,
-        action: Callable,
-    ) -> Button:
-        button = Button(text=text, width="33.33%", onclick=action)
-        button.properties.font_size = 24
-        button.properties.padding = 10
-        return button
+    def _subscribe_to_events(self) -> None:
+        if not self.game:
+            return
+
+        self.game.event.subscribe(JumpOrDieEvent.PAUSE, self._on_pause_toggle)
+        self.game.event.subscribe(JumpOrDieEvent.GAME_OVER, self._on_game_over)
+
+    def _set_overlay(self, overlay: Optional[Element] = None):
+        self.overlays.clear()
+
+        if overlay:
+            self.overlays.add(overlay)

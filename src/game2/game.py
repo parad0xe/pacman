@@ -1,17 +1,17 @@
-from random import seed, randint
-from typing import Optional
 from enum import Enum, auto
+from random import randint, seed
 from time import time
-import pyray as rl
+from typing import Optional
 
+import pyray as rl
 from mazegenerator import mazegenerator
 
 from src.context import Config
-from src.game2.pathfinder import PathFinder
-from src.game2.stage import Stage
-from src.game2.ghost import Ghost
-from src.game2.player import PlayerState
 from src.event import Event
+from src.game2.ghost import Ghost
+from src.game2.pathfinder import PathFinder
+from src.game2.player import PlayerState
+from src.game2.stage import Stage
 
 
 class GameEvent(Enum):

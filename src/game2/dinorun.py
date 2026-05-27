@@ -89,9 +89,11 @@ class DinoRun:
             if (x - (speed * time_step)) < 0:
                 self.score += 1
 
-        self.cacs = [(x - (speed * time_step), speed)
-                     for x, speed in self.cacs
-                     if (x - (speed * time_step)) >= 0]
+        self.cacs = [
+            (x - (speed * time_step), speed)
+            for x, speed in self.cacs
+            if (x - (speed * time_step)) >= 0
+        ]
 
         for cac_x, _ in self.cacs:
             cac_rec = pr.Rectangle(

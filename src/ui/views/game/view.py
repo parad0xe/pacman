@@ -6,7 +6,7 @@ from typing_extensions import Unpack
 
 from src.context import Context
 from src.game2.game import Game, GameEvent
-from src.ui.core.element import ElementKwargs
+from src.ui.core.element import Element, ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
@@ -16,6 +16,33 @@ from src.ui.views.game.overlays.game_over import GameOverOverlay
 from src.ui.views.game.overlays.select_action import SelectActionOverlay
 from src.ui.views.game.overlays.start_timer import StartTimerOverlay
 from src.ui.views.game.overlays.win import WinOverlay
+from src.ui.views.game.theme import PacmanViewTheme
+
+
+class _Layout:
+
+    @staticmethod
+    def header() -> HBox:
+        header = HBox(width="100%", height="15%")
+        header.properties.padding = 20.0
+        header.properties.justify_content = "center"
+        header.properties.gap = 50.0
+        return header
+
+    @staticmethod
+    def footer() -> HBox:
+        footer = HBox(width="100%", height="15%")
+        footer.properties.padding = 10.0
+        footer.properties.justify_content = "center"
+        footer.properties.align_items = "center"
+        return footer
+
+    @staticmethod
+    def text(text: str, width: str) -> Text:
+        element = Text(text=text, width=width)
+        element.properties.text_color = PacmanViewTheme.TEXT_COLOR_PRIMARY
+        element.properties.font_size = "35%"
+        return element
 
 
 class PacmanView(View):
@@ -25,49 +52,34 @@ class PacmanView(View):
         self, *, context: Context, **kwargs: Unpack[ElementKwargs]
     ) -> None:
         super().__init__(event=context.event, **kwargs)
-        self.properties.background_color = pr.Color(20, 20, 30, 255)
+        self.properties.background_color = PacmanViewTheme.BACKGROUND_COLOR
 
         self.context = context
         self.game: Optional[Game] = None
-
         self.show_fps_counter = False
 
         main_layout = VBox(width="100%", height="100%")
 
-        header = HBox(width="100%", height="15%")
-        header.properties.padding = 20.0
-        header.properties.justify_content = "center"
-        header.properties.gap = 50.0
+        header = _Layout.header()
         main_layout.add(header)
 
-        self._score_text = Text(text="Score: 0", width="33.33%")
-        self._score_text.properties.text_color = pr.RED
-        self._score_text.properties.font_size = "35%"
-
-        self._level_text = Text(text="Level: 1", width="33.33%")
-        self._level_text.properties.text_color = pr.RED
-        self._level_text.properties.font_size = "35%"
-
-        self._time_text = Text(text="Time: 0s", width="33.33%")
-        self._time_text.properties.text_color = pr.RED
-        self._time_text.properties.font_size = "35%"
-
-        header.add(self._score_text, self._level_text, self._time_text)
+        self._score_text = _Layout.text("Score: 0", "33.33%")
+        self._level_text = _Layout.text("Level: 1", "33.33%")
+        self._time_text = _Layout.text("Time: 0s", "33.33%")
+        header.add(
+            self._score_text,
+            self._level_text,
+            self._time_text,
+        )
 
         self.game_container = ElementGroup(width="100%", height="70%")
         main_layout.add(self.game_container)
 
-        footer = HBox(width="100%", height="15%")
-        footer.properties.padding = 10.0
-        footer.properties.justify_content = "center"
-        footer.properties.align_items = "center"
-
-        self._life_text = Text(text="Life: 3")
-        self._life_text.properties.text_color = pr.RED
-        self._life_text.properties.font_size = "35%"
-
-        footer.add(self._life_text)
+        footer = _Layout.footer()
         main_layout.add(footer)
+
+        self._life_text = _Layout.text("Life: 3", "100%")
+        footer.add(self._life_text)
 
         self.overlays = ElementGroup(width="100%", height="100%")
 
@@ -78,12 +90,7 @@ class PacmanView(View):
         self.game_container.clear()
 
         self.game = Game(config=self.context.config)
-        self.game.event.subscribe(GameEvent.PAUSE, self._on_pause)
-        self.game.event.subscribe(GameEvent.NEW_STAGE, self._on_new_stage)
-        self.game.event.subscribe(GameEvent.VICTORY, self._on_win)
-        self.game.event.subscribe(
-            GameEvent.GAME_OVER, lambda: self.overlays.clear()
-        )
+        self._subcribe_to_events()
 
         self._on_new_stage()
 
@@ -122,8 +129,6 @@ class PacmanView(View):
         self.game = None
 
     def _on_new_stage(self) -> None:
-        self.overlays.clear()
-
         self.game_container.add(
             GameCanvas(
                 id="canvas",
@@ -137,7 +142,7 @@ class PacmanView(View):
             )
         )
 
-        self.overlays.add(
+        self._set_overlay(
             StartTimerOverlay(
                 game=self.game,
                 on_timer_end=lambda: self.overlays.clear(),
@@ -148,27 +153,25 @@ class PacmanView(View):
         if not self.game:
             return
 
-        self.overlays.clear()
-
-        overlay = WinOverlay(
-            score_file=self.context.config.score_file,
-            score=self.game.score,
-            on_next=self._on_select_action,
+        self._set_overlay(
+            WinOverlay(
+                score_file=self.context.config.score_file,
+                score=self.game.score,
+                on_next=self._on_select_action,
+            )
         )
-        self.overlays.add(overlay)
 
     def _on_game_over(self) -> None:
         if not self.game:
             return
 
-        self.overlays.clear()
-
-        overlay = GameOverOverlay(
-            score_file=self.context.config.score_file,
-            score=self.game.score,
-            on_next=self._on_select_action,
+        self._set_overlay(
+            GameOverOverlay(
+                score_file=self.context.config.score_file,
+                score=self.game.score,
+                on_next=self._on_select_action,
+            )
         )
-        self.overlays.add(overlay)
 
     def _on_pause(self, is_paused: bool) -> None:
         if self.game.wait_timer > 0:
@@ -180,14 +183,31 @@ class PacmanView(View):
             self.overlays.clear()
 
     def _on_select_action(self) -> None:
-        self.overlays.clear()
-        overlay = SelectActionOverlay(
-            on_restart=self.on_enter,
-            on_menu=lambda: self.goto_view("menu"),
-            on_toggle_fps=self._on_toggle_fps,
-            on_quit=lambda: self.quit(),
+        self._set_overlay(
+            SelectActionOverlay(
+                on_restart=self.on_enter,
+                on_menu=lambda: self.goto_view("menu"),
+                on_toggle_fps=self._on_toggle_fps,
+                on_quit=lambda: self.quit(),
+            )
         )
-        self.overlays.add(overlay)
 
     def _on_toggle_fps(self) -> None:
         self.show_fps_counter = not self.show_fps_counter
+
+    def _set_overlay(self, overlay: Optional[Element] = None):
+        self.overlays.clear()
+
+        if overlay:
+            self.overlays.add(overlay)
+
+    def _subcribe_to_events(self) -> None:
+        if not self.game:
+            return
+
+        self.game.event.subscribe(GameEvent.PAUSE, self._on_pause)
+        self.game.event.subscribe(GameEvent.NEW_STAGE, self._on_new_stage)
+        self.game.event.subscribe(GameEvent.VICTORY, self._on_win)
+        self.game.event.subscribe(
+            GameEvent.GAME_OVER, lambda: self._set_overlay()
+        )

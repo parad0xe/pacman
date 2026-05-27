@@ -1,8 +1,9 @@
-from src.models.player import PlayerPort, PlayerState
-from src.game2.direction import Direction
+from time import time
 
 import pyray as rl
-from time import time
+
+from src.game2.direction import Direction
+from src.models.player import PlayerPort, PlayerState
 
 
 class Player(PlayerPort):
@@ -48,8 +49,10 @@ class Player(PlayerPort):
 
     def on_cell(self) -> bool:
         """True if the player is aligned on a cell."""
-        return (abs(self._pos.x - round(self._pos.x)) < self.speed and
-                abs(self._pos.y - round(self._pos.y)) < self.speed)
+        return (
+            abs(self._pos.x - round(self._pos.x)) < self.speed
+            and abs(self._pos.y - round(self._pos.y)) < self.speed
+        )
 
     def update_key(self) -> None:
         if rl.is_key_down(rl.KeyboardKey.KEY_LEFT):
@@ -65,20 +68,28 @@ class Player(PlayerPort):
             self.key_buffer = rl.KeyboardKey.KEY_DOWN
 
     def update_direction(self, maze: list[list[int]]) -> None:
-        if self.direction == Direction.WEST\
-                and self.key_buffer == rl.KeyboardKey.KEY_RIGHT:
+        if (
+            self.direction == Direction.WEST
+            and self.key_buffer == rl.KeyboardKey.KEY_RIGHT
+        ):
             self._direction = Direction.EAST
 
-        if self.direction == Direction.EAST\
-                and self.key_buffer == rl.KeyboardKey.KEY_LEFT:
+        if (
+            self.direction == Direction.EAST
+            and self.key_buffer == rl.KeyboardKey.KEY_LEFT
+        ):
             self._direction = Direction.WEST
 
-        if self.direction == Direction.NORTH\
-                and self.key_buffer == rl.KeyboardKey.KEY_DOWN:
+        if (
+            self.direction == Direction.NORTH
+            and self.key_buffer == rl.KeyboardKey.KEY_DOWN
+        ):
             self._direction = Direction.SOUTH
 
-        if self.direction == Direction.SOUTH\
-                and self.key_buffer == rl.KeyboardKey.KEY_UP:
+        if (
+            self.direction == Direction.SOUTH
+            and self.key_buffer == rl.KeyboardKey.KEY_UP
+        ):
             self._direction = Direction.NORTH
 
         if not self.on_cell():
@@ -86,20 +97,18 @@ class Player(PlayerPort):
 
         x, y = self.cell()
 
-        if self.key_buffer == rl.KeyboardKey.KEY_LEFT\
-                and not (maze[y][x] & 8):
+        if self.key_buffer == rl.KeyboardKey.KEY_LEFT and not (maze[y][x] & 8):
             self._direction = Direction.WEST
 
-        if self.key_buffer == rl.KeyboardKey.KEY_RIGHT\
-                and not (maze[y][x] & 2):
+        if self.key_buffer == rl.KeyboardKey.KEY_RIGHT and not (
+            maze[y][x] & 2
+        ):
             self._direction = Direction.EAST
 
-        if self.key_buffer == rl.KeyboardKey.KEY_UP\
-                and not (maze[y][x] & 1):
+        if self.key_buffer == rl.KeyboardKey.KEY_UP and not (maze[y][x] & 1):
             self._direction = Direction.NORTH
 
-        if self.key_buffer == rl.KeyboardKey.KEY_DOWN\
-                and not (maze[y][x] & 4):
+        if self.key_buffer == rl.KeyboardKey.KEY_DOWN and not (maze[y][x] & 4):
             self._direction = Direction.SOUTH
 
     def update_pos(self, maze: list[list[int]]) -> None:
@@ -122,20 +131,16 @@ class Player(PlayerPort):
             self._pos.y = float(round(self._pos.y))
             x, y = self.cell()
 
-            if self.direction == Direction.WEST\
-                    and not maze[y][x] & 8:
+            if self.direction == Direction.WEST and not maze[y][x] & 8:
                 self._pos.x -= self.speed
 
-            if self.direction == Direction.EAST\
-                    and not maze[y][x] & 2:
+            if self.direction == Direction.EAST and not maze[y][x] & 2:
                 self._pos.x += self.speed
 
-            if self.direction == Direction.NORTH\
-                    and not maze[y][x] & 1:
+            if self.direction == Direction.NORTH and not maze[y][x] & 1:
                 self._pos.y -= self.speed
 
-            if self.direction == Direction.SOUTH\
-                    and not maze[y][x] & 4:
+            if self.direction == Direction.SOUTH and not maze[y][x] & 4:
                 self._pos.y += self.speed
 
     def update(self, maze: list[list[int]]) -> None:
@@ -143,6 +148,6 @@ class Player(PlayerPort):
         self.update_direction(maze)
         self.update_pos(maze)
         if self.state_timer != -1 and time() - self.state_timer > 5:
-           self.state_switch()
+            self.state_switch()
         self._frame += 1
         self._frame %= 5

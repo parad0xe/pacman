@@ -1,6 +1,6 @@
 import pyray as pr
 
-from src.ui.views.game.coord_util import MazeCoordinateMapper
+from src.ui.views.game.utils.coord_util import MazeCoordinateMapper
 
 
 class PacgumRenderer:

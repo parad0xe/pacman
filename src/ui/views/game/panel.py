@@ -2,13 +2,13 @@ import os
 from typing import Callable
 
 import pyray as pr
-from src.ui.views.game.animation import Animation, AnimTexturePack
+from src.ui.core.element.element import UIElementKwargs
+from src.ui.core.element.element_group import UIElementGroup
+from src.ui.views.game.animation import AnimTexturePack, Animation
 from typing_extensions import Unpack
 
 from src.game.game import Game
 from src.game2.direction import Direction
-from src.ui.core.element.element import UIElementKwargs
-from src.ui.core.element.element_group import UIElementGroup
 
 
 class GamePanel(UIElementGroup):
@@ -83,8 +83,8 @@ class GamePanel(UIElementGroup):
 
     def _has_move(self) -> bool:
         return (
-            self.game.stage.player.pos.x != self._last_player_position.x or
-            self.game.stage.player.pos.y != self._last_player_position.y
+            self.game.stage.player.pos.x != self._last_player_position.x
+            or self.game.stage.player.pos.y != self._last_player_position.y
         )
 
     def _update_impl(self, dt: float) -> None:
@@ -181,12 +181,12 @@ class GamePanel(UIElementGroup):
         )
 
         start_x = (
-            self.boxes.content_box.x +
-            (self.boxes.content_box.width - cols * cell_size) / 2.0
+            self.boxes.content_box.x
+            + (self.boxes.content_box.width - cols * cell_size) / 2.0
         )
         start_y = (
-            self.boxes.content_box.y +
-            (self.boxes.content_box.height - rows * cell_size) / 2.0
+            self.boxes.content_box.y
+            + (self.boxes.content_box.height - rows * cell_size) / 2.0
         )
 
         pacgums = self.game.stage.pacgums
@@ -231,10 +231,12 @@ class GamePanel(UIElementGroup):
                 # -- PACGUMS --
 
                 if pacgums[y][x] > 0:
-                    is_corner = ((x == 0 and y == 0) or
-                                 (x == cols - 1 and y == 0) or
-                                 (x == 0 and y == rows - 1) or
-                                 (x == cols - 1 and y == rows - 1))
+                    is_corner = (
+                        (x == 0 and y == 0)
+                        or (x == cols - 1 and y == 0)
+                        or (x == 0 and y == rows - 1)
+                        or (x == cols - 1 and y == rows - 1)
+                    )
                     color = pr.Color(180, 180, 10, 200)
                     if is_corner:
                         if self._super_pacgum_visible:
