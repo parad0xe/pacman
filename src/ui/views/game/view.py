@@ -30,6 +30,8 @@ class PacmanView(View):
         self.context = context
         self.game: Optional[Game] = None
 
+        self.show_fps_counter = False
+
         main_layout = VBox(width="100%", height="100%")
 
         header = HBox(width="100%", height="15%")
@@ -103,6 +105,15 @@ class PacmanView(View):
         )
         self._score_text.properties.text_content = f"Score: {self.game.score}"
 
+    def on_render(self) -> None:
+        super().on_render()
+
+        if self.show_fps_counter:
+            pr.draw_fps(
+                pr.get_screen_width() - 90,
+                pr.get_screen_height() - 30,
+            )
+
     def on_exit(self) -> None:
         GameCanvas.unload()
 
@@ -160,6 +171,9 @@ class PacmanView(View):
         self.overlays.add(overlay)
 
     def _on_pause(self, is_paused: bool) -> None:
+        if self.game.wait_timer > 0:
+            return
+
         if is_paused:
             self._on_select_action()
         else:
@@ -170,6 +184,10 @@ class PacmanView(View):
         overlay = SelectActionOverlay(
             on_restart=self.on_enter,
             on_menu=lambda: self.goto_view("menu"),
+            on_toggle_fps=self._on_toggle_fps,
             on_quit=lambda: self.quit(),
         )
         self.overlays.add(overlay)
+
+    def _on_toggle_fps(self) -> None:
+        self.show_fps_counter = not self.show_fps_counter

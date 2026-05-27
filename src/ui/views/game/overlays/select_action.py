@@ -15,6 +15,7 @@ class SelectActionOverlay(VBox):
         on_restart: Callable[[], None],
         on_menu: Callable[[], None],
         on_quit: Callable[[], None],
+        on_toggle_fps: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
         super().__init__(**kwargs)
@@ -41,6 +42,12 @@ class SelectActionOverlay(VBox):
                 text="Menu",
                 width=button_width,
                 onclick=on_menu,
+                properties=button_props,
+            ),
+            Button(
+                text="Toggle FPS",
+                width=button_width,
+                onclick=on_toggle_fps,
                 properties=button_props,
             ),
             Button(
