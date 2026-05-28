@@ -74,17 +74,32 @@ class InputText(ElementGroup):
     def value(self, text: str) -> None:
         self.input.properties.text_content = text
 
-    def on_update(self, dt: float) -> None:
-        super().on_update(dt)
-
-        if self.is_focused and pr.is_key_pressed(pr.KeyboardKey.KEY_ENTER):
-            self.on_submit()
-
+    def on_layout(
+        self,
+        parent_x: float,
+        parent_y: float,
+        parent_width: float,
+        parent_height: float,
+        update_children: bool = True,
+    ) -> None:
+        super().on_layout(
+            parent_x,
+            parent_y,
+            parent_width,
+            parent_height,
+            update_children,
+        )
         self.label.y = (
             self.main_content.y
             - self.label.boxes.border_box.height
             + self.label.boxes.content_box.height / 2
         )
+
+    def on_update(self, dt: float) -> None:
+        super().on_update(dt)
+
+        if self.is_focused and pr.is_key_pressed(pr.KeyboardKey.KEY_ENTER):
+            self.on_submit()
 
         if self.is_focused:
             self._check_entry()

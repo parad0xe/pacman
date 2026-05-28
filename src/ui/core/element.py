@@ -50,6 +50,8 @@ class Element(ABC):
         self._resolved_width = 0.0
         self._resolved_height = 0.0
         self._resolved_font_size = 0.0
+        self._text_width = 0.0
+        self._text_height = 0.0
 
         self._text_cache: dict[str, Any] = {
             "text": None,
@@ -88,13 +90,13 @@ class Element(ABC):
             self.properties.font_size, min_parent_dim
         )
 
-        content_width, content_height = 0.0, 0.0
+        self._text_width, self._text_height = 0.0, 0.0
         if self.properties.text_content:
-            content_width, content_height = self._measure_text()
+            self._text_width, self._text_height = self._measure_text()
 
         if self._resolved_width <= 0:
             final_width = (
-                content_width
+                self._text_width
                 + (self.properties.padding * 2)
                 + (self.properties.border * 2)
             )
@@ -105,7 +107,7 @@ class Element(ABC):
 
         if self._resolved_height <= 0:
             final_height = (
-                content_height
+                self._text_height
                 + (self.properties.padding * 2)
                 + (self.properties.border * 2)
             )
@@ -177,18 +179,19 @@ class Element(ABC):
             self.properties.text_content
             and float(self._resolved_font_size) > 0
         ):
-            text_width, text_height = self._measure_text()
             text_pos_x = self.boxes.content_box.x
 
             if self.properties.text_align == "center":
-                text_pos_x += (self.boxes.content_box.width - text_width) / 2
+                text_pos_x += (
+                    self.boxes.content_box.width - self._text_width
+                ) / 2
 
             elif self.properties.text_align == "right":
-                text_pos_x += self.boxes.content_box.width - text_width
+                text_pos_x += self.boxes.content_box.width - self._text_width
 
             text_pos_y = (
                 self.boxes.content_box.y
-                + (self.boxes.content_box.height - text_height) / 2
+                + (self.boxes.content_box.height - self._text_height) / 2
             )
 
             pr.draw_text_ex(
@@ -201,7 +204,9 @@ class Element(ABC):
             )
 
     def _default_properties(
-        self, base: Optional[ElementPropertiesDef], kwargs: ElementKwargs
+        self,
+        base: Optional[ElementPropertiesDef],
+        kwargs: ElementKwargs,
     ) -> None:
         if base is None:
             return

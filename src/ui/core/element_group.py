@@ -1,10 +1,17 @@
+from typing import Optional
+
 from typing_extensions import Unpack
 
 from src.ui.core.element import Element, ElementKwargs
 
 
 class ElementGroup(Element):
-    def __init__(self, **kwargs: Unpack[ElementKwargs]) -> None:
+    def __init__(
+        self,
+        *,
+        children: Optional[tuple[Element, ...]] = None,
+        **kwargs: Unpack[ElementKwargs],
+    ) -> None:
         super().__init__(**kwargs)
         self._children: dict[str, Element] = {}
 
@@ -12,6 +19,9 @@ class ElementGroup(Element):
         self._pending_adds: list[Element] = []
         self._pending_removes: list[str] = []
         self._pending_clear: bool = False
+
+        if children:
+            self.add(*children)
 
     def add(self, *elements: Element) -> None:
         if self._is_updating:
@@ -79,8 +89,12 @@ class ElementGroup(Element):
         parent_y: float,
         parent_width: float,
         parent_height: float,
+        update_children: bool = True,
     ) -> None:
         super().on_layout(parent_x, parent_y, parent_width, parent_height)
+
+        if not update_children:
+            return
 
         max_child_width = 0.0
         max_child_height = 0.0

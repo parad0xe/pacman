@@ -2,14 +2,22 @@ from src.ui.core.element_group import ElementGroup
 
 
 class VBox(ElementGroup):
+
     def on_layout(
         self,
         parent_x: float,
         parent_y: float,
         parent_width: float,
         parent_height: float,
+        update_children: bool = False,
     ) -> None:
-        super().on_layout(parent_x, parent_y, parent_width, parent_height)
+        super().on_layout(
+            parent_x,
+            parent_y,
+            parent_width,
+            parent_height,
+            update_children,
+        )
 
         max_child_width, total_child_height = 0.0, 0.0
 
@@ -85,8 +93,15 @@ class HBox(ElementGroup):
         parent_y: float,
         parent_width: float,
         parent_height: float,
+        update_children: bool = False,
     ) -> None:
-        super().on_layout(parent_x, parent_y, parent_width, parent_height)
+        super().on_layout(
+            parent_x,
+            parent_y,
+            parent_width,
+            parent_height,
+            update_children,
+        )
 
         total_child_width, max_child_height = 0.0, 0.0
 

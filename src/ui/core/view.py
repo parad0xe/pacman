@@ -5,7 +5,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.event import AppEvent, Event
-from src.ui.core.element import ElementKwargs
+from src.ui.core.element import Element, ElementKwargs
 from src.ui.core.element_group import ElementGroup
 
 
@@ -23,6 +23,9 @@ class View(ElementGroup, ABC):
         super().__init__(**kwargs)
 
         self.event = event
+
+        self._refresh_dt: float = 0.0
+        self._refresh_fps: float = 1.0 / 30.0
 
         self._focus_index: int = 0
         self._last_mouse_position = pr.Vector2(-1, -1)
@@ -48,7 +51,23 @@ class View(ElementGroup, ABC):
 
     def on_update(self, dt: float) -> None:
         super().on_update(dt)
+        self._refresh_dt += dt
         self._update_focus()
+
+    def on_layout(
+        self,
+        parent_x: float,
+        parent_y: float,
+        parent_width: float,
+        parent_height: float,
+        update_children: bool = True,
+    ) -> None:
+        if self._refresh_dt < self._refresh_fps:
+            return
+        self._refresh_dt = 0.0
+        super().on_layout(
+            parent_x, parent_y, parent_width, parent_height, update_children
+        )
 
     def goto_view(self, name: str) -> None:
         self.event.emit(AppEvent.SWITCH_VIEW, name)
