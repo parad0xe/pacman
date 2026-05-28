@@ -32,6 +32,7 @@ class PauseOverlay(VBox):
         button_width = 300
         button_props: ElementPropertiesDef = {
             "padding": 20,
+            "font_size": 25,
         }
 
         self.add(
