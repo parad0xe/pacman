@@ -1,8 +1,8 @@
-from src.game2.direction import Direction
-from src.game2.ghost import Ghost, GhostState
-from src.game2.player import Player
+from src.game.direction import Direction
+from src.game.ghost import Ghost, GhostState
+from src.game.player import Player
 from src.ui.animation import Animation, AnimationRegistry, AnimationTexture
-from src.ui.views.game.utils.coord_util import MazeCoordinateMapper
+from src.ui.views.game.renderers.maze import MazeCoordinateMapper
 
 
 class GhostRenderer:

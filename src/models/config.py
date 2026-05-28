@@ -20,7 +20,6 @@ class Config(BaseModel):
     ghost: int = 250
 
 
-
 def load_config(file_path: str | Path) -> Config:
     if isinstance(file_path, str):
         file_path = Path(file_path)

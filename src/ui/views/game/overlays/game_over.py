@@ -101,7 +101,7 @@ class GameOverOverlay(VBox):
                 Score(pseudo=pseudo, score=self.score)
             )
         except ValidationError as e:
-            raise SchemaValidationError(e, context=f"append new score")
+            raise SchemaValidationError(e, context="append new score")
         save_highscores(self.score_file, self.highscores)
 
         self.on_next()

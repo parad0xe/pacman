@@ -10,7 +10,7 @@ from src.ui.core.base import (
     ElementProperties,
     ElementPropertiesDef,
 )
-from src.ui.core.utils import unique_id
+from src.utils.common import unique_id
 
 if TYPE_CHECKING:
     from src.ui.core.element_group import ElementGroup

@@ -1,6 +1,7 @@
+import pyray as pr
 from typing_extensions import Unpack
 
-from src.game2.game import Game
+from src.game.game import Game
 from src.ui.core.base import ElementPropertiesDef
 from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
@@ -9,8 +10,6 @@ from src.ui.elements.button import Button
 from src.ui.elements.input_text import InputText
 from src.ui.elements.text import Text
 from src.ui.views.game.theme import PacmanViewTheme
-
-import pyray as pr
 
 
 class CheatsOverlay(ElementGroup):

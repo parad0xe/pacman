@@ -1,6 +1,6 @@
 from heapq import heappop, heappush
 
-from src.game2.direction import Direction
+from src.game.direction import Direction
 
 
 class PathFinder:

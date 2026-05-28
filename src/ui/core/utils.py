@@ -1,11 +1,6 @@
 import os
-import uuid
 
 import pyray as pr
-
-
-def unique_id() -> str:
-    return str(uuid.uuid4())
 
 
 def load_texture_from_path(path: str) -> pr.Texture:

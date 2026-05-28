@@ -2,7 +2,7 @@ from typing import Callable
 
 from typing_extensions import Unpack
 
-from src.game2.game import Game
+from src.game.game import Game
 from src.ui.core.element import ElementKwargs
 from src.ui.core.layout import VBox
 from src.ui.elements.text import Text

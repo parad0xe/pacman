@@ -5,7 +5,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.context import Context
-from src.game2.game import Game, GameEvent
+from src.game.game import Game, GameEvent
 from src.ui.core.element import Element, ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox

@@ -1,12 +1,12 @@
-from src.game2.direction import Direction
-from src.game2.player import Player
+from src.game.direction import Direction
+from src.game.player import Player
 from src.ui.animation import (
     Animation,
     AnimationMode,
     AnimationRegistry,
     AnimationTexture,
 )
-from src.ui.views.game.utils.coord_util import MazeCoordinateMapper
+from src.ui.views.game.renderers.maze import MazeCoordinateMapper
 
 
 class PlayerRenderer:

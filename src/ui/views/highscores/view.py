@@ -80,7 +80,9 @@ class HighscoreView(View):
                     text="No highscores.",
                     properties={
                         "font_size": 35,
-                        "text_color": HighscoresViewTheme.TEXT_COLOR_NO_HIGHSCORES,
+                        "text_color": (
+                            HighscoresViewTheme.TEXT_COLOR_NO_HIGHSCORES
+                        ),
                     },
                 )
             )

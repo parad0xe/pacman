@@ -2,7 +2,7 @@ from typing import Callable, ClassVar
 
 from typing_extensions import Unpack
 
-from src.game2.game import Game, GameEvent
+from src.game.game import Game, GameEvent
 from src.ui.animation import (
     AnimationTexture,
 )
@@ -10,10 +10,9 @@ from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.texture import TextureManager
 from src.ui.views.game.renderers.ghost import GhostRenderer
-from src.ui.views.game.renderers.maze import MazeRenderer
+from src.ui.views.game.renderers.maze import MazeCoordinateMapper, MazeRenderer
 from src.ui.views.game.renderers.pacgum import PacgumRenderer
 from src.ui.views.game.renderers.player import PlayerRenderer
-from src.ui.views.game.utils.coord_util import MazeCoordinateMapper
 
 
 class GameCanvas(ElementGroup):

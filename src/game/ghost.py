@@ -4,9 +4,9 @@ from random import shuffle
 
 import pyray as rl
 
-from src.game2.direction import Direction
-from src.game2.pathfinder import PathFinder
-from src.game2.player import Player, PlayerState
+from src.game.direction import Direction
+from src.game.pathfinder import PathFinder
+from src.game.player import Player, PlayerState
 
 
 class GhostID(Enum):

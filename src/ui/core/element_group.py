@@ -1,5 +1,3 @@
-from typing import Optional
-
 from typing_extensions import Unpack
 
 from src.ui.core.element import Element, ElementKwargs
