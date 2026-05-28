@@ -5,7 +5,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.event import AppEvent, Event
-from src.ui.core.element import Element, ElementKwargs
+from src.ui.core.element import ElementKwargs
 from src.ui.core.element_group import ElementGroup
 
 

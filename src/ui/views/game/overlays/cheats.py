@@ -170,13 +170,13 @@ class CheatsOverlay(ElementGroup):
         button_container.add(
             _CheatNumericAction(
                 label="Game speed",
-                value_getter=lambda: self.game.stage.player.speed,
+                value_getter=lambda: self.game.game_speed_mod,
                 on_decrease=lambda: self.game.cheat_game_speed(-1),
                 on_increase=lambda: self.game.cheat_game_speed(1),
             ),
             _CheatNumericAction(
                 label="Player speed",
-                value_getter=lambda: self.game.stage.player.speed,
+                value_getter=lambda: self.game.player_speed_mod,
                 on_decrease=lambda: self.game.cheat_speed(-1),
                 on_increase=lambda: self.game.cheat_speed(1),
             ),
