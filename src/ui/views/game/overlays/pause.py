@@ -9,12 +9,14 @@ from src.ui.elements.button import Button
 from src.ui.views.game.theme import PacmanViewTheme
 
 
-class SelectActionOverlay(VBox):
+class PauseOverlay(VBox):
     def __init__(
         self,
+        on_continue: Callable[[], None],
         on_restart: Callable[[], None],
         on_menu: Callable[[], None],
         on_quit: Callable[[], None],
+        on_toggle_fps: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
         kwargs.setdefault("width", "100%")
@@ -34,6 +36,12 @@ class SelectActionOverlay(VBox):
 
         self.add(
             Button(
+                text="Continue",
+                width=button_width,
+                onclick=on_continue,
+                properties=button_props,
+            ),
+            Button(
                 text="Restart",
                 width=button_width,
                 onclick=on_restart,
@@ -43,6 +51,12 @@ class SelectActionOverlay(VBox):
                 text="Menu",
                 width=button_width,
                 onclick=on_menu,
+                properties=button_props,
+            ),
+            Button(
+                text="Toggle FPS",
+                width=button_width,
+                onclick=on_toggle_fps,
                 properties=button_props,
             ),
             Button(

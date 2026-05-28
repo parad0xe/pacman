@@ -14,6 +14,7 @@ from src.ui.elements.text import Text
 from src.ui.views.game.canvas import GameCanvas
 from src.ui.views.game.overlays.cheats import CheatsOverlay
 from src.ui.views.game.overlays.game_over import GameOverOverlay
+from src.ui.views.game.overlays.pause import PauseOverlay
 from src.ui.views.game.overlays.select_action import SelectActionOverlay
 from src.ui.views.game.overlays.start_timer import StartTimerOverlay
 from src.ui.views.game.overlays.win import WinOverlay
@@ -187,28 +188,34 @@ class PacmanView(View):
             return
 
         if is_paused:
-            self._on_select_action(with_cheats=True)
-        else:
-            self.overlays.clear()
-
-    def _on_select_action(self, with_cheats: bool = False) -> None:
-        self._set_overlay(
-            SelectActionOverlay(
-                width="50%" if with_cheats else "100%",
-                on_restart=self.on_enter,
-                on_menu=lambda: self.goto_view("menu"),
-                on_toggle_fps=self._on_toggle_fps,
-                on_quit=lambda: self.quit(),
+            self._set_overlay(
+                PauseOverlay(
+                    width="50%",
+                    on_continue=lambda: self.game.toggle_pause(),
+                    on_restart=self.on_enter,
+                    on_menu=lambda: self.goto_view("menu"),
+                    on_toggle_fps=self._on_toggle_fps,
+                    on_quit=lambda: self.quit(),
+                )
             )
-        )
-
-        if with_cheats and self.game:
             self.overlays.add(
                 CheatsOverlay(
                     width="50%",
                     game=self.game,
                 ),
             )
+        else:
+            self.overlays.clear()
+
+    def _on_select_action(self) -> None:
+        self._set_overlay(
+            SelectActionOverlay(
+                width="100%",
+                on_restart=self.on_enter,
+                on_menu=lambda: self.goto_view("menu"),
+                on_quit=lambda: self.quit(),
+            )
+        )
 
     def _on_toggle_fps(self) -> None:
         self.show_fps_counter = not self.show_fps_counter
