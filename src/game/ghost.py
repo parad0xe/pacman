@@ -42,9 +42,9 @@ class Ghost:
 
         self.path_finder = path_finder
 
-        self.speed = 1.5
+        self.speed = 1.75
         self.retreat_timer = 0.0
-        self.wait_timer = self.id.value
+        self.wait_timer: float = self.id.value
         self.interact = True
 
     def can_interact(self) -> bool:

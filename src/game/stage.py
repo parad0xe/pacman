@@ -53,7 +53,8 @@ class Stage:
             ghost.reset(ghost.id.value)
 
     def update_pacgums(self) -> int:
-        if self.player.next_cell_dist() > 0.25:
+        if self.player.next_cell_dist() > 0.3 \
+         and self.player.next_cell_dist() < 0.7:
             return 0
 
         cell = self.player.cell()
