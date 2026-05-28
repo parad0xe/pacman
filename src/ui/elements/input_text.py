@@ -21,7 +21,7 @@ class InputText(ElementGroup):
         focus_color: pr.Color = pr.Color(54, 100, 150, 255),
         label_color: pr.Color = pr.WHITE,
         **kwargs: Unpack[ElementKwargs],
-    ):
+    ) -> None:
         self._default_properties(
             {
                 "border": 2,
@@ -68,7 +68,7 @@ class InputText(ElementGroup):
 
     @property
     def value(self) -> str:
-        return self.input.properties.text_content
+        return self.input.properties.text_content or ""
 
     @value.setter
     def value(self, text: str) -> None:
@@ -130,19 +130,17 @@ class InputText(ElementGroup):
 
     def _check_entry(self) -> None:
         key = pr.get_char_pressed()
+        value = self.value
         while key > 0:
-            if (
-                32 <= key <= 125
-                and len(self.input.properties.text_content) < self.max_length
-            ):
-                self.input.properties.text_content += chr(key)
+            if 32 <= key <= 125 and len(value) < self.max_length:
+                self.input.properties.text_content = value + chr(key)
             key = pr.get_char_pressed()
 
     def _check_backspace(self) -> None:
+        value = self.value
+
         if pr.is_key_pressed(
             pr.KeyboardKey.KEY_BACKSPACE
         ) or pr.is_key_pressed_repeat(pr.KeyboardKey.KEY_BACKSPACE):
-            if len(self.input.properties.text_content) > 0:
-                self.input.properties.text_content = (
-                    self.input.properties.text_content[:-1]
-                )
+            if len(value) > 0:
+                self.input.properties.text_content = value[:-1]

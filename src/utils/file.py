@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, TypeVar, cast
 
 from src.exceptions.schema import (
     SchemaInvalidJSONFormatError,
@@ -13,7 +13,7 @@ from src.exceptions.storage import (
     StorageFilePermissionError,
 )
 
-T = TypeVar("T", bound=list | dict)
+T = TypeVar("T", bound=list[Any] | dict[Any, Any])
 
 
 def file_load_json(file_path: Path, expected_root: type[T]) -> T:
@@ -39,14 +39,14 @@ def file_load_json(file_path: Path, expected_root: type[T]) -> T:
         raise StorageError(str(file_path)) from e
 
     if content.strip() == "":
-        return expected_root()
+        return cast(T, expected_root())
 
     try:
         output: T = json.loads(content)
 
         if not isinstance(output, expected_root):
             raise SchemaInvalidJSONRootError(
-                expected=expected_root, context=file_path
+                expected=cast(Any, expected_root), context=file_path
             )
 
         return output

@@ -28,7 +28,7 @@ class MazeCoordinateMapper:
             + (real_coord.height - self.rows * self.cell_size) / 2.0
         )
 
-    def on_update(self):
+    def on_update(self) -> None:
         self.cell_size = int(
             min(
                 self.real_coord.width / self.cols,
@@ -55,7 +55,7 @@ class MazeCoordinateMapper:
 
 
 class MazeRenderer:
-    def __init__(self, *, coord_mapper: MazeCoordinateMapper):
+    def __init__(self, *, coord_mapper: MazeCoordinateMapper) -> None:
         self.coord_mapper = coord_mapper
 
     def on_render(self) -> None:

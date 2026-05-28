@@ -17,7 +17,7 @@ class ProgressBar(ElementGroup):
     ) -> None:
         super().__init__(**kwargs)
         self.properties.justify_content = "center"
-        self.properties.align = "center"
+        self.properties.align_items = "center"
         self.properties.border = 2
 
         self.max_value = max_value

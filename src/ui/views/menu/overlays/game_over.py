@@ -19,7 +19,7 @@ class GameOverOverlay(VBox):
         self.width = "100%"
         self.height = "100%"
         self.properties.justify_content = "center"
-        self.properties.align = "center"
+        self.properties.align_items = "center"
         self.properties.background_color = pr.Color(0, 0, 0, 150)
 
         self.on_restart = on_restart

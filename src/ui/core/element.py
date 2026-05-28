@@ -191,10 +191,8 @@ class Element(ABC):
                 + (self.boxes.content_box.height - text_height) / 2
             )
 
-            font = self.properties.font or Element.default_font
-
             pr.draw_text_ex(
-                font,
+                self.get_font(),
                 self.properties.text_content,
                 pr.Vector2(text_pos_x, text_pos_y),
                 float(self._resolved_font_size),
@@ -223,13 +221,20 @@ class Element(ABC):
         except ValueError:
             raise Exception(f"Invalid element size: <{size}>")
 
+    def get_font(self) -> pr.Font:
+        return (
+            self.properties.font
+            or Element.default_font
+            or pr.get_font_default()
+        )
+
     def _measure_text(self) -> tuple[float, float]:
         text = self.properties.text_content
 
         if not text:
             return 0.0, 0.0
 
-        font = self.properties.font or Element.default_font
+        font = self.get_font()
 
         cache_valid = (
             self._text_cache["text"] == text

@@ -58,7 +58,7 @@ class _Layout:
         return footer
 
     @staticmethod
-    def create_menu_button(text: str, action: Callable) -> Button:
+    def create_menu_button(text: str, action: Callable[[], None]) -> Button:
         button = Button(text=text, width="33.33%", onclick=action)
         button.properties.font_size = 24
         button.properties.padding = 10
@@ -197,7 +197,7 @@ class MenuView(View):
         self.game.event.subscribe(JumpOrDieEvent.PAUSE, self._on_pause_toggle)
         self.game.event.subscribe(JumpOrDieEvent.GAME_OVER, self._on_game_over)
 
-    def _set_overlay(self, overlay: Optional[Element] = None):
+    def _set_overlay(self, overlay: Optional[Element] = None) -> None:
         self.overlays.clear()
 
         if overlay:

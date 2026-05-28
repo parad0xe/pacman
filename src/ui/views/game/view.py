@@ -159,6 +159,12 @@ class PacmanView(View):
             )
         )
 
+    def _on_toggle_pause(self) -> None:
+        if not self.game:
+            return
+
+        self.game.toggle_pause()
+
     def _on_win(self) -> None:
         if not self.game:
             return
@@ -191,7 +197,7 @@ class PacmanView(View):
             self._set_overlay(
                 PauseOverlay(
                     width="50%",
-                    on_continue=lambda: self.game.toggle_pause(),
+                    on_continue=self._on_toggle_pause,
                     on_restart=self.on_enter,
                     on_menu=lambda: self.goto_view("menu"),
                     on_toggle_fps=self._on_toggle_fps,
@@ -220,7 +226,7 @@ class PacmanView(View):
     def _on_toggle_fps(self) -> None:
         self.show_fps_counter = not self.show_fps_counter
 
-    def _set_overlay(self, overlay: Optional[Element] = None):
+    def _set_overlay(self, overlay: Optional[Element] = None) -> None:
         self.overlays.clear()
 
         if overlay:
