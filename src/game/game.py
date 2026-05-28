@@ -35,9 +35,12 @@ class Game:
         self.score = 0
         self.life = config.life
 
-        self.wait_timer = 0
+        self.wait_timer: float = 0
         self.is_over = 0
         self.is_paused = 0
+
+        self.player_speed_mod = 1.0
+        self.game_speed_mod = 1.0
 
         self.newstage()
 
@@ -49,13 +52,21 @@ class Game:
         )
         self.mazegenerator.generate(seed)
         self.level += 1
+
+        if self.level > 10:
+            self.event.emit(GameEvent.VICTORY)
+            self.is_over = 1
+            return
+
         self.stage = Stage(
             self.mazegenerator.maze, self.path_finder, self.level, self.config
         )
         self.wait_timer = 1.5
         self.event.emit(GameEvent.NEW_STAGE)
+        self.cheat_game_speed(0)
+        self.cheat_speed(0)
 
-    def player_death(self):
+    def player_death(self) -> None:
         self.life -= 1
         if not self.life:
             return
@@ -88,8 +99,8 @@ class Game:
                 self.newstage()
 
         if self.stage.remaining <= 0 or self.life <= 0:
-            self.is_over = 1
             self.event.emit(GameEvent.GAME_OVER)
+            self.is_over = 1
 
     def toggle_pause(self) -> None:
         if not self.is_over:
@@ -135,21 +146,31 @@ class Game:
         for ghost in self.stage.ghosts:
             ghost.interact = not ghost.interact
 
-    def cheat_speed(self, sign: int) -> None:
-        speed_mod = 1.1
-        if sign == -1:
-            self.stage.player.speed /= speed_mod
-        else:
-            self.stage.player.speed *= speed_mod
+    def cheat_speed(self, mod: int) -> None:
+        """speed the player up or down by mod/10 %"""
+        if self.player_speed_mod >= 3 and mod > 0 \
+                or self.player_speed_mod < 0.2 and mod < 0:
+            return
 
-    def cheat_game_speed(self, sign: int) -> None:
-        speed_mod = 1.1
+        if mod != 0:
+            self.stage.player.speed /= self.player_speed_mod
+
+        self.player_speed_mod += mod / 10
+        self.stage.player.speed *= self.player_speed_mod
+
+    def cheat_game_speed(self, mod: int) -> None:
+        """speed the game up or down by mod/10 %"""
+        if self.game_speed_mod >= 3 and mod > 0 \
+                or self.game_speed_mod < 0.2 and mod < 0:
+            return
+
+        if mod != 0:
+            self.stage.player.speed /= self.game_speed_mod
+            for ghost in self.stage.ghosts:
+                ghost.speed /= self.game_speed_mod
+
+        self.game_speed_mod += mod / 10
+
+        self.stage.player.speed *= self.game_speed_mod
         for ghost in self.stage.ghosts:
-            if sign == -1:
-                ghost.speed /= speed_mod
-            else:
-                ghost.speed *= speed_mod
-        if sign == -1:
-            self.stage.player.speed /= speed_mod
-        else:
-            self.stage.player.speed *= speed_mod
+            ghost.speed *= self.game_speed_mod

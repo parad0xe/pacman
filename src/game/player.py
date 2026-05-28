@@ -19,11 +19,11 @@ class Player:
         self.maze = maze
 
         self.state = PlayerState.NORMAL
-        self.super_timer = -1
+        self.super_timer: float = -1
 
         self.direction: Direction = Direction.IDLE
         self.key_buffer: Optional[int] = None
-        self.speed = 3.0
+        self.speed = 3.5
 
     def cell(self) -> tuple[int, int]:
         """Current cell the player is on or nearest to."""
@@ -66,7 +66,7 @@ class Player:
         if rl.is_key_down(rl.KeyboardKey.KEY_DOWN):
             self.key_buffer = rl.KeyboardKey.KEY_DOWN
 
-    def key_to_direction(self, key: Optional[int]):
+    def key_to_direction(self, key: Optional[int]) -> Direction:
         if key == rl.KeyboardKey.KEY_UP:
             return Direction.NORTH
 
