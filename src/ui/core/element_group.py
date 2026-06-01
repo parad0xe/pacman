@@ -6,12 +6,31 @@ from src.ui.core.element import Element, ElementKwargs
 
 
 class ElementGroup(Element):
+    """
+    Manages a collection of child UI elements.
+
+    Attributes:
+        _children: Dictionary of child elements mapped by ID.
+        _is_updating: Flag indicating if an update is in progress.
+        _pending_adds: Elements waiting to be added after update.
+        _pending_removes: IDs of elements waiting to be removed.
+        _pending_clear: Flag to clear children after update.
+    """
+
     def __init__(
         self,
         *,
         children: Optional[tuple[Element, ...]] = None,
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        """
+        Initializes an element group with optional children.
+
+        Args:
+            children: Initial elements to add to the group.
+            kwargs: Additional element arguments.
+        """
+
         super().__init__(**kwargs)
         self._children: dict[str, Element] = {}
 
@@ -24,6 +43,13 @@ class ElementGroup(Element):
             self.add(*children)
 
     def add(self, *elements: Element) -> None:
+        """
+        Adds one or more elements to the group.
+
+        Args:
+            elements: The UI elements to append.
+        """
+
         if self._is_updating:
             self._pending_adds.extend(elements)
             return
@@ -33,6 +59,13 @@ class ElementGroup(Element):
             self._children[element.id] = element
 
     def remove(self, *ids: str) -> None:
+        """
+        Removes elements from the group by their IDs.
+
+        Args:
+            ids: The unique identifiers of elements to remove.
+        """
+
         for id in ids:
             if id not in self._children:
                 continue
@@ -44,6 +77,8 @@ class ElementGroup(Element):
             del self._children[id]
 
     def clear(self) -> None:
+        """Removes all child elements from the group."""
+
         if self._is_updating:
             self._pending_clear = True
             return
@@ -53,6 +88,13 @@ class ElementGroup(Element):
         self._children.clear()
 
     def get_focusables(self) -> list[Element]:
+        """
+        Retrieves all focusable elements within the group.
+
+        Returns:
+            A list of focusable UI elements.
+        """
+
         focusables: list[Element] = []
         for child in self._children.values():
             if child.can_focus:
@@ -62,6 +104,13 @@ class ElementGroup(Element):
         return focusables
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the group and its children.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
 
         self._is_updating = True
@@ -91,6 +140,17 @@ class ElementGroup(Element):
         parent_height: float,
         update_children: bool = True,
     ) -> None:
+        """
+        Computes the layout for the group and its children.
+
+        Args:
+            parent_x: X-coordinate of the parent element.
+            parent_y: Y-coordinate of the parent element.
+            parent_width: Available width from the parent.
+            parent_height: Available height from the parent.
+            update_children: Flag to update child layouts.
+        """
+
         super().on_layout(parent_x, parent_y, parent_width, parent_height)
 
         if not update_children:
@@ -156,6 +216,8 @@ class ElementGroup(Element):
             )
 
     def on_render(self) -> None:
+        """Renders the group and its child elements."""
+
         super().on_render()
 
         for element in self._children.values():

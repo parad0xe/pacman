@@ -7,6 +7,14 @@ from src.ui.core.element import Element, ElementKwargs
 
 
 class Button(Element):
+    """
+    Interactive button element that triggers a callback on click.
+
+    Attributes:
+        can_focus: Indicates if the button accepts keyboard focus.
+        onclick: The function executed when the button is clicked.
+    """
+
     def __init__(
         self,
         *,
@@ -14,6 +22,15 @@ class Button(Element):
         onclick: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        """
+        Initializes a new button instance.
+
+        Args:
+            text: The text displayed inside the button.
+            onclick: The callback triggered upon clicking.
+            kwargs: Additional base element properties.
+        """
+
         self._default_properties(
             {
                 "border": 3,
@@ -33,6 +50,13 @@ class Button(Element):
         self.onclick = onclick
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the button state and checks for interaction.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
 
         if self.is_hovered:

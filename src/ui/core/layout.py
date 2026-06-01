@@ -2,6 +2,7 @@ from src.ui.core.element_group import ElementGroup
 
 
 class VBox(ElementGroup):
+    """Arranges child elements vertically."""
 
     def on_layout(
         self,
@@ -11,6 +12,17 @@ class VBox(ElementGroup):
         parent_height: float,
         update_children: bool = False,
     ) -> None:
+        """
+        Computes the layout for the container and its children.
+
+        Args:
+            parent_x: X-coordinate of the parent element.
+            parent_y: Y-coordinate of the parent element.
+            parent_width: Available width from the parent.
+            parent_height: Available height from the parent.
+            update_children: Flag to update child layouts.
+        """
+
         super().on_layout(
             parent_x,
             parent_y,
@@ -86,6 +98,7 @@ class VBox(ElementGroup):
 
 
 class HBox(ElementGroup):
+    """Arranges child elements horizontally."""
 
     def on_layout(
         self,
@@ -95,6 +108,17 @@ class HBox(ElementGroup):
         parent_height: float,
         update_children: bool = False,
     ) -> None:
+        """
+        Computes the layout for the container and its children.
+
+        Args:
+            parent_x: X-coordinate of the parent element.
+            parent_y: Y-coordinate of the parent element.
+            parent_width: Available width from the parent.
+            parent_height: Available height from the parent.
+            update_children: Flag to update child layouts.
+        """
+
         super().on_layout(
             parent_x,
             parent_y,

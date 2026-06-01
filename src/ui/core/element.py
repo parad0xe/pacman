@@ -17,6 +17,18 @@ if TYPE_CHECKING:
 
 
 class ElementKwargs(TypedDict, total=False):
+    """
+    Defines keyword arguments for element initialization.
+
+    Attributes:
+        id: The unique identifier.
+        x: The local x-coordinate.
+        y: The local y-coordinate.
+        width: The element's width.
+        height: The element's height.
+        properties: Styling and layout properties.
+    """
+
     id: str
     x: float
     y: float
@@ -26,9 +38,35 @@ class ElementKwargs(TypedDict, total=False):
 
 
 class Element(ABC):
+    """
+    Base class for all UI elements in the framework.
+
+    Attributes:
+        default_font: The globally shared default font.
+        id: Unique identifier for the element.
+        x: Local x-coordinate position.
+        y: Local y-coordinate position.
+        width: Requested width of the element.
+        height: Requested height of the element.
+        properties: Visual and layout configurations.
+        is_focused: Indicates if the element has focus.
+        is_hovered: Indicates if the mouse is over it.
+        can_focus: Whether the element accepts focus.
+        is_typing_target: Whether it accepts text input.
+        parent: The parent element group.
+        boxes: The computed layout bounding boxes.
+    """
+
     default_font: Optional[pr.Font] = None
 
     def __init__(self, **kwargs: Unpack[ElementKwargs]) -> None:
+        """
+        Initializes the base UI element.
+
+        Args:
+            kwargs: Keyword arguments for configuration.
+        """
+
         self.id = kwargs.get("id") or unique_id()
         self.x = kwargs.get("x") or 0.0
         self.y = kwargs.get("y") or 0.0
@@ -68,6 +106,13 @@ class Element(ABC):
             )
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the element's interactive state.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         self.is_hovered = pr.check_collision_point_rec(
             pr.get_mouse_position(), self.boxes.border_box
         )
@@ -79,6 +124,16 @@ class Element(ABC):
         parent_width: float,
         parent_height: float,
     ) -> None:
+        """
+        Computes the physical layout boxes.
+
+        Args:
+            parent_x: Global x-coordinate of the parent.
+            parent_y: Global y-coordinate of the parent.
+            parent_width: Available width from the parent.
+            parent_height: Available height from the parent.
+        """
+
         start_x = parent_x + self.x + self.properties.origin.x
         start_y = parent_y + self.y + self.properties.origin.y
 
@@ -143,6 +198,8 @@ class Element(ABC):
         )
 
     def on_render(self) -> None:
+        """Draws the element to the screen."""
+
         if (
             self.boxes.border_box.width <= 0
             or self.boxes.border_box.height <= 0
@@ -208,6 +265,14 @@ class Element(ABC):
         base: Optional[ElementPropertiesDef],
         kwargs: ElementKwargs,
     ) -> None:
+        """
+        Applies default properties to the arguments.
+
+        Args:
+            base: Fallback properties to apply.
+            kwargs: The keyword arguments to update.
+        """
+
         if base is None:
             return
         properties = cast(dict[str, Any], kwargs.get("properties") or {})
@@ -219,6 +284,17 @@ class Element(ABC):
         )
 
     def _resolve_size(self, size: float | str, parent_size: float) -> float:
+        """
+        Converts a relative or absolute size to pixels.
+
+        Args:
+            size: The configured size value.
+            parent_size: The available parent dimension.
+
+        Returns:
+            The resolved size in pixels.
+        """
+
         if isinstance(size, str) and size.endswith("%"):
             return parent_size * (float(size.strip("%")) / 100.0)
         try:
@@ -227,6 +303,13 @@ class Element(ABC):
             raise Exception(f"Invalid element size: <{size}>")
 
     def get_font(self) -> pr.Font:
+        """
+        Retrieves the font for text rendering.
+
+        Returns:
+            The active font object.
+        """
+
         return (
             self.properties.font
             or Element.default_font
@@ -234,6 +317,13 @@ class Element(ABC):
         )
 
     def _measure_text(self) -> tuple[float, float]:
+        """
+        Calculates the rendered dimensions of the text.
+
+        Returns:
+            The width and height of the text.
+        """
+
         text = self.properties.text_content
 
         if not text:

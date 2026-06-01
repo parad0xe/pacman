@@ -9,12 +9,39 @@ from src.game.jump_or_die.entities.player import Player
 
 
 class JumpOrDieEvent(Enum):
+    """Enumeration of possible events in the Jump or Die game."""
+
     PAUSE = auto()
     GAME_OVER = auto()
 
 
 class JumpOrDie:
+    """
+    Manages the main game loop, state, and entity interactions.
+
+    Attributes:
+        width: Current width of the game screen.
+        height: Current height of the game screen.
+        event: Event dispatcher for game state changes.
+        player: The main player entity.
+        enemies: List of currently active enemy entities.
+        spawn_timer: Accumulator for enemy spawn timing.
+        time_to_next_spawn: Target time until the next enemy spawn.
+        paused: Flag indicating if the game is paused.
+        is_over: Flag indicating if the game is over.
+        score: The player's current score.
+        game_speed: Multiplier for game physics and movement.
+    """
+
     def __init__(self, width: float, height: float) -> None:
+        """
+        Initializes the game state and entities.
+
+        Args:
+            width: The initial width of the game window.
+            height: The initial height of the game window.
+        """
+
         self.width = width
         self.height = height
 
@@ -35,6 +62,8 @@ class JumpOrDie:
         self._last_height = height
 
     def toggle_pause(self) -> None:
+        """Toggles the paused state and emits a pause event."""
+
         if self.is_over:
             return
 
@@ -42,7 +71,13 @@ class JumpOrDie:
         self.event.emit(JumpOrDieEvent.PAUSE, self.paused)
 
     def update(self, dt: float) -> None:
-        time_step = dt * self.game_speed
+        """
+        Updates game logic, physics, and collision detection.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         width = self.width
         height = self.height
 
@@ -73,6 +108,7 @@ class JumpOrDie:
             self.spawn_timer = 0.0
             self.time_to_next_spawn = random.uniform(0.4, 2.0)
 
+        time_step = dt * self.game_speed
         floor_y = float(height - self.player.size)
         self.player.update(dt, time_step, floor_y)
 
