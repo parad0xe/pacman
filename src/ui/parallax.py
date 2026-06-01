@@ -2,6 +2,15 @@ import pyray as pr
 
 
 class Parallax:
+    """
+    Implements a parallax scrolling background effect.
+
+    Attributes:
+        container: The bounding box for the parallax background.
+        textures: List of tuples containing speed and texture for each layer.
+        texture_origin_xs: List of current X offsets for each layer.
+    """
+
     def __init__(
         self,
         *,
@@ -10,6 +19,16 @@ class Parallax:
         fps: float = 50.0,
         dispersion: float = 1.05,
     ) -> None:
+        """
+        Initializes the parallax background.
+
+        Args:
+            textures: List of textures for each layer.
+            container: The rectangle defining the viewport.
+            fps: Base scrolling speed for the first layer.
+            dispersion: Multiplier for speed between successive layers.
+        """
+
         self.container: pr.Rectangle = container
         self.textures: list[tuple[float, pr.Texture]] = []
         self.texture_origin_xs: list[float] = []
@@ -19,12 +38,23 @@ class Parallax:
             fps = fps * dispersion
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the scrolling offsets based on elapsed time.
+
+        Args:
+            dt: Delta time since the last update.
+        """
+
         for i, ox in enumerate(self.texture_origin_xs):
             self.texture_origin_xs[i] += self.textures[i][0] * dt
             if self.texture_origin_xs[i] >= self.container.width:
                 self.texture_origin_xs[i] = 0
 
     def on_render(self) -> None:
+        """
+        Renders the parallax layers within the container bounds.
+        """
+
         pr.begin_scissor_mode(
             int(self.container.x),
             int(self.container.y),

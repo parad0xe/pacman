@@ -2,6 +2,10 @@ import pyray as pr
 
 
 class HighscoresViewTheme:
+    """
+    Defines the visual theme and colors for the highscores view.
+    """
+
     BACKGROUND_COLOR = pr.Color(20, 20, 30, 255)
 
     TEXT_COLOR_PRIMARY = pr.RED

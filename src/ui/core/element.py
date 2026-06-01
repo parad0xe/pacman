@@ -55,6 +55,12 @@ class Element(ABC):
         is_typing_target: Whether it accepts text input.
         parent: The parent element group.
         boxes: The computed layout bounding boxes.
+        _resolved_width: Computed width in pixels.
+        _resolved_height: Computed height in pixels.
+        _resolved_font_size: Computed font size in pixels.
+        _text_width: Measured width of text content.
+        _text_height: Measured height of text content.
+        _text_cache: Cache for measured text dimensions.
     """
 
     default_font: Optional[pr.Font] = None

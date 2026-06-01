@@ -17,11 +17,35 @@ from src.ui.views.menu.renderers.player import PlayerRenderer
 
 
 class GameCanvas(ElementGroup):
+    """
+    Renders the interactive menu game preview and HUD.
+
+    Attributes:
+        _textures: Static manager for menu textures.
+        game: Reference to the JumpOrDie preview game.
+        background_parallax: Parallax background for the menu.
+        player_animation_texture: Spritesheet for the menu player.
+        enemy_animation_texture: Spritesheet for menu enemies.
+        player: Renderer for the menu player entity.
+        enemies_renderers: Mapping of active enemy renderers.
+        hud: Horizontal container for the HUD elements.
+        progress: Energy bar for the player.
+        score_text: Text element for current score display.
+    """
+
     _textures: ClassVar[TextureManager] = TextureManager()
 
     def __init__(
         self, *, game: JumpOrDie, **kwargs: Unpack[ElementKwargs]
     ) -> None:
+        """
+        Initializes the menu canvas with parallax and entities.
+
+        Args:
+            game: The JumpOrDie logic instance.
+            kwargs: Supplemental element properties.
+        """
+
         super().__init__(**kwargs)
         self.game = game
 
@@ -86,6 +110,13 @@ class GameCanvas(ElementGroup):
         self.add(self.hud)
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the parallax, entities, and HUD.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
 
         if self.game.is_over or self.game.paused:
@@ -121,6 +152,10 @@ class GameCanvas(ElementGroup):
                 self.enemies_renderers[enemy.id].on_update(dt)
 
     def on_render(self) -> None:
+        """
+        Renders the background, entities, and HUD components.
+        """
+
         self.background_parallax.on_render()
 
         base_x = self.boxes.content_box.x
@@ -135,4 +170,8 @@ class GameCanvas(ElementGroup):
 
     @staticmethod
     def unload() -> None:
+        """
+        Unloads all textures used by the menu canvas.
+        """
+
         GameCanvas._textures.unload()

@@ -4,7 +4,9 @@ from src.ui.core.element import Element, ElementKwargs
 
 
 class Text(Element):
-    """Displays a simple text string on the screen."""
+    """
+    Displays a simple text string on the screen.
+    """
 
     def __init__(self, *, text: str, **kwargs: Unpack[ElementKwargs]) -> None:
         """

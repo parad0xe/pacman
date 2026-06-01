@@ -9,6 +9,14 @@ MAX_HIGHSCORES = 10
 
 
 class Score(BaseModel):
+    """
+    Represents a single high score entry.
+
+    Attributes:
+        pseudo: The username or alias of the player.
+        score: The numerical score achieved.
+    """
+
     model_config = ConfigDict(extra="forbid")
 
     pseudo: str
@@ -16,12 +24,29 @@ class Score(BaseModel):
 
 
 class Highscores(BaseModel):
+    """
+    Represents the collection of high scores.
+
+    Attributes:
+        scores: The list of stored Score entries.
+    """
+
     model_config = ConfigDict(extra="forbid")
 
     scores: list[Score] = Field(default_factory=list)
 
 
 def save_highscores(file_path: str | Path, scores: Highscores) -> None:
+    """
+    Saves the high score collection to a JSON file.
+
+    Args:
+        file_path: Destination path for the JSON file.
+        scores: The highscores data object to persist.
+
+    Raises:
+        SchemaValidationError: If serialization or validation fails.
+    """
     if isinstance(file_path, str):
         file_path = Path(file_path)
 
@@ -34,6 +59,18 @@ def save_highscores(file_path: str | Path, scores: Highscores) -> None:
 
 
 def load_highscores(file_path: str | Path) -> Highscores:
+    """
+    Loads the high score collection from a JSON file.
+
+    Args:
+        file_path: Source path of the JSON file.
+
+    Returns:
+        The loaded Highscores object, or an empty one if missing.
+
+    Raises:
+        SchemaValidationError: If parsing or validation fails.
+    """
     if isinstance(file_path, str):
         file_path = Path(file_path)
 

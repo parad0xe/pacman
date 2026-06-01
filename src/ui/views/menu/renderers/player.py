@@ -5,12 +5,28 @@ import pyray as pr
 
 
 class PlayerRenderer:
+    """
+    Handles rendering for the player in the JumpOrDie menu game.
+
+    Attributes:
+        player: Reference to the menu player entity.
+        player_animations: Registry managing player animations.
+    """
+
     def __init__(
         self,
         *,
         player: Player,
         texture: AnimationTexture,
     ) -> None:
+        """
+        Initializes the player renderer with animations.
+
+        Args:
+            player: The menu player instance.
+            texture: The spritesheet for the player.
+        """
+
         self.player = player
 
         self.player_animations = AnimationRegistry(
@@ -39,6 +55,13 @@ class PlayerRenderer:
         )
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the player animation based on its state.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         self.player_animations.switch_to("run")
         if self.player.v < 0:
             self.player_animations.switch_to("jump_up")
@@ -48,6 +71,14 @@ class PlayerRenderer:
         self.player_animations.next(dt)
 
     def on_render(self, base_x: float, base_y: float) -> None:
+        """
+        Renders the current player frame.
+
+        Args:
+            base_x: Screen X origin for rendering.
+            base_y: Screen Y origin for rendering.
+        """
+
         self.player_animations.render(
             pr.Rectangle(
                 base_x + self.player.box.x,

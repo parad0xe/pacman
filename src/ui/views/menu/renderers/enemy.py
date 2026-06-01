@@ -7,6 +7,14 @@ from src.ui.animation import Animation, AnimationRegistry, AnimationTexture
 
 
 class EnemyRenderer:
+    """
+    Handles rendering for enemies in the JumpOrDie menu game.
+
+    Attributes:
+        animation_texture: The spritesheet used for enemies.
+        enemy: Reference to the enemy entity.
+        animations: Registry managing enemy animations.
+    """
 
     def __init__(
         self,
@@ -14,6 +22,14 @@ class EnemyRenderer:
         animation_texture: AnimationTexture,
         enemy: Enemy,
     ) -> None:
+        """
+        Initializes the enemy renderer with animations.
+
+        Args:
+            animation_texture: The spritesheet for enemies.
+            enemy: The enemy entity to render.
+        """
+
         self.animation_texture = animation_texture
         self.enemy = enemy
 
@@ -38,6 +54,13 @@ class EnemyRenderer:
         )
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the enemy animation.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         self.animations.next(dt)
 
     def on_render(
@@ -45,6 +68,14 @@ class EnemyRenderer:
         base_x: float,
         base_y: float,
     ) -> None:
+        """
+        Renders the current enemy frame.
+
+        Args:
+            base_x: Screen X origin for rendering.
+            base_y: Screen Y origin for rendering.
+        """
+
         self.animations.render(
             pr.Rectangle(
                 base_x + self.enemy.box.x,
