@@ -122,6 +122,11 @@ class GameCanvas(ElementGroup):
         if self.game.is_over or self.game.paused:
             return
 
+        if self.game.player.boost:
+            self.background_parallax.set_fps(80.0)
+        else:
+            self.background_parallax.set_fps(50.0)
+
         self.background_parallax.on_update(dt)
 
         self.progress.current_value = self.game.player.energy
