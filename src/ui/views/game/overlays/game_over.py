@@ -14,6 +14,17 @@ from src.ui.views.game.theme import PacmanViewTheme
 
 
 class GameOverOverlay(VBox):
+    """
+    Displays the end-of-game screen with username entry.
+
+    Attributes:
+        score_file: The file path to save or load high scores.
+        score: The final score achieved by the player.
+        on_next: Callback triggered to proceed past this screen.
+        highscores: The loaded high score data structure.
+        input_text: Field for the user to input their name.
+    """
+
     def __init__(
         self,
         *,
@@ -22,6 +33,16 @@ class GameOverOverlay(VBox):
         on_next: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ):
+        """
+        Initializes the game over screen interface.
+
+        Args:
+            score: The player's final score.
+            score_file: The file path for high score storage.
+            on_next: Callback to transition to the next state.
+            kwargs: Additional base element properties.
+        """
+
         super().__init__(**kwargs)
         self.width = "100%"
         self.height = "100%"
@@ -88,9 +109,18 @@ class GameOverOverlay(VBox):
         self.add(header, main_content)
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the game over overlay elements.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
 
     def _on_submit(self) -> None:
+        """Processes the entered username and saves the new score."""
+
         pseudo = self.input_text.value.strip()
 
         if len(pseudo) <= 0:

@@ -23,6 +23,15 @@ _button_props: ElementPropertiesDef = {
 
 
 class _CheatNumericAction(VBox):
+    """
+    A numerical cheat action control with decrease/increase buttons.
+
+    Attributes:
+        label: The display text for the cheat action.
+        value_getter: Function returning the current cheat value.
+        title: Text element displaying the label and current value.
+    """
+
     def __init__(
         self,
         label: str,
@@ -31,6 +40,17 @@ class _CheatNumericAction(VBox):
         on_increase: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        """
+        Initializes a numeric cheat action component.
+
+        Args:
+            label: The display name of the setting.
+            value_getter: Function to retrieve the current value.
+            on_decrease: Callback to decrement the value.
+            on_increase: Callback to increment the value.
+            kwargs: Additional base element properties.
+        """
+
         super().__init__(**kwargs)
         self.width = "100%"
         self.properties.gap = 20
@@ -68,6 +88,13 @@ class _CheatNumericAction(VBox):
         )
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the text to display.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
         self.title.properties.text_content = (
             f"{self.label} ({round(self.value_getter(), 1)})"
@@ -75,6 +102,15 @@ class _CheatNumericAction(VBox):
 
 
 class _CheatToggleAction(VBox):
+    """
+    A toggle cheat action control with a single interaction button.
+
+    Attributes:
+        label: The display text for the cheat action.
+        state_getter: Function returning the current boolean state.
+        button: The interactive element toggling the state.
+    """
+
     def __init__(
         self,
         label: str,
@@ -82,6 +118,16 @@ class _CheatToggleAction(VBox):
         on_toggle: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        """
+        Initializes a toggle cheat action component.
+
+        Args:
+            label: The display name of the toggle setting.
+            state_getter: Function to retrieve the current state.
+            on_toggle: Callback triggered to invert the state.
+            kwargs: Additional base element properties.
+        """
+
         super().__init__(**kwargs)
         self.width = "100%"
         self.properties.gap = 20
@@ -100,6 +146,13 @@ class _CheatToggleAction(VBox):
         self.add(self.button)
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the button text to reflect the current boolean state.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
         self.button.properties.text_content = (
             f"{self.label} ({self.state_getter()})"
@@ -107,9 +160,27 @@ class _CheatToggleAction(VBox):
 
 
 class CheatsOverlay(ElementGroup):
+    """
+    Overlay providing access to game modification cheat controls.
+
+    Attributes:
+        cheat_access: Global flag enabling access to cheats.
+        game: The current active game instance.
+        main_content: The central container for cheat UI elements.
+        input: Text field for entering the cheat password.
+    """
+
     cheat_access: bool = False
 
     def __init__(self, game: Game, **kwargs: Unpack[ElementKwargs]) -> None:
+        """
+        Initializes the cheats overlay interface.
+
+        Args:
+            game: The active game state to modify.
+            kwargs: Additional base element properties.
+        """
+
         kwargs.setdefault("width", "100%")
         kwargs.setdefault("height", "100%")
         super().__init__(**kwargs)
@@ -145,12 +216,16 @@ class CheatsOverlay(ElementGroup):
             self.on_cheat_enter()
 
     def on_password_submit(self) -> None:
+        """Validates the entered password and grants access if correct."""
+
         if self.input.value == "zeus":
             CheatsOverlay.cheat_access = True
             self.on_cheat_enter()
         self.input.value = ""
 
     def on_cheat_enter(self) -> None:
+        """Populates the overlay with available cheat actions."""
+
         self.main_content.clear()
         self.main_content.properties.justify_content = "start"
         self.main_content.properties.padding = 40
@@ -214,4 +289,6 @@ class CheatsOverlay(ElementGroup):
 
     @staticmethod
     def unload() -> None:
+        """Revokes cheat access globally."""
+
         CheatsOverlay.cheat_access = False

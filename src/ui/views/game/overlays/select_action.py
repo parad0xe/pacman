@@ -10,6 +10,10 @@ from src.ui.views.game.theme import PacmanViewTheme
 
 
 class SelectActionOverlay(VBox):
+    """
+    Provides a simplified menu for restarting or quitting.
+    """
+
     def __init__(
         self,
         on_restart: Callable[[], None],
@@ -17,6 +21,16 @@ class SelectActionOverlay(VBox):
         on_quit: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        """
+        Initializes the select action menu overlay.
+
+        Args:
+            on_restart: Callback to restart the current stage.
+            on_menu: Callback to return to the main menu.
+            on_quit: Callback to exit the application entirely.
+            kwargs: Additional base element properties.
+        """
+
         kwargs.setdefault("width", "100%")
         kwargs.setdefault("height", "100%")
         super().__init__(**kwargs)

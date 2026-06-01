@@ -4,7 +4,29 @@ from src.game.game import Game
 
 
 class MazeCoordinateMapper:
+    """
+    Maps logical maze coordinates to screen pixel coordinates.
+
+    Attributes:
+        real_coord: The screen area allocated for the maze.
+        game: The current game state instance.
+        board: The grid representation of the maze.
+        cols: Number of columns in the maze grid.
+        rows: Number of rows in the maze grid.
+        cell_size: The computed pixel size for each cell.
+        start_x: The starting X pixel coordinate on screen.
+        start_y: The starting Y pixel coordinate on screen.
+    """
+
     def __init__(self, real_coord: pr.Rectangle, game: Game) -> None:
+        """
+        Initializes the maze coordinate mapper.
+
+        Args:
+            real_coord: The designated screen drawing area.
+            game: The active game instance.
+        """
+
         self.real_coord = real_coord
         self.game = game
 
@@ -29,6 +51,8 @@ class MazeCoordinateMapper:
         )
 
     def on_update(self) -> None:
+        """Recalculates cell sizes and starting pixel positions."""
+
         self.cell_size = int(
             min(
                 self.real_coord.width / self.cols,
@@ -46,6 +70,17 @@ class MazeCoordinateMapper:
         )
 
     def to_real_coords(self, x: float, y: float) -> pr.Rectangle:
+        """
+        Converts logical grid coordinates to a screen rectangle.
+
+        Args:
+            x: Logical X coordinate in the grid.
+            y: Logical Y coordinate in the grid.
+
+        Returns:
+            The corresponding screen bounding box.
+        """
+
         return pr.Rectangle(
             self.start_x + self.cell_size * x,
             self.start_y + self.cell_size * y,
@@ -55,10 +90,26 @@ class MazeCoordinateMapper:
 
 
 class MazeRenderer:
+    """
+    Renders the maze layout structure on the screen.
+
+    Attributes:
+        coord_mapper: The utility mapping logical to screen coordinates.
+    """
+
     def __init__(self, *, coord_mapper: MazeCoordinateMapper) -> None:
+        """
+        Initializes the maze layout renderer.
+
+        Args:
+            coord_mapper: Mapper for screen coordinate translation.
+        """
+
         self.coord_mapper = coord_mapper
 
     def on_render(self) -> None:
+        """Draws the maze walls based on the logical board data."""
+
         start_x = self.coord_mapper.start_x
         start_y = self.coord_mapper.start_y
         cell_size = self.coord_mapper.cell_size

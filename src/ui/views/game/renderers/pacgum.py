@@ -4,9 +4,27 @@ from src.ui.views.game.renderers.maze import MazeCoordinateMapper
 
 
 class PacgumRenderer:
+    """
+    Renders the collectible pacgums on the maze board.
+
+    Attributes:
+        pacgums: The 2D grid representing pacgum locations.
+        coord_mapper: The utility for screen coordinate mapping.
+        _super_pacgum_dt: Accumulated time for animation.
+        _super_pacgum_visible: State of super pacgum blink.
+    """
+
     def __init__(
         self, pacgums: list[list[int]], coord_mapper: MazeCoordinateMapper
     ) -> None:
+        """
+        Initializes the pacgum renderer state.
+
+        Args:
+            pacgums: The 2D grid containing pacgum states.
+            coord_mapper: Mapper for screen coordinate translation.
+        """
+
         self.pacgums = pacgums
         self.coord_mapper = coord_mapper
 
@@ -14,12 +32,21 @@ class PacgumRenderer:
         self._super_pacgum_visible = True
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the blinking animation timer for super pacgums.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         if self._super_pacgum_dt > 0.8:
             self._super_pacgum_visible = not self._super_pacgum_visible
             self._super_pacgum_dt = 0.0
         self._super_pacgum_dt += dt
 
     def on_render(self) -> None:
+        """Draws all active pacgums and super pacgums."""
+
         rows, cols = self.coord_mapper.rows, self.coord_mapper.cols
 
         for y in range(rows):

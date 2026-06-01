@@ -10,12 +10,33 @@ from src.ui.views.game.theme import PacmanViewTheme
 
 
 class StartTimerOverlay(VBox):
+    """
+    Displays a countdown before gameplay begins.
+
+    Attributes:
+        game: The active game instance reference.
+        on_timer_end: Callback triggered when countdown finishes.
+        text: Text element showing the remaining seconds.
+        default_wait: The initial total wait time.
+        wait: The current displayed integer second.
+        emitted: Flag to ensure callback fires only once.
+    """
+
     def __init__(
         self,
         game: Game,
         on_timer_end: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        """
+        Initializes the start timer overlay.
+
+        Args:
+            game: The active game state instance.
+            on_timer_end: Callback for when the timer reaches zero.
+            kwargs: Additional base element properties.
+        """
+
         super().__init__(**kwargs)
         self.width = "100%"
         self.height = "100%"
@@ -47,6 +68,13 @@ class StartTimerOverlay(VBox):
         self.emitted = False
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the countdown value based on elapsed time.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
 
         ratio = self.game.wait_timer / self.default_wait

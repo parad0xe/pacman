@@ -10,6 +10,17 @@ from src.ui.views.game.renderers.maze import MazeCoordinateMapper
 
 
 class PlayerRenderer:
+    """
+    Handles the rendering and animation of the player.
+
+    Attributes:
+        player: The active player instance reference.
+        animation_texture: The spritesheet used for rendering.
+        coord_mapper: The utility mapping logical to screen coordinates.
+        _is_death: State flag indicating if the death animation is active.
+        animations: The registry managing all player animations.
+    """
+
     def __init__(
         self,
         *,
@@ -17,6 +28,15 @@ class PlayerRenderer:
         animation_texture: AnimationTexture,
         coord_mapper: MazeCoordinateMapper,
     ) -> None:
+        """
+        Initializes the player renderer and its animations.
+
+        Args:
+            player: The active player state instance.
+            animation_texture: Spritesheet containing player frames.
+            coord_mapper: Mapper for screen coordinate translation.
+        """
+
         self.player = player
         self.animation_texture = animation_texture
         self.coord_mapper = coord_mapper
@@ -76,19 +96,29 @@ class PlayerRenderer:
 
     @property
     def is_death_done(self) -> bool:
+        """
+        Checks if the death animation sequence has finished.
+
+        Returns:
+            True if the death animation is complete, else False.
+        """
+
         return self.animations.animations["death"].done
 
     def death(self) -> None:
+        """Triggers the player death animation sequence."""
+
         self.animations.switch_to("death")
         self._is_death = True
 
     def on_update(self, dt: float) -> None:
-        # if game_event == GameEvent.GAME_OVER:
-        #    self.animations.switch_to("death")
-        #    self.animations.next(dt)
-        #    return
-        # elif game_event == GameEvent.PLAYER_DEATH:
-        #    self._game_started = False
+        """
+        Updates the active animation frame based on player state.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         if self._is_death:
             self.animations.next(dt)
         else:
@@ -97,6 +127,8 @@ class PlayerRenderer:
                 self.animations.next(dt)
 
     def on_render(self) -> None:
+        """Draws the current player animation frame to the screen."""
+
         self.animations.render(
             self.coord_mapper.to_real_coords(
                 self.player.pos.x, self.player.pos.y
