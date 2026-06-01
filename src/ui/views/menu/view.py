@@ -4,7 +4,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.context import Context
-from src.game.jump_or_die import JumpOrDie, JumpOrDieEvent
+from src.game.jump_or_die.jump_or_die import JumpOrDie, JumpOrDieEvent
 from src.ui.core.element import Element, ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox
@@ -129,6 +129,9 @@ class MenuView(View):
             if pr.is_key_pressed(pr.KeyboardKey.KEY_SPACE):
                 self._on_start_game()
             return
+
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+            self.game.toggle_pause()
 
         self.game.width = self.main_content.boxes.content_box.width
         self.game.height = self.main_content.boxes.content_box.height
