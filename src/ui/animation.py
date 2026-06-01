@@ -208,6 +208,19 @@ class AnimationRegistry:
         self.animations: dict[str | int, Animation] = animations or {}
         self.current_animation: str | int | None = default
 
+    @property
+    def animation(self) -> Animation | None:
+        """
+        Gets the currently active animation.
+
+        Returns:
+            The current Animation object, or None if no animation is active.
+        """
+
+        if not self.current_animation:
+            return None
+        return self.animations.get(self.current_animation)
+
     def next(self, dt: float) -> None:
         """
         Updates the active animation.

@@ -63,10 +63,14 @@ class PlayerRenderer:
         """
 
         self.player_animations.switch_to("run")
-        if self.player.v < 0:
+        if self.player.vy < 0:
             self.player_animations.switch_to("jump_up")
-        elif self.player.v > 0:
+        elif self.player.vy > 0:
             self.player_animations.switch_to("jump_down")
+
+        current_animation = self.player_animations.animation
+        if current_animation:
+            current_animation.fps = 0.07 if self.player.boost else 0.1
 
         self.player_animations.next(dt)
 

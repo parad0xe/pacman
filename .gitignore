@@ -175,6 +175,9 @@ poetry.toml
 
 # LSP config files
 pyrightconfig.json
+.antigravitycli
+package-lock.json
+package.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 

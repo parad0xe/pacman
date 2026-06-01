@@ -244,6 +244,13 @@ class MenuView(View):
                     "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
                 },
             ),
+            Text(
+                text="Press SHIFT to speedup",
+                properties={
+                    "padding": 20,
+                    "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
+                },
+            ),
         )
 
         self.main_content.add(

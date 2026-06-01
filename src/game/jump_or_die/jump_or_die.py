@@ -30,6 +30,7 @@ class JumpOrDie:
         paused: Flag indicating if the game is paused.
         is_over: Flag indicating if the game is over.
         score: The player's current score.
+        default_game_speed: Default multiplier for game physics and movement.
         game_speed: Multiplier for game physics and movement.
     """
 
@@ -56,7 +57,8 @@ class JumpOrDie:
         self.paused: bool = False
         self.is_over: bool = False
         self.score: int = 0
-        self.game_speed = 120.0
+        self.default_game_speed = 120.0
+        self.game_speed = self.default_game_speed
 
         self._last_width = width
         self._last_height = height
@@ -95,6 +97,13 @@ class JumpOrDie:
 
         if self.is_over or self.paused:
             return
+
+        if pr.is_key_down(pr.KeyboardKey.KEY_LEFT_SHIFT):
+            self.game_speed = self.default_game_speed + 80.0
+            self.player.boost = True
+        else:
+            self.game_speed = self.default_game_speed
+            self.player.boost = False
 
         self.spawn_timer += dt
         if self.spawn_timer >= self.time_to_next_spawn:
