@@ -98,6 +98,7 @@ class WinOverlay(VBox):
             label_color=PacmanViewTheme.TEXT_COLOR_DEFAULT,
             label_background_color=PacmanViewTheme.BACKGROUND_COLOR,
             on_submit=self._on_submit,
+            pattern=r"[\w ]{1,10}",
         )
         main_content.add(self.input_text)
 

@@ -21,6 +21,7 @@ class PauseOverlay(VBox):
         on_menu: Callable[[], None],
         on_quit: Callable[[], None],
         on_toggle_fps: Callable[[], None],
+        on_toggle_instruction: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
         """
@@ -32,6 +33,7 @@ class PauseOverlay(VBox):
             on_menu: Callback to return to the main menu.
             on_quit: Callback to exit the application entirely.
             on_toggle_fps: Callback to toggle the FPS display.
+            on_toggle_instruction: Callback to toggle the instruction screen.
             kwargs: Additional base element properties.
         """
 
@@ -74,6 +76,12 @@ class PauseOverlay(VBox):
                 text="Toggle FPS",
                 width=button_width,
                 onclick=on_toggle_fps,
+                properties=button_props,
+            ),
+            Button(
+                text="Instruction",
+                width=button_width,
+                onclick=on_toggle_instruction,
                 properties=button_props,
             ),
             Button(

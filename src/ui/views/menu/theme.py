@@ -7,6 +7,7 @@ class MenuTheme:
     """
 
     BACKGROUND_COLOR = pr.Color(20, 20, 30, 255)
+    BACKGROUND_COLOR_TRANSPARENCY = pr.Color(20, 20, 30, 255)
 
     TEXT_COLOR_DEFAULT = pr.GRAY
 

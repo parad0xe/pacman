@@ -40,6 +40,7 @@ class Application:
             height: The initial height of the application window.
         """
         # pr.set_config_flags(pr.ConfigFlags.FLAG_WINDOW_RESIZABLE)
+        pr.set_trace_log_level(pr.TraceLogLevel.LOG_NONE)
         pr.init_window(width, height, "Pac-Man")
         pr.set_window_min_size(800, 600)
         pr.set_target_fps(120)
