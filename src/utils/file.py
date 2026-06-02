@@ -1,31 +1,25 @@
 import json
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import Any
 
-from src.exceptions.schema import (
-    SchemaInvalidJSONFormatError,
-    SchemaInvalidJSONRootError,
-    SchemaJSONSerializationError,
-)
+from src.exceptions.schema import SchemaJSONSerializationError
 from src.exceptions.storage import (
     StorageError,
     StorageFileNotFoundError,
     StorageFilePermissionError,
 )
+from src.utils.common import JsonRootType, load_json
 
-T = TypeVar("T", bound=list[Any] | dict[Any, Any])
 
-
-def file_load_json(file_path: Path, expected_root: type[T]) -> T:
+def file_load_plain(file_path: Path) -> str:
     """
-    Reads a file and parses its content as a JSON list of objects.
+    Reads a file.
 
     Args:
-        file_path: Path to the target JSON file to read.
-        expected_root: Expected root type of the JSON file.
+        file_path: Path to the target file to read.
 
     Returns:
-        Parsed JSON data.
+        File content as a string.
     """
 
     try:
@@ -38,23 +32,26 @@ def file_load_json(file_path: Path, expected_root: type[T]) -> T:
     except OSError as e:
         raise StorageError(str(file_path)) from e
 
-    if content.strip() == "":
-        return cast(T, expected_root())
+    return content
 
-    try:
-        output: T = json.loads(content)
 
-        if not isinstance(output, expected_root):
-            raise SchemaInvalidJSONRootError(
-                expected=cast(Any, expected_root), context=file_path
-            )
+def file_load_json(
+    file_path: Path,
+    expected_root: type[JsonRootType],
+) -> JsonRootType:
+    """
+    Reads a file and parses its content as a JSON list of objects.
 
-        return output
-    except json.JSONDecodeError as e:
-        raise SchemaInvalidJSONFormatError(
-            context=file_path,
-            lineno=e.lineno,
-        ) from e
+    Args:
+        file_path: Path to the target JSON file to read.
+        expected_root: Expected root type of the JSON file.
+
+    Returns:
+        Parsed JSON data.
+    """
+
+    content = file_load_plain(file_path)
+    return load_json(content, expected_root=expected_root)
 
 
 def file_write_json(
