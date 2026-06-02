@@ -5,7 +5,7 @@ from typing import Optional
 
 from mazegenerator import mazegenerator
 
-from src.context import Config
+from src.models.config import Config
 from src.event import Event
 from src.game.ghost import Ghost
 from src.game.pathfinder import PathFinder

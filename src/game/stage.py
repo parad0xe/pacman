@@ -1,4 +1,4 @@
-from src.context import Config
+from src.models.config import Config
 from src.game.ghost import Ghost, GhostID
 from src.game.pathfinder import PathFinder
 from src.game.player import Player

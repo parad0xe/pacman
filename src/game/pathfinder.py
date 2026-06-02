@@ -53,7 +53,10 @@ class PathFinder:
         return Direction.IDLE
 
     def reconstruct(
-        self, came_from: dict, start: tuple[int, int], end: tuple[int, int]
+        self,
+        came_from: dict[tuple[int, int], tuple[int, int]],
+        start: tuple[int, int],
+        end: tuple[int, int]
     ) -> list[Direction]:
         """
         Rebuild a direction path from the came_from map produced by search().
