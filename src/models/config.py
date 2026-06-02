@@ -3,7 +3,11 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, ValidationError
 
 from src.exceptions.schema import SchemaValidationError
-from src.utils.file import file_load_json
+from src.utils.common import (
+    json_parse_comments,
+    load_json,
+)
+from src.utils.file import file_load_plain
 
 
 class Config(BaseModel):
@@ -51,7 +55,9 @@ def load_config(file_path: str | Path) -> Config:
     if isinstance(file_path, str):
         file_path = Path(file_path)
 
-    data = file_load_json(Path(file_path), expected_root=dict)
+    file_data = file_load_plain(Path(file_path))
+    parsed_data = json_parse_comments(file_data)
+    data = load_json(parsed_data, expected_root=dict)
 
     try:
         config = Config(**data)
