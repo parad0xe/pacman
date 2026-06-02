@@ -10,7 +10,7 @@ class Parallax:
         textures: List of tuples containing speed and texture for each layer.
         texture_origin_xs: List of current X offsets for each layer.
         dispersion: Multiplier for speed between successive layers.
-        _default_textures: List of original textures used for recalculating speed.
+        _default_textures: Original textures used for recalculating speed.
         _last_fps: Last known frames per second setting.
     """
 
@@ -55,7 +55,7 @@ class Parallax:
             return
 
         self._last_fps = fps
-        self.textures: list[tuple[float, pr.Texture]] = []
+        self.textures = []
         for i in range(len(self._default_textures)):
             self.textures.append((fps * i, self._default_textures[i]))
             fps = fps * self.dispersion
