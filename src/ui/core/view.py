@@ -19,6 +19,7 @@ class View(ElementGroup, ABC):
         _refresh_dt: Time accumulated since the last layout refresh.
         _refresh_fps: Fixed interval time between layout updates.
         _focus_index: Index of the currently focused UI element.
+        _focus_enable: Flag to allow or prevent UI focus updates.
         _last_mouse_position: Previous recorded position of the mouse.
     """
 
@@ -48,6 +49,7 @@ class View(ElementGroup, ABC):
         self._refresh_fps: float = 1.0 / 30.0
 
         self._focus_index: int = 0
+        self._focus_enable: bool = True
         self._last_mouse_position = pr.Vector2(-1, -1)
 
     @abstractmethod
@@ -174,24 +176,39 @@ class View(ElementGroup, ABC):
                     self._focus_index = i
                     break
 
-        if (
-            pr.is_key_pressed(pr.KeyboardKey.KEY_UP)
-            or pr.is_key_pressed(pr.KeyboardKey.KEY_LEFT)
-            or (
-                pr.is_key_down(pr.KeyboardKey.KEY_LEFT_SHIFT)
-                and pr.is_key_pressed(pr.KeyboardKey.KEY_TAB)
-            )
-        ):
-            self._focus_index = (self._focus_index - 1) % len(focusables)
-        elif (
-            pr.is_key_pressed(pr.KeyboardKey.KEY_DOWN)
-            or pr.is_key_pressed(pr.KeyboardKey.KEY_RIGHT)
-            or pr.is_key_pressed(pr.KeyboardKey.KEY_TAB)
-        ):
-            self._focus_index = (self._focus_index + 1) % len(focusables)
+        if self._focus_enable:
+            if (
+                pr.is_key_pressed(pr.KeyboardKey.KEY_UP)
+                or pr.is_key_pressed(pr.KeyboardKey.KEY_LEFT)
+                or (
+                    pr.is_key_down(pr.KeyboardKey.KEY_LEFT_SHIFT)
+                    and pr.is_key_pressed(pr.KeyboardKey.KEY_TAB)
+                )
+            ):
+                self._focus_index = (self._focus_index - 1) % len(focusables)
+            elif (
+                pr.is_key_pressed(pr.KeyboardKey.KEY_DOWN)
+                or pr.is_key_pressed(pr.KeyboardKey.KEY_RIGHT)
+                or pr.is_key_pressed(pr.KeyboardKey.KEY_TAB)
+            ):
+                self._focus_index = (self._focus_index + 1) % len(focusables)
 
         for i, element in enumerate(focusables):
-            element.is_focused = i == self._focus_index
+            element.is_focused = i == self._focus_index and self._focus_enable
+
+    def disable_focus(self) -> None:
+        """
+        Disables focus cycling and interactions for the view.
+        """
+
+        self._focus_enable = False
+
+    def enable_focus(self) -> None:
+        """
+        Enables focus cycling and interactions for the view.
+        """
+
+        self._focus_enable = True
 
 
 class ViewManager:

@@ -19,6 +19,7 @@ from src.ui.views.game.overlays.select_action import SelectActionOverlay
 from src.ui.views.game.overlays.start_timer import StartTimerOverlay
 from src.ui.views.game.overlays.win import WinOverlay
 from src.ui.views.game.theme import PacmanViewTheme
+from src.ui.views.overlays.instruction import InstructionOverlay
 
 
 class _Layout:
@@ -83,6 +84,7 @@ class PacmanView(View):
         context: The shared application context.
         game: The active game logic engine instance.
         show_fps_counter: Toggle for displaying the FPS counter.
+        instruction_visible: Flag if instructions are currently shown.
         game_container: Container for the main game canvas.
         overlays: Group for displaying game overlays like pause/win.
         _score_text: Text element showing the current score.
@@ -110,6 +112,7 @@ class PacmanView(View):
         self.context = context
         self.game: Optional[Game] = None
         self.show_fps_counter = False
+        self.instruction_visible: bool = False
 
         main_layout = VBox(width="100%", height="100%")
 
@@ -163,11 +166,16 @@ class PacmanView(View):
 
         if self.is_key_pressed(pr.KeyboardKey.KEY_ZERO):
             self.goto_view("menu")
+        elif pr.is_key_pressed(pr.KeyboardKey.KEY_I):
+            self._on_toggle_instruction()
 
         if not self.game:
             return
 
-        if self.is_key_pressed(pr.KeyboardKey.KEY_P):
+        if (
+            self.is_key_pressed(pr.KeyboardKey.KEY_P)
+            and not self.instruction_visible
+        ):
             self.game.toggle_pause()
             return
 
@@ -294,6 +302,7 @@ class PacmanView(View):
                     on_restart=self.on_enter,
                     on_menu=lambda: self.goto_view("menu"),
                     on_toggle_fps=self._on_toggle_fps,
+                    on_toggle_instruction=self._on_toggle_instruction,
                     on_quit=lambda: self.quit(),
                 )
             )
@@ -319,6 +328,23 @@ class PacmanView(View):
                 on_quit=lambda: self.quit(),
             )
         )
+
+    def _on_toggle_instruction(self) -> None:
+        """
+        Toggles the visibility of the instruction overlay.
+        """
+
+        if not self.instruction_visible:
+            self.disable_focus()
+            self.add(InstructionOverlay(id="instruction"))
+            self.instruction_visible = True
+
+            if self.game and not self.game.is_paused:
+                self.game.toggle_pause()
+        else:
+            self.enable_focus()
+            self.remove("instruction")
+            self.instruction_visible = False
 
     def _on_toggle_fps(self) -> None:
         """

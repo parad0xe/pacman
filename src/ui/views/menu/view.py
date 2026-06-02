@@ -13,6 +13,7 @@ from src.ui.elements.button import Button
 from src.ui.elements.text import Text
 from src.ui.views.menu.canvas import GameCanvas
 from src.ui.views.menu.overlays.game_over import GameOverOverlay
+from src.ui.views.overlays.instruction import InstructionOverlay
 from src.ui.views.menu.overlays.pause import PauseOverlay
 from src.ui.views.menu.theme import MenuTheme
 
@@ -66,17 +67,17 @@ class _Layout:
         return main_content
 
     @staticmethod
-    def footer() -> HBox:
+    def footer() -> VBox:
         """
-        Creates the horizontal footer layout for menu buttons.
+        Creates the vertical footer layout for menu buttons.
 
         Returns:
-            The configured HBox for the footer.
+            The configured VBox for the footer.
         """
 
-        footer = HBox(width="100%", height="25%")
-        footer.properties.padding = 20
-        footer.properties.gap = 10
+        footer = VBox(width="100%")
+        footer.properties.padding = 60
+        footer.properties.gap = 20
         footer.properties.justify_content = "center"
         footer.properties.align_items = "center"
 
@@ -95,7 +96,7 @@ class _Layout:
             The styled Button instance.
         """
 
-        button = Button(text=text, width="33.33%", onclick=action)
+        button = Button(text=text, width="50%", onclick=action)
         button.properties.font_size = 24
         button.properties.padding = 10
         return button
@@ -107,6 +108,7 @@ class MenuView(View):
 
     Attributes:
         game: The active JumpOrDie preview game instance.
+        instruction_visible: Flag if instructions are currently shown.
         main_content: The container for the primary menu components.
         overlays: Group for displaying pause or game over overlays.
     """
@@ -129,6 +131,7 @@ class MenuView(View):
         self.properties.justify_content = "center"
 
         self.game: Optional[JumpOrDie] = None
+        self.instruction_visible: bool = False
 
         main_layout = VBox(width="80%", height="100%")
         main_layout.properties.align_items = "center"
@@ -145,11 +148,18 @@ class MenuView(View):
         footer_buttons = [
             ("Play (M)", lambda: self.goto_view("game")),
             ("Highscores (H)", lambda: self.goto_view("highscores")),
+            ("Instruction (I)", lambda: self._toggle_instruction()),
             ("Quit (Esc)", lambda: self.quit()),
         ]
 
-        for text, callback in footer_buttons:
-            footer.add(_Layout.create_menu_button(text, callback))
+        for k in range(0, len(footer_buttons), 2):
+            row = HBox(width="100%")
+            row.properties.justify_content = "center"
+            row.properties.align_items = "center"
+            row.properties.gap = 20
+            for text, callback in footer_buttons[k : k + 2]:
+                row.add(_Layout.create_menu_button(text, callback))
+            footer.add(row)
 
         self.overlays = ElementGroup(
             id="overlays",
@@ -188,13 +198,21 @@ class MenuView(View):
             self.goto_view("game")
         elif pr.is_key_pressed(pr.KeyboardKey.KEY_H):
             self.goto_view("highscores")
+        elif pr.is_key_pressed(pr.KeyboardKey.KEY_I):
+            self._toggle_instruction()
 
         if not self.game:
-            if pr.is_key_pressed(pr.KeyboardKey.KEY_SPACE):
+            if (
+                pr.is_key_pressed(pr.KeyboardKey.KEY_SPACE)
+                and not self.instruction_visible
+            ):
                 self._on_start_game()
             return
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+        if (
+            pr.is_key_pressed(pr.KeyboardKey.KEY_P)
+            and not self.instruction_visible
+        ):
             self.game.toggle_pause()
 
         self.game.width = self.main_content.boxes.content_box.width
@@ -227,27 +245,31 @@ class MenuView(View):
         )
         self._subscribe_to_events()
 
-        helper = HBox(y=self.main_content.boxes.border_box.height)
+        helper = HBox()
+        helper.properties.origin.y = self.main_content.boxes.content_box.height
         helper.properties.gap = 20
         helper.add(
             Text(
                 text="Press SPACE to jump",
                 properties={
-                    "padding": 20,
+                    "margin": 10,
+                    "padding": 10,
                     "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
                 },
             ),
             Text(
                 text="Press P to pause",
                 properties={
-                    "padding": 20,
+                    "margin": 10,
+                    "padding": 10,
                     "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
                 },
             ),
             Text(
                 text="Press SHIFT to speedup",
                 properties={
-                    "padding": 20,
+                    "margin": 10,
+                    "padding": 10,
                     "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
                 },
             ),
@@ -282,6 +304,23 @@ class MenuView(View):
         """
 
         self.overlays.add(GameOverOverlay(on_restart=self._on_start_game))
+
+    def _toggle_instruction(self) -> None:
+        """
+        Toggles the visibility of the instruction overlay.
+        """
+
+        if not self.instruction_visible:
+            self.disable_focus()
+            self.add(InstructionOverlay(id="instruction"))
+            self.instruction_visible = True
+
+            if self.game and not self.game.paused:
+                self.game.toggle_pause()
+        else:
+            self.enable_focus()
+            self.remove("instruction")
+            self.instruction_visible = False
 
     def _subscribe_to_events(self) -> None:
         """
