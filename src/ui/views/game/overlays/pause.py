@@ -10,6 +10,10 @@ from src.ui.views.game.theme import PacmanViewTheme
 
 
 class PauseOverlay(VBox):
+    """
+    Provides an interactive pause menu with navigation options.
+    """
+
     def __init__(
         self,
         on_continue: Callable[[], None],
@@ -19,6 +23,18 @@ class PauseOverlay(VBox):
         on_toggle_fps: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        """
+        Initializes the pause menu overlay.
+
+        Args:
+            on_continue: Callback to resume the current game.
+            on_restart: Callback to restart the current stage.
+            on_menu: Callback to return to the main menu.
+            on_quit: Callback to exit the application entirely.
+            on_toggle_fps: Callback to toggle the FPS display.
+            kwargs: Additional base element properties.
+        """
+
         kwargs.setdefault("width", "100%")
         kwargs.setdefault("height", "100%")
         super().__init__(**kwargs)
@@ -32,6 +48,7 @@ class PauseOverlay(VBox):
         button_width = 300
         button_props: ElementPropertiesDef = {
             "padding": 20,
+            "font_size": 25,
         }
 
         self.add(

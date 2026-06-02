@@ -9,17 +9,32 @@ from src.ui.elements.text import Text
 
 
 class GameOverOverlay(VBox):
+    """
+    Overlay displayed when the preview game in the menu is over.
+
+    Attributes:
+        on_restart: Callback function to restart the game.
+    """
+
     def __init__(
         self,
         *,
         on_restart: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ):
+        """
+        Initializes the game over overlay.
+
+        Args:
+            on_restart: Callback triggered when restarting.
+            kwargs: Supplemental element properties.
+        """
+
         super().__init__(**kwargs)
         self.width = "100%"
         self.height = "100%"
         self.properties.justify_content = "center"
-        self.properties.align = "center"
+        self.properties.align_items = "center"
         self.properties.background_color = pr.Color(0, 0, 0, 150)
 
         self.on_restart = on_restart
@@ -37,6 +52,13 @@ class GameOverOverlay(VBox):
         self.add(subtitle)
 
     def on_update(self, dt: float) -> None:
+        """
+        Handles restart input.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
 
         if pr.is_key_pressed(pr.KeyboardKey.KEY_R):

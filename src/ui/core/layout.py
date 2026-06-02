@@ -2,14 +2,36 @@ from src.ui.core.element_group import ElementGroup
 
 
 class VBox(ElementGroup):
+    """
+    Arranges child elements vertically.
+    """
+
     def on_layout(
         self,
         parent_x: float,
         parent_y: float,
         parent_width: float,
         parent_height: float,
+        update_children: bool = False,
     ) -> None:
-        super().on_layout(parent_x, parent_y, parent_width, parent_height)
+        """
+        Computes the vertical layout for children.
+
+        Args:
+            parent_x: X-coordinate of the parent element.
+            parent_y: Y-coordinate of the parent element.
+            parent_width: Available width from the parent.
+            parent_height: Available height from the parent.
+            update_children: Flag to update child layouts.
+        """
+
+        super().on_layout(
+            parent_x,
+            parent_y,
+            parent_width,
+            parent_height,
+            update_children,
+        )
 
         max_child_width, total_child_height = 0.0, 0.0
 
@@ -78,6 +100,9 @@ class VBox(ElementGroup):
 
 
 class HBox(ElementGroup):
+    """
+    Arranges child elements horizontally.
+    """
 
     def on_layout(
         self,
@@ -85,8 +110,26 @@ class HBox(ElementGroup):
         parent_y: float,
         parent_width: float,
         parent_height: float,
+        update_children: bool = False,
     ) -> None:
-        super().on_layout(parent_x, parent_y, parent_width, parent_height)
+        """
+        Computes the horizontal layout for children.
+
+        Args:
+            parent_x: X-coordinate of the parent element.
+            parent_y: Y-coordinate of the parent element.
+            parent_width: Available width from the parent.
+            parent_height: Available height from the parent.
+            update_children: Flag to update child layouts.
+        """
+
+        super().on_layout(
+            parent_x,
+            parent_y,
+            parent_width,
+            parent_height,
+            update_children,
+        )
 
         total_child_width, max_child_height = 0.0, 0.0
 

@@ -4,7 +4,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.context import Context
-from src.models.score import Highscores, MAX_HIGHSCORES, load_highscores
+from src.models.score import MAX_HIGHSCORES, Highscores, load_highscores
 from src.ui.core.element import ElementKwargs
 from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
@@ -14,11 +14,28 @@ from src.ui.views.highscores.theme import HighscoresViewTheme
 
 
 class HighscoreView(View):
+    """
+    Displays the application's top scores in a table format.
+
+    Attributes:
+        context: The shared application context.
+        highscores: The loaded highscore data structure.
+        score_content: Container for the highscore list or empty message.
+    """
+
     name: ClassVar[str] = "highscores"
 
     def __init__(
         self, *, context: Context, **kwargs: Unpack[ElementKwargs]
     ) -> None:
+        """
+        Initializes the highscore view with layout and navigation.
+
+        Args:
+            context: Shared application state.
+            kwargs: Supplemental element properties.
+        """
+
         super().__init__(event=context.event, **kwargs)
         self.properties.background_color = HighscoresViewTheme.BACKGROUND_COLOR
         self.properties.padding = 80
@@ -70,6 +87,10 @@ class HighscoreView(View):
         self.add(main_layout)
 
     def on_enter(self) -> None:
+        """
+        Loads the highscores when the view is entered.
+        """
+
         self.highscores = load_highscores(
             file_path=self.context.config.score_file
         )
@@ -176,9 +197,20 @@ class HighscoreView(View):
         self.score_content.add(table)
 
     def on_exit(self) -> None:
+        """
+        Clears the highscore display content when leaving the view.
+        """
+
         self.score_content.clear()
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the view and handles input.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
 
         if pr.is_key_pressed(pr.KeyboardKey.KEY_ZERO):

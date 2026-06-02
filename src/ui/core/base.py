@@ -5,6 +5,29 @@ import pyray as pr
 
 
 class ElementPropertiesDef(TypedDict, total=False):
+    """
+    Defines the dictionary structure for element properties.
+
+    Attributes:
+        origin: The offset origin point.
+        padding: Inner spacing of the element.
+        margin: Outer spacing of the element.
+        border: Thickness of the border line.
+        border_radius: Radius for rounded corners.
+        border_color: Color of the border outline.
+        background_color: Fill color of the element.
+        font: Font used for text display.
+        font_size: Size of the rendered text.
+        text_content: The string text to display.
+        text_align: Horizontal text alignment.
+        text_color: Color of the rendered text.
+        letter_spacing: Spacing between text characters.
+        hover_color: Color applied on hover state.
+        gap: Space between child elements.
+        justify_content: Alignment along the main axis.
+        align_items: Alignment along the cross axis.
+    """
+
     origin: pr.Vector2
 
     padding: float
@@ -32,6 +55,29 @@ class ElementPropertiesDef(TypedDict, total=False):
 
 @dataclass
 class ElementProperties:
+    """
+    Stores the visual and layout configuration for an element.
+
+    Attributes:
+        origin: The offset origin point.
+        padding: Inner spacing of the element.
+        margin: Outer spacing of the element.
+        border: Thickness of the border line.
+        border_radius: Radius for rounded corners.
+        border_color: Color of the border outline.
+        background_color: Fill color of the element.
+        font: Font used for text display.
+        font_size: Size of the rendered text.
+        text_content: The string text to display.
+        text_align: Horizontal text alignment.
+        text_color: Color of the rendered text.
+        letter_spacing: Spacing between text characters.
+        hover_color: Color applied on hover state.
+        gap: Space between child elements.
+        justify_content: Alignment along the main axis.
+        align_items: Alignment along the cross axis.
+    """
+
     origin: pr.Vector2 = field(default_factory=lambda: pr.Vector2(0, 0))
 
     padding: float = 0.0
@@ -59,6 +105,16 @@ class ElementProperties:
 
 @dataclass
 class ElementBoxes:
+    """
+    Maintains the bounding rectangles for the box model.
+
+    Attributes:
+        margin_box: Boundary including the outer margin.
+        border_box: Boundary including the border thickness.
+        padding_box: Boundary including the inner padding.
+        content_box: Innermost boundary for the actual content.
+    """
+
     margin_box: pr.Rectangle = field(
         default_factory=lambda: pr.Rectangle(0, 0, 0, 0)
     )

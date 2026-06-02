@@ -10,6 +10,20 @@ from src.ui.elements.text import Text
 
 
 class InputText(ElementGroup):
+    """
+    Interactive text input field with a floating label.
+
+    Attributes:
+        max_length: Maximum allowed characters in the input.
+        focus_color: Color applied when the field is focused.
+        on_submit: Callback triggered when enter is pressed.
+        underline_visible: Toggles the typing cursor visibility.
+        underline_dt: Timer for the blinking cursor effect.
+        blink_speed: Interval in seconds for cursor blinking.
+        main_content: Vertical box containing the text input.
+        label: The text element displaying the field label.
+        input: The text element displaying the typed content.
+    """
 
     def __init__(
         self,
@@ -21,7 +35,20 @@ class InputText(ElementGroup):
         focus_color: pr.Color = pr.Color(54, 100, 150, 255),
         label_color: pr.Color = pr.WHITE,
         **kwargs: Unpack[ElementKwargs],
-    ):
+    ) -> None:
+        """
+        Initializes a new input text field.
+
+        Args:
+            label: The placeholder or title for the input.
+            label_background_color: Background color of the label.
+            max_length: Maximum number of typed characters.
+            on_submit: Function called on enter key press.
+            focus_color: Highlight color for focused state.
+            label_color: Default color of the text label.
+            kwargs: Additional base element properties.
+        """
+
         self._default_properties(
             {
                 "border": 2,
@@ -68,23 +95,58 @@ class InputText(ElementGroup):
 
     @property
     def value(self) -> str:
-        return self.input.properties.text_content
+        """The current string value of the input field."""
+
+        return self.input.properties.text_content or ""
 
     @value.setter
     def value(self, text: str) -> None:
         self.input.properties.text_content = text
 
-    def on_update(self, dt: float) -> None:
-        super().on_update(dt)
+    def on_layout(
+        self,
+        parent_x: float,
+        parent_y: float,
+        parent_width: float,
+        parent_height: float,
+        update_children: bool = True,
+    ) -> None:
+        """
+        Positions the input field and its floating label.
 
-        if self.is_focused and pr.is_key_pressed(pr.KeyboardKey.KEY_ENTER):
-            self.on_submit()
+        Args:
+            parent_x: Global x-coordinate of the parent container.
+            parent_y: Global y-coordinate of the parent container.
+            parent_width: Total available width from the parent.
+            parent_height: Total available height from the parent.
+            update_children: Flag to cascade updates to children.
+        """
 
+        super().on_layout(
+            parent_x,
+            parent_y,
+            parent_width,
+            parent_height,
+            update_children,
+        )
         self.label.y = (
             self.main_content.y
             - self.label.boxes.border_box.height
             + self.label.boxes.content_box.height / 2
         )
+
+    def on_update(self, dt: float) -> None:
+        """
+        Handles typing inputs and blinking cursor state.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
+        super().on_update(dt)
+
+        if self.is_focused and pr.is_key_pressed(pr.KeyboardKey.KEY_ENTER):
+            self.on_submit()
 
         if self.is_focused:
             self._check_entry()
@@ -96,6 +158,8 @@ class InputText(ElementGroup):
         self.underline_dt += dt
 
     def on_render(self) -> None:
+        """Draws the text input and cursor to the screen."""
+
         if self.is_focused:
             text_color = self.label.properties.text_color
             self.label.properties.text_color = self.focus_color
@@ -129,20 +193,22 @@ class InputText(ElementGroup):
             super().on_render()
 
     def _check_entry(self) -> None:
+        """Captures keyboard character inputs into the field."""
+
         key = pr.get_char_pressed()
+        value = self.value
         while key > 0:
-            if (
-                32 <= key <= 125
-                and len(self.input.properties.text_content) < self.max_length
-            ):
-                self.input.properties.text_content += chr(key)
+            if 32 <= key <= 125 and len(value) < self.max_length:
+                self.input.properties.text_content = value + chr(key)
             key = pr.get_char_pressed()
 
     def _check_backspace(self) -> None:
+        """Handles text deletion when backspace is pressed."""
+
+        value = self.value
+
         if pr.is_key_pressed(
             pr.KeyboardKey.KEY_BACKSPACE
         ) or pr.is_key_pressed_repeat(pr.KeyboardKey.KEY_BACKSPACE):
-            if len(self.input.properties.text_content) > 0:
-                self.input.properties.text_content = (
-                    self.input.properties.text_content[:-1]
-                )
+            if len(value) > 0:
+                self.input.properties.text_content = value[:-1]

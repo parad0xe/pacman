@@ -16,6 +16,21 @@ from src.ui.views.game.renderers.player import PlayerRenderer
 
 
 class GameCanvas(ElementGroup):
+    """
+    The main rendering area for the Pac-Man game.
+
+    Attributes:
+        _textures: Static manager for caching and unloading textures.
+        game: Reference to the active game engine instance.
+        on_game_over: Callback function triggered when the game ends.
+        coord_mapper: Utility for translating game grid to screen pixels.
+        animation_texture: The spritesheet used by all game entities.
+        player: The renderer for the player character.
+        ghosts: List of renderers for all ghosts in the stage.
+        maze_renderer: Handles the drawing of the maze structure.
+        pacgums_renderer: Handles the drawing of pacgums and powerups.
+    """
+
     _textures: ClassVar[TextureManager] = TextureManager()
 
     def __init__(
@@ -25,6 +40,15 @@ class GameCanvas(ElementGroup):
         on_game_over: Callable[[], None],
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
+        """
+        Initializes the game canvas and its renderers.
+
+        Args:
+            game: The active game logic instance.
+            on_game_over: Callback for game termination events.
+            kwargs: Supplemental properties for the element.
+        """
+
         super().__init__(**kwargs)
         self.game = game
         self.on_game_over = on_game_over
@@ -62,6 +86,13 @@ class GameCanvas(ElementGroup):
         )
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the coordinate mapper and all entity renderers.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
         self.coord_mapper.on_update()
 
@@ -82,6 +113,10 @@ class GameCanvas(ElementGroup):
         self.pacgums_renderer.on_update(dt)
 
     def on_render(self) -> None:
+        """
+        Renders the maze, entities, and effects in the correct order.
+        """
+
         super().on_render()
 
         self.maze_renderer.on_render()
@@ -94,4 +129,8 @@ class GameCanvas(ElementGroup):
 
     @staticmethod
     def unload() -> None:
+        """
+        Unloads all textures used by the game canvas.
+        """
+
         GameCanvas._textures.unload()

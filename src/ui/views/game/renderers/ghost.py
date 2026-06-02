@@ -6,6 +6,16 @@ from src.ui.views.game.renderers.maze import MazeCoordinateMapper
 
 
 class GhostRenderer:
+    """
+    Renders a ghost entity with its corresponding animations.
+
+    Attributes:
+        player: The active player instance reference.
+        ghost: The ghost entity to be rendered.
+        animation_texture: The spritesheet used for rendering.
+        coord_mapper: The utility mapping logical to screen coordinates.
+        animations: The registry managing all ghost animations.
+    """
 
     def __init__(
         self,
@@ -15,6 +25,16 @@ class GhostRenderer:
         animation_texture: AnimationTexture,
         coord_mapper: MazeCoordinateMapper,
     ) -> None:
+        """
+        Initializes the ghost renderer and its animations.
+
+        Args:
+            player: The active player state instance.
+            ghost: The ghost entity to render.
+            animation_texture: Spritesheet containing ghost frames.
+            coord_mapper: Mapper for screen coordinate translation.
+        """
+
         self.player = player
         self.ghost = ghost
         self.animation_texture = animation_texture
@@ -86,6 +106,13 @@ class GhostRenderer:
         )
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the active animation state based on ghost status.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         if self.ghost.state == GhostState.FLEE:
             if self.player.super_timer < 2:
                 self.animations.switch_to("flee_caution")
@@ -97,6 +124,8 @@ class GhostRenderer:
         self.animations.next(dt)
 
     def on_render(self) -> None:
+        """Draws the current ghost animation frame to the screen."""
+
         opacity = 255 if self.ghost.can_interact() else 90
         self.animations.render(
             self.coord_mapper.to_real_coords(

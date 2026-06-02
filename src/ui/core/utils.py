@@ -4,6 +4,16 @@ import pyray as pr
 
 
 def load_texture_from_path(path: str) -> pr.Texture:
+    """
+    Loads a texture from a file with background transparency.
+
+    Args:
+        path: The file system path to the image.
+
+    Returns:
+        The loaded texture ready for rendering.
+    """
+
     if not os.path.isfile(path):
         raise FileNotFoundError()
 

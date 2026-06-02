@@ -4,7 +4,7 @@ import pyray as pr
 from typing_extensions import Unpack
 
 from src.context import Context
-from src.game.jump_or_die import JumpOrDie, JumpOrDieEvent
+from src.game.jump_or_die.jump_or_die import JumpOrDie, JumpOrDieEvent
 from src.ui.core.element import Element, ElementKwargs
 from src.ui.core.element_group import ElementGroup
 from src.ui.core.layout import HBox, VBox
@@ -18,8 +18,19 @@ from src.ui.views.menu.theme import MenuTheme
 
 
 class _Layout:
+    """
+    Static helper for creating recurring UI layouts in the menu view.
+    """
+
     @staticmethod
     def header() -> VBox:
+        """
+        Creates the vertical header layout for the menu.
+
+        Returns:
+            The configured VBox for the header.
+        """
+
         header = VBox(width="100%", height="25%")
         header.properties.justify_content = "center"
         header.properties.padding = 20
@@ -40,6 +51,13 @@ class _Layout:
 
     @staticmethod
     def main_content() -> ElementGroup:
+        """
+        Creates the central content container for the menu.
+
+        Returns:
+            The configured ElementGroup for main content.
+        """
+
         main_content = ElementGroup(width="100%", height="50%")
         main_content.properties.justify_content = "center"
         main_content.properties.margin = 10
@@ -49,6 +67,13 @@ class _Layout:
 
     @staticmethod
     def footer() -> HBox:
+        """
+        Creates the horizontal footer layout for menu buttons.
+
+        Returns:
+            The configured HBox for the footer.
+        """
+
         footer = HBox(width="100%", height="25%")
         footer.properties.padding = 20
         footer.properties.gap = 10
@@ -58,7 +83,18 @@ class _Layout:
         return footer
 
     @staticmethod
-    def create_menu_button(text: str, action: Callable) -> Button:
+    def create_menu_button(text: str, action: Callable[[], None]) -> Button:
+        """
+        Factory for standardized menu buttons.
+
+        Args:
+            text: Button label content.
+            action: Callback function on click.
+
+        Returns:
+            The styled Button instance.
+        """
+
         button = Button(text=text, width="33.33%", onclick=action)
         button.properties.font_size = 24
         button.properties.padding = 10
@@ -66,11 +102,28 @@ class _Layout:
 
 
 class MenuView(View):
+    """
+    The main menu screen of the application.
+
+    Attributes:
+        game: The active JumpOrDie preview game instance.
+        main_content: The container for the primary menu components.
+        overlays: Group for displaying pause or game over overlays.
+    """
+
     name: ClassVar[str] = "menu"
 
     def __init__(
         self, *, context: Context, **kwargs: Unpack[ElementKwargs]
     ) -> None:
+        """
+        Initializes the menu view with layout and entities.
+
+        Args:
+            context: Shared application state.
+            kwargs: Supplemental element properties.
+        """
+
         super().__init__(event=context.event, **kwargs)
         self.properties.background_color = MenuTheme.BACKGROUND_COLOR
         self.properties.justify_content = "center"
@@ -106,6 +159,10 @@ class MenuView(View):
         self.add(main_layout)
 
     def on_enter(self) -> None:
+        """
+        Sets up the view components when entering the menu.
+        """
+
         self.main_content.add(
             Text(
                 text="Press SPACE to start",
@@ -118,6 +175,13 @@ class MenuView(View):
         )
 
     def on_update(self, dt: float) -> None:
+        """
+        Updates the menu logic and preview game.
+
+        Args:
+            dt: Delta time since the last frame.
+        """
+
         super().on_update(dt)
 
         if pr.is_key_pressed(pr.KeyboardKey.KEY_M):
@@ -130,12 +194,19 @@ class MenuView(View):
                 self._on_start_game()
             return
 
+        if pr.is_key_pressed(pr.KeyboardKey.KEY_P):
+            self.game.toggle_pause()
+
         self.game.width = self.main_content.boxes.content_box.width
         self.game.height = self.main_content.boxes.content_box.height
 
         self.game.update(dt)
 
     def on_exit(self) -> None:
+        """
+        Cleans up resources and preview game when leaving.
+        """
+
         GameCanvas.unload()
 
         self._set_overlay()
@@ -143,6 +214,10 @@ class MenuView(View):
         self.game = None
 
     def _on_start_game(self) -> None:
+        """
+        Initializes and starts the JumpOrDie preview game.
+        """
+
         self._set_overlay()
         self.main_content.clear()
 
@@ -169,6 +244,13 @@ class MenuView(View):
                     "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
                 },
             ),
+            Text(
+                text="Press SHIFT to speedup",
+                properties={
+                    "padding": 20,
+                    "text_color": MenuTheme.TEXT_COLOR_DEFAULT,
+                },
+            ),
         )
 
         self.main_content.add(
@@ -182,22 +264,44 @@ class MenuView(View):
         self.main_content.add(self.overlays)
 
     def _on_pause_toggle(self, paused: bool) -> None:
+        """
+        Handles the pause state of the preview game.
+
+        Args:
+            paused: True if the game was paused.
+        """
+
         if paused:
             self._set_overlay(PauseOverlay())
         else:
             self._set_overlay()
 
     def _on_game_over(self) -> None:
+        """
+        Displays the game over overlay for the preview game.
+        """
+
         self.overlays.add(GameOverOverlay(on_restart=self._on_start_game))
 
     def _subscribe_to_events(self) -> None:
+        """
+        Binds view methods to game events.
+        """
+
         if not self.game:
             return
 
         self.game.event.subscribe(JumpOrDieEvent.PAUSE, self._on_pause_toggle)
         self.game.event.subscribe(JumpOrDieEvent.GAME_OVER, self._on_game_over)
 
-    def _set_overlay(self, overlay: Optional[Element] = None):
+    def _set_overlay(self, overlay: Optional[Element] = None) -> None:
+        """
+        Replaces all menu overlay.
+
+        Args:
+            overlay: The UI element to display as an overlay.
+        """
+
         self.overlays.clear()
 
         if overlay:
