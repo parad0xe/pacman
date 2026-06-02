@@ -4,26 +4,28 @@ from src.game.direction import Direction
 
 
 class PathFinder:
+    """
+    A* pathfinder operating on a bitmask maze.
+
+    Each cell in the maze is an integer where bits 1/2/4/8 represent
+    walls on the North/East/South/West sides respectively. A set bit
+    means a wall is present and that passage is blocked.
+    """
     def __init__(self, maze: list[list[int]] = []) -> None:
+        """Initialise with an optional maze, call new_maze to set it later."""
         self.maze = maze
 
     def new_maze(self, maze: list[list[int]]) -> None:
-        """
-        changes the class maze when the level changes
-        """
+        """changes the class maze when the level changes"""
         self.maze = maze
 
     @staticmethod
     def dist(src: tuple[int, int], dest: tuple[int, int]) -> int:
-        """
-        calculates the manathan distance between two nodes
-        """
+        """calculates the manathan distance between two nodes"""
         return abs(src[0] - dest[0]) + abs(src[1] - dest[1])
 
     def neighbors(self, pos: tuple[int, int]) -> list[tuple[int, int]]:
-        """
-        return the coordinate of the avaible neighbors from 'pos' cell
-        """
+        """return the coordinate of the avaible neighbors from 'pos' cell"""
         neighbors_coords: list[tuple[int, int]] = []
         walls: int = self.maze[pos[1]][pos[0]]
 
@@ -38,6 +40,8 @@ class PathFinder:
         return neighbors_coords
 
     def dir(self, src: tuple[int, int], dest: tuple[int, int]) -> Direction:
+        """Return the Direction needed to step
+        from src to an adjacent dest cell."""
         if dest[0] - src[0] == 1:
             return Direction.EAST
         if dest[0] - src[0] == -1:
@@ -51,6 +55,12 @@ class PathFinder:
     def reconstruct(
         self, came_from: dict, start: tuple[int, int], end: tuple[int, int]
     ) -> list[Direction]:
+        """
+        Rebuild a direction path from the came_from map produced by search().
+
+        Walks backwards from end to start via came_from, converts each
+        step to a Direction, then reverses the list to get start→end order.
+        """
         path: list[Direction] = []
         cur = end
         while cur != start:
@@ -63,6 +73,13 @@ class PathFinder:
     def search(
         self, start: tuple[int, int], end: tuple[int, int]
     ) -> list[Direction]:
+        """
+        Find the shortest path from start to end using A*.
+
+        Uses Manhattan distance as the admissible heuristic, guaranteeing
+        an optimal path. Returns a list of Directions to follow from start
+        to end, or an empty list if no path exists.
+        """
         open_heap: list[tuple[int, int, tuple[int, int]]] = []
         heappush(open_heap, (self.dist(start, end), 0, start))
 
