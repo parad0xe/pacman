@@ -19,7 +19,7 @@ from src.ui.views.game.overlays.select_action import SelectActionOverlay
 from src.ui.views.game.overlays.start_timer import StartTimerOverlay
 from src.ui.views.game.overlays.win import WinOverlay
 from src.ui.views.game.theme import PacmanViewTheme
-from src.ui.views.overlays.instruction import InstructionOverlay
+from src.ui.overlays import InstructionOverlay
 
 
 class _Layout:

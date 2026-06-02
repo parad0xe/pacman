@@ -5,7 +5,7 @@
     "height": 15,
     "seed": -1,
     "time": 120,
-    "pacgum": 10,
-    "super_pacgum": 50,
-    "ghost": 250
+    "pacgum_points": 10,
+    "super_pacgum_points": 50,
+    "ghost_points": 250
 }
