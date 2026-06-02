@@ -1,4 +1,5 @@
-from typing import Callable
+import re
+from typing import Callable, Optional
 
 import pyray as pr
 from typing_extensions import Unpack
@@ -34,6 +35,7 @@ class InputText(ElementGroup):
         on_submit: Callable[[], None],
         focus_color: pr.Color = pr.Color(54, 100, 150, 255),
         label_color: pr.Color = pr.WHITE,
+        pattern: Optional[str] = None,
         **kwargs: Unpack[ElementKwargs],
     ) -> None:
         """
@@ -68,6 +70,7 @@ class InputText(ElementGroup):
         self.can_focus = True
         self.is_typing_target = True
 
+        self.pattern: str = pattern
         self.max_length: int = max_length
         self.focus_color = focus_color
         self.on_submit = on_submit
@@ -198,7 +201,12 @@ class InputText(ElementGroup):
         key = pr.get_char_pressed()
         value = self.value
         while key > 0:
-            if 32 <= key <= 125 and len(value) < self.max_length:
+            if self.pattern is not None:
+                result = value + chr(key)
+                if match := re.fullmatch(self.pattern, result):
+                    if match is not None:
+                        self.input.properties.text_content = result
+            elif 32 <= key <= 125 and len(value) < self.max_length:
                 self.input.properties.text_content = value + chr(key)
             key = pr.get_char_pressed()
 
