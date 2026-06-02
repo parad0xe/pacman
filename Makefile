@@ -54,7 +54,7 @@ clean: cache-clean
 	rm -rf $(VENV)
 
 debug: install-dev
-	$(UV) run python -m pdb -m src $(ARGS)
+	$(UV) run python -m pdb pac-man.py $(ARGS)
 
 lint: install-dev
 	@$(FLAKE8)
