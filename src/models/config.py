@@ -1,67 +1,72 @@
+from __future__ import annotations
+
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel, Field, ConfigDict, ValidationError
 
-from src.exceptions.schema import SchemaValidationError
-from src.utils.common import (
-    json_parse_comments,
-    load_json,
-)
+from src.utils.common import json_parse_comments, load_json
 from src.utils.file import file_load_plain
 
 
 class Config(BaseModel):
-    """
-    Defines the configuration schema for the Pac-Man application.
-
-    Attributes:
-        score_file: The file path to save and load high scores.
-        life: The starting number of player lives.
-        width: The logical width of the game board in cells.
-        height: The logical height of the game board in cells.
-        seed: Random seed for maze generation (-1 for random).
-        time: Maximum time allowed for a stage in seconds.
-        pacgum: Score value for a standard pacgum.
-        super_pacgum: Score value for a super pacgum.
-        ghost: Score value for eating a frightened ghost.
-    """
-
     model_config = ConfigDict(extra="forbid")
 
     score_file: str = "scores.json"
     life: int = Field(default=3, ge=1)
-    width: int = Field(default=15, ge=10, le=25)
-    height: int = Field(default=15, ge=10, le=25)
+    width: int = Field(default=15, ge=10, le=20)
+    height: int = Field(default=15, ge=10, le=20)
     seed: int = Field(default=-1, ge=-1)
     time: int = Field(default=90, ge=1)
-    pacgum: int = Field(default=10, ge=0)
-    super_pacgum: int = Field(default=50, ge=0)
-    ghost: int = Field(default=250, ge=0)
+    pacgum_points: int = Field(default=10, ge=0)
+    super_pacgum_points: int = Field(default=50, ge=0)
+    ghost_points: int = Field(default=250, ge=0)
 
 
 def load_config(file_path: str | Path) -> Config:
     """
-    Loads and validates the configuration from a JSON file.
-
-    Args:
-        file_path: Path to the JSON configuration file.
-
-    Returns:
-        The validated Config object.
-
-    Raises:
-        SchemaValidationError: If the JSON data fails validation.
+    Loads configuration from JSON with fallbacks:
+    - Missing keys -> default values
+    - Invalid values -> default values
+    Returns (config, warnings).
     """
-    if isinstance(file_path, str):
-        file_path = Path(file_path)
+    path = Path(file_path)
+    raw_text = file_load_plain(path)
+    parsed_text = json_parse_comments(raw_text)
+    data: dict[str, Any] = load_json(parsed_text, expected_root=dict)
 
-    file_data = file_load_plain(Path(file_path))
-    parsed_data = json_parse_comments(file_data)
-    data = load_json(parsed_data, expected_root=dict)
+    defaults = Config()
+    config = Config()
+    warnings: list[str] = []
 
-    try:
-        config = Config(**data)
-    except ValidationError as e:
-        raise SchemaValidationError(e, context=f"load config: {file_path}")
+    provided_keys = set(data.keys())
+    model_keys = set(Config.model_fields.keys())
+
+    for extra_key in sorted(provided_keys - model_keys):
+        warnings.append(f"Unknown config key '{extra_key}' ignored.")
+
+    for key, field in Config.model_fields.items():
+        if key in provided_keys:
+            continue
+        warnings.append(f"Missing config key '{key}', using default "
+                        f"{getattr(defaults, key)!r}.")
+
+    for key, value in data.items():
+        if key not in Config.model_fields:
+            continue
+
+        candidate = config.model_dump()
+        candidate[key] = value
+
+        try:
+            config = Config.model_validate(candidate)
+        except ValidationError:
+            warnings.append(
+                f"Invalid value for '{key}'={value!r}, "
+                f"using default ({getattr(defaults, key)!r}). "
+            )
+
+    for warn in warnings:
+        print(warn)
 
     return config

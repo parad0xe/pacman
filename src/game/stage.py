@@ -36,7 +36,9 @@ class Stage:
         self.remaining = float(config.time)
 
         self.player: Player = Player(
-            (int(len(self.board) / 2), int(len(self.board[0]) / 2)), self.board
+            (int((len(self.board) - 1) / 2),
+             int((len(self.board[0]) - 1) / 2)),
+            self.board
         )
 
         self.height = len(self.board)
@@ -87,12 +89,12 @@ class Stage:
 
         if self.pacgums[cell[1]][cell[0]] == 1:
             self.pacgums[cell[1]][cell[0]] = 0
-            return self.config.pacgum
+            return self.config.pacgum_points
 
         if self.pacgums[cell[1]][cell[0]] == 2:
             self.pacgums[cell[1]][cell[0]] = 0
             self.player.super_state()
-            return self.config.super_pacgum
+            return self.config.super_pacgum_points
 
         return 0
 

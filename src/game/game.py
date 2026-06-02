@@ -99,7 +99,7 @@ class Game:
     def eat_ghost(self, ghost: Ghost) -> None:
         """Reset a ghost after being eaten and award ghost-kill score."""
         ghost.reset(self.stage.player.super_timer)
-        self.score += self.config.ghost
+        self.score += self.config.ghost_points
 
     def ghosts_collisions(self) -> None:
         """
