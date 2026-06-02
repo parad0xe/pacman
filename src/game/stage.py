@@ -22,7 +22,7 @@ class Stage:
         self.remaining = float(config.time)
 
         self.player: Player = Player(
-            (int(len(self.board[0]) / 2), int(len(self.board) / 2)), self.board
+            (int(len(self.board) / 2), int(len(self.board[0]) / 2)), self.board
         )
 
         self.height = len(self.board)
@@ -46,6 +46,8 @@ class Stage:
                 (self.height - 1, self.width - 1),
             ),
         ]
+        self.ghosts_interact = True
+        self.ghost_pathfind = True
 
     def reset_all(self) -> None:
         self.player.reset()

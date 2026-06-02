@@ -28,14 +28,15 @@ class Game:
         self.event = Event()
 
         seed(time())
-        self.mazegenerator = mazegenerator.MazeGenerator()
+        self.mazegenerator = mazegenerator.MazeGenerator(size=(config.width,
+                                                               config.height))
         self.path_finder = PathFinder()
 
         self.level = 0
         self.score = 0
         self.life = config.life
 
-        self.wait_timer: float = 0
+        self.wait_timer = 0.0
         self.is_over = 0
         self.is_paused = 0
 
@@ -50,13 +51,16 @@ class Game:
             if self.config.seed != -1 and self.level == 0
             else randint(0, 100000)
         )
-        self.mazegenerator.generate(seed)
         self.level += 1
 
         if self.level > 10:
             self.event.emit(GameEvent.VICTORY)
             self.is_over = 1
             return
+
+        print("generating maze ...")
+        self.mazegenerator.generate(seed)
+        print("maze done generating")
 
         self.stage = Stage(
             self.mazegenerator.maze, self.path_finder, self.level, self.config
@@ -139,12 +143,15 @@ class Game:
         for ghost in self.stage.ghosts:
             if ghost.wait_timer != float("inf"):
                 ghost.wait_timer = float("inf")
+                self.stage.ghost_pathfind = False
             else:
                 ghost.wait_timer = 0
+                self.stage.ghost_pathfind = True
 
     def cheat_intangible_ghosts(self) -> None:
+        self.stage.ghosts_interact = not self.stage.ghosts_interact
         for ghost in self.stage.ghosts:
-            ghost.interact = not ghost.interact
+            ghost.interact = self.stage.ghosts_interact
 
     def cheat_speed(self, mod: int) -> None:
         """speed the player up or down by mod/10 %"""

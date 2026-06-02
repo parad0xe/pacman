@@ -1,5 +1,7 @@
 {
   "score_file": "scores.json",
   "time": 90,
-  "life": 1
+  "life": 1,
+  "width": 25,
+  "height": 25
 }

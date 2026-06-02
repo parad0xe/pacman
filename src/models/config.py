@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, Field, ConfigDict, ValidationError
 
 from src.exceptions.schema import SchemaValidationError
 from src.utils.file import file_load_json
@@ -10,14 +10,14 @@ class Config(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     score_file: str = "scores.json"
-    life: int = 3
-    width: int = 15
-    height: int = 15
-    seed: int = -1
-    time: int = 90
-    pacgum: int = 10
-    super_pacgum: int = 50
-    ghost: int = 250
+    life: int = Field(default=3, ge=1)
+    width: int = Field(default=15, ge=10, le=25)
+    height: int = Field(default=15, ge=10, le=25)
+    seed: int = Field(default=-1, ge=-1)
+    time: int = Field(default=90, ge=1)
+    pacgum: int = Field(default=10, ge=0)
+    super_pacgum: int = Field(default=50, ge=0)
+    ghost: int = Field(default=250, ge=0)
 
 
 def load_config(file_path: str | Path) -> Config:
