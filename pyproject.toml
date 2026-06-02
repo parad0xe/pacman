@@ -15,3 +15,7 @@ dev = [
     "mypy>=1.19.1",
     "black>=26.5.1",
 ]
+
+[[tool.mypy.overrides]]
+module = "mazegenerator.*"
+ignore_missing_imports = true
