@@ -11,6 +11,7 @@ Pacman is a Python-based implementation of the classic Pac-Man arcade game. This
 - [Instructions](#instructions)
   - [Installation](#installation)
   - [Execution](#execution)
+  - [Build](#build)
 - [Configuration](#configuration)
 - [Highscore](#highscore)
 - [Maze Generation](#maze-generation)
@@ -57,7 +58,7 @@ To create a standalone executable of the game using `pyinstaller`, run:
 make build
 ```
 
-The resulting executable will be placed in the `dist/` directory.
+This will create an executable and bundle it alongside its required assets, configuration file, and documentation into a `pac-man.zip` archive located in the `dist/` directory.
 
 ## Configuration
 
