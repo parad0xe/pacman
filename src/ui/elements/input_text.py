@@ -70,7 +70,7 @@ class InputText(ElementGroup):
         self.can_focus = True
         self.is_typing_target = True
 
-        self.pattern: str = pattern
+        self.pattern: str | None = pattern
         self.max_length: int = max_length
         self.focus_color = focus_color
         self.on_submit = on_submit

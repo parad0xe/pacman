@@ -11,9 +11,9 @@ from src.ui.core.layout import HBox, VBox
 from src.ui.core.view import View
 from src.ui.elements.button import Button
 from src.ui.elements.text import Text
+from src.ui.overlays.instruction import InstructionOverlay
 from src.ui.views.menu.canvas import GameCanvas
 from src.ui.views.menu.overlays.game_over import GameOverOverlay
-from src.ui.overlays.instruction import InstructionOverlay
 from src.ui.views.menu.overlays.pause import PauseOverlay
 from src.ui.views.menu.theme import MenuTheme
 
@@ -157,7 +157,7 @@ class MenuView(View):
             row.properties.justify_content = "center"
             row.properties.align_items = "center"
             row.properties.gap = 20
-            for text, callback in footer_buttons[k : k + 2]:
+            for text, callback in footer_buttons[k:k+2]:
                 row.add(_Layout.create_menu_button(text, callback))
             footer.add(row)
 

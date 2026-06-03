@@ -1,5 +1,3 @@
-from typing import Callable
-
 import pyray as pr
 from typing_extensions import Unpack
 
