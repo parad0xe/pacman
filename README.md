@@ -128,8 +128,9 @@ Project planning and task decomposition were organized using Trello. The workloa
 
 ## Resources
 
-- **Raylib Python Bindings (pyray)**: [https://github.com/electronstudio/raylib-python-cffi](https://github.com/electronstudio/raylib-python-cffi)
+- **Raylib Python (pyray)**: [https://electronstudio.github.io/raylib-python-cffi/pyray.html](https://electronstudio.github.io/raylib-python-cffi/pyray.html)
 - **Pydantic Documentation**: [https://docs.pydantic.dev/](https://docs.pydantic.dev/)
+- **PyInstaller doucmentation**: [https://pyinstaller.org/en/v6.13.0/usage.html](https://pyinstaller.org/en/v6.13.0/usage.html)
 
 ### AI Usage
 

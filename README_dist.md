@@ -12,11 +12,6 @@ Pacman is a Python-based implementation of the classic Pac-Man arcade game. This
   - [Execution](#execution)
 - [Configuration](#configuration)
 - [Highscore](#highscore)
-- [Maze Generation](#maze-generation)
-- [Implementation](#implementation)
-- [General Software Architecture](#general-software-architecture)
-- [Project Management](#project-management)
-- [Resources](#resources)
 
 ## Instructions
 
@@ -59,52 +54,3 @@ The highscore system persists player scores in a JSON file specified in the conf
 
 **Why this implementation:**
 Using JSON paired with Pydantic ensures data integrity, easy serialization, and immunity to manual tampering (invalid entries are immediately rejected). Constraining the highscores to the top 10 entries saves file space and limits processing time, which fits the classic arcade paradigm perfectly.
-
-## Maze generation
-
-The maze generation utilizes the provided `A-Maze-ing` package (imported as `mazegenerator`). 
-
-At the start of a new stage, the `Game` controller instantiates `MazeGenerator` with the configured `width` and `height`. 
-For the first level, it uses the `seed` from the configuration (unless set to `-1`, which generates a random seed). For subsequent levels, a new random seed is generated. 
-Calling the `mazegenerator.generate(seed)` method executes the generation algorithm, and the resulting 2D array (`maze`) is passed directly to the `Stage` class. The stage then interprets the grid, placing the player at the center, ghosts in the four corners, and super pacgums in the four corners.
-
-## Implementation
-
-The project is built entirely in Python, utilizing `pyray` (Raylib) for fast, hardware-accelerated 2D rendering at a smooth 120 FPS. 
-A major technical highlight is the use of a fixed timestep update loop within the `Game.update` method. The loop breaks down delta time (dt) into smaller sub-steps to ensure entities (like the player) never skip over cell boundaries during movement, thus eliminating collision tunneling.
-State management is decoupled from the rendering loop. Logical entities (`Player`, `Ghost`, `Stage`, `Game`) only manage internal states, making the game loop predictable and easy to manage. Additionally, a custom mini UI framework was developed, implementing UI views and flex-box layouts (`VBox`, `HBox`) directly over Raylib's primitive drawing functions.
-
-## General software architecture
-
-The architecture relies on decoupling logic, state, and rendering, following a clear Model-View-Controller (MVC) pattern.
-
-- **src/game/** (The Core Engine): 
-  - `Game`: The top-level controller, orchestrating stages, cheat codes, and overall transitions (game over, victory).
-  - `Stage`: Represents a single level instance, owning the maze board, pacgums, player, and ghosts.
-  - `Player` / `Ghost`: Entity models maintaining movement logic, states (NORMAL, SUPER), and sub-step physics.
-  - `PathFinder`: Handles shortest-path evaluations for ghost AI targeting.
-- **src/ui/** (The Custom mini UI Framework):
-  - `ViewManager`: Handles scene routing and transitions (Menu -> Game -> Highscores).
-  - **views/** (`MenuView`, `PacmanView`, `HighscoreView`): Specific screen layouts.
-  - **core/ & elements/** (`HBox`, `VBox`, `Button`, `Text`): Building blocks of the UI.
-- **src/models/** (Data & Configuration):
-  - `Config`: Validates and parses `config.json`.
-  - `Score` / `Highscores`: Validates `scores.json`.
-- **src/application.py**: The main application lifecycle manager, initializing the Raylib window, the global context, and the 120 FPS game loop.
-- **src/context.py & src/event.py**: Implements a global event dispatcher (`AppEvent`, `GameEvent`) to facilitate loosely coupled communication across the app (e.g., a button click triggering a view switch).
-
-## Project management
-
-Project planning and task decomposition were organized using Trello. The workload was divided so that one person focused on implementing the custom UI system, while the other was dedicated to creating the core game engine.
-
-## Resources
-
-- **Raylib Python Bindings (pyray)**: [https://github.com/electronstudio/raylib-python-cffi](https://github.com/electronstudio/raylib-python-cffi)
-- **Pydantic Documentation**: [https://docs.pydantic.dev/](https://docs.pydantic.dev/)
-
-### AI Usage
-
-AI was utilized during this project for:
-- Helping to resolve rendering issues.
-- Generating the documentation.
-- Drafting and structuring this README.
