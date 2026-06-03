@@ -42,13 +42,12 @@ class Player:
 
         self.box = pr.Rectangle(x, y, self.size, self.size)
 
-    def update(self, dt: float, time_step: float, floor_y: float) -> None:
+    def update(self, dt: float, floor_y: float) -> None:
         """
         Updates player position, velocity, and energy state.
 
         Args:
             dt: Delta time since the last frame.
-            time_step: Fixed time step for physics updates.
             floor_y: The y-coordinate representing the ground.
         """
 
@@ -67,8 +66,8 @@ class Player:
         if self.energy > self.energy_max:
             self.energy = self.energy_max
 
-        self.vy += self.g * time_step
-        self.box.y += self.vy * time_step
+        self.vy += self.g
+        self.box.y += self.vy
 
         if self.box.y >= floor_y:
             self.box.y = floor_y

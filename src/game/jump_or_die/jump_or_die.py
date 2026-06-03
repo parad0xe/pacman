@@ -119,7 +119,7 @@ class JumpOrDie:
 
         time_step = dt * self.game_speed
         floor_y = float(height - self.player.size)
-        self.player.update(dt, time_step, floor_y)
+        self.player.update(dt, floor_y)
 
         for enemy in self.enemies:
             enemy.update(time_step)
