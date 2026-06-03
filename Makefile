@@ -42,7 +42,7 @@ build: install
 	$(UV) run pyinstaller --onefile --windowed $(MAIN)
 	mkdir $(DIST)/pacman
 	cp -r assets $(DIST)/pacman
-	cp README.md $(DIST)/pacman
+	cp README_dist.md $(DIST)/pacman/README.md
 	cp config.json $(DIST)/pacman
 	mv $(DIST)/pac-man $(DIST)/pacman
 	cd $(DIST); zip -r pac-man.zip pacman/

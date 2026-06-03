@@ -9,9 +9,7 @@ Pacman is a Python-based implementation of the classic Pac-Man arcade game. This
 ## Table of contents
 
 - [Instructions](#instructions)
-  - [Installation](#installation)
   - [Execution](#execution)
-  - [Build](#build)
 - [Configuration](#configuration)
 - [Highscore](#highscore)
 - [Maze Generation](#maze-generation)
@@ -22,43 +20,16 @@ Pacman is a Python-based implementation of the classic Pac-Man arcade game. This
 
 ## Instructions
 
-### Installation
-
-The project uses `uv` for dependency management. To install the required packages (including `pyray`, `pydantic`, and the provided `mazegenerator`), run:
-
-```bash
-make
-```
-
-Or you can use `uv` directly to sync dependencies:
-
-```bash
-uv sync
-```
+This version is the standalone executable of the game. No installation or building is required.
 
 ### Execution
 
-To run the game, use the following command at the root of the repository:
+To run the game, extract the archive and execute the provided binary from your terminal:
 
+**On Linux / macOS:**
 ```bash
-make run [ARGS="config_file"]
+./pac-man <config_file>
 ```
-
-Alternatively, you can run it directly using uv:
-
-```bash
-uv run python pac-man.py <config_file>
-```
-
-### Build
-
-To create a standalone executable of the game using `pyinstaller`, run:
-
-```bash
-make build
-```
-
-This will create an executable and bundle it alongside its required assets, configuration file, and documentation into a `pac-man.zip` archive located in the `dist/` directory.
 
 ## Configuration
 
