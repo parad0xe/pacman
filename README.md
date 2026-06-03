@@ -49,6 +49,16 @@ Alternatively, you can run it directly using uv:
 uv run python pac-man.py [config_file]
 ```
 
+### Build
+
+To create a standalone executable of the game using `pyinstaller`, run:
+
+```bash
+make build
+```
+
+The resulting executable will be placed in the `dist/` directory.
+
 ## Configuration
 
 The game relies on a JSON configuration file (by default `config.json`), managed and strictly validated through Pydantic models to ensure stability. 
