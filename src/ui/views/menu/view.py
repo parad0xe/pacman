@@ -51,12 +51,12 @@ class _Layout:
         return header
 
     @staticmethod
-    def main_content() -> ElementGroup:
+    def game_content() -> ElementGroup:
         """
         Creates the central content container for the menu.
 
         Returns:
-            The configured ElementGroup for main content.
+            The configured ElementGroup for game content.
         """
 
         main_content = ElementGroup(width="100%", height="50%")
@@ -109,8 +109,8 @@ class MenuView(View):
     Attributes:
         game: The active JumpOrDie preview game instance.
         instruction_visible: Flag if instructions are currently shown.
-        main_content: The container for the primary menu components.
-        overlays: Group for displaying pause or game over overlays.
+        game_content: The container for the primary menu components.
+        game_overlays: Group for displaying pause or game over overlays.
     """
 
     name: ClassVar[str] = "menu"
@@ -139,8 +139,8 @@ class MenuView(View):
         header = _Layout.header()
         main_layout.add(header)
 
-        self.main_content = _Layout.main_content()
-        main_layout.add(self.main_content)
+        self.game_content = _Layout.game_content()
+        main_layout.add(self.game_content)
 
         footer = _Layout.footer()
         main_layout.add(footer)
@@ -161,7 +161,7 @@ class MenuView(View):
                 row.add(_Layout.create_menu_button(text, callback))
             footer.add(row)
 
-        self.overlays = ElementGroup(
+        self.game_overlays = ElementGroup(
             id="overlays",
             width="100%",
             height="100%",
@@ -173,7 +173,7 @@ class MenuView(View):
         Sets up the view components when entering the menu.
         """
 
-        self.main_content.add(
+        self.game_content.add(
             Text(
                 text="Press SPACE to start",
                 height="100%",
@@ -215,8 +215,8 @@ class MenuView(View):
         ):
             self.game.toggle_pause()
 
-        self.game.width = self.main_content.boxes.content_box.width
-        self.game.height = self.main_content.boxes.content_box.height
+        self.game.width = self.game_content.boxes.content_box.width
+        self.game.height = self.game_content.boxes.content_box.height
 
         self.game.update(dt)
 
@@ -227,8 +227,8 @@ class MenuView(View):
 
         GameCanvas.unload()
 
-        self._set_overlay()
-        self.main_content.clear()
+        self._set_game_overlay()
+        self.game_content.clear()
         self.game = None
 
     def _on_start_game(self) -> None:
@@ -236,8 +236,8 @@ class MenuView(View):
         Initializes and starts the JumpOrDie preview game.
         """
 
-        self._set_overlay()
-        self.main_content.clear()
+        self._set_game_overlay()
+        self.game_content.clear()
 
         self.game = JumpOrDie(
             self.boxes.content_box.width,
@@ -246,7 +246,7 @@ class MenuView(View):
         self._subscribe_to_events()
 
         helper = HBox()
-        helper.properties.origin.y = self.main_content.boxes.content_box.height
+        helper.properties.origin.y = self.game_content.boxes.content_box.height
         helper.properties.gap = 20
         helper.add(
             Text(
@@ -275,7 +275,7 @@ class MenuView(View):
             ),
         )
 
-        self.main_content.add(
+        self.game_content.add(
             GameCanvas(
                 game=self.game,
                 width="100%",
@@ -283,7 +283,7 @@ class MenuView(View):
             ),
             helper,
         )
-        self.main_content.add(self.overlays)
+        self.game_content.add(self.game_overlays)
 
     def _on_pause_toggle(self, paused: bool) -> None:
         """
@@ -294,16 +294,16 @@ class MenuView(View):
         """
 
         if paused:
-            self._set_overlay(PauseOverlay())
+            self._set_game_overlay(PauseOverlay())
         else:
-            self._set_overlay()
+            self._set_game_overlay()
 
     def _on_game_over(self) -> None:
         """
         Displays the game over overlay for the preview game.
         """
 
-        self.overlays.add(GameOverOverlay(on_restart=self._on_start_game))
+        self.game_overlays.add(GameOverOverlay(on_restart=self._on_start_game))
 
     def _toggle_instruction(self) -> None:
         """
@@ -333,15 +333,15 @@ class MenuView(View):
         self.game.event.subscribe(JumpOrDieEvent.PAUSE, self._on_pause_toggle)
         self.game.event.subscribe(JumpOrDieEvent.GAME_OVER, self._on_game_over)
 
-    def _set_overlay(self, overlay: Optional[Element] = None) -> None:
+    def _set_game_overlay(self, overlay: Optional[Element] = None) -> None:
         """
-        Replaces all menu overlay.
+        Replaces all game overlay.
 
         Args:
             overlay: The UI element to display as an overlay.
         """
 
-        self.overlays.clear()
+        self.game_overlays.clear()
 
         if overlay:
-            self.overlays.add(overlay)
+            self.game_overlays.add(overlay)
