@@ -13,7 +13,7 @@ from src.ui.elements.button import Button
 from src.ui.elements.text import Text
 from src.ui.views.menu.canvas import GameCanvas
 from src.ui.views.menu.overlays.game_over import GameOverOverlay
-from src.ui.overlays import InstructionOverlay
+from src.ui.overlays.instruction import InstructionOverlay
 from src.ui.views.menu.overlays.pause import PauseOverlay
 from src.ui.views.menu.theme import MenuTheme
 
