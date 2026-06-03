@@ -128,13 +128,13 @@ Project planning and task decomposition were organized using Trello. The workloa
 
 ## Resources
 
-- **Raylib Python (pyray)**: [https://electronstudio.github.io/raylib-python-cffi/pyray.html](https://electronstudio.github.io/raylib-python-cffi/pyray.html)
-- **Pydantic Documentation**: [https://docs.pydantic.dev/](https://docs.pydantic.dev/)
-- **PyInstaller doucmentation**: [https://pyinstaller.org/en/v6.13.0/usage.html](https://pyinstaller.org/en/v6.13.0/usage.html)
+- **Raylib python (pyray)**: [https://electronstudio.github.io/raylib-python-cffi/pyray.html](https://electronstudio.github.io/raylib-python-cffi/pyray.html)
+- **Pydantic documentation**: [https://docs.pydantic.dev/](https://docs.pydantic.dev/)
+- **PyInstaller documentation**: [https://pyinstaller.org/en/v6.13.0/usage.html](https://pyinstaller.org/en/v6.13.0/usage.html)
 
 ### AI Usage
 
 AI was utilized during this project for:
-- Helping to resolve rendering issues.
-- Generating the documentation.
-- Drafting and structuring this README.
+- helping to resolve rendering issues.
+- generating the documentation.
+- drafting and structuring this README.
