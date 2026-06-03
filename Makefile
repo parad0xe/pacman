@@ -1,6 +1,7 @@
 MAKEFLAGS=--no-print-directory
 
 # structure
+MAIN = pac-man.py
 ARGS ?= config.json
 
 
@@ -12,7 +13,7 @@ UV_LOCK := uv.lock
 PYPROJECT_TOML := pyproject.toml
 
 # cache
-CACHE_DIRS := __pycache__ .mypy_cache .pytest_cache
+CACHE_DIRS := __pycache__ .mypy_cache .pytest_cache .ruff_cache
 CACHE_EXCLUDE = -name "$(VENV)" -prune -o
 CACHE_SEARCH = $(foreach cache,$(CACHE_DIRS),-name "$(cache)" -o)
 FIND_CACHES = find . \
@@ -31,8 +32,11 @@ install: uv_check $(UV_LOCK) $(VENV_STATE_PROD)
 install-dev: uv_check $(UV_LOCK) $(VENV_STATE_DEV)
 
 run: install
-	@echo "$(UV) run python pac-man.py $(ARGS)"
-	@$(UV) run python pac-man.py $(ARGS)
+	@echo "$(UV) run python $(MAIN) $(ARGS)"
+	@$(UV) run python $(MAIN) $(ARGS)
+
+build: install
+	$(UV) run pyinstaller --onefile --windowed $(MAIN)
 
 $(UV_LOCK): $(PYPROJECT_TOML)
 	@$(UV) lock
@@ -51,10 +55,10 @@ cache-clean:
 	$(FIND_CACHES) -exec rm -rf {} + 1>/dev/null
 
 clean: cache-clean
-	rm -rf $(VENV)
+	rm -rf dist/ build/ $(VENV) *.spec
 
 debug: install-dev
-	$(UV) run python -m pdb pac-man.py $(ARGS)
+	$(UV) run python -m pdb $(MAIN) $(ARGS)
 
 lint: install-dev
 	@$(FLAKE8)
@@ -73,4 +77,4 @@ uv_check:
 		exit 1; \
 	}
 
-.PHONY: install install-dev run cache-clean clean debug lint lint-strict uv_check
+.PHONY: install install-dev run build cache-clean clean debug lint lint-strict uv_check
