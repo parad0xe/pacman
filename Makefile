@@ -4,6 +4,8 @@ MAKEFLAGS=--no-print-directory
 MAIN = pac-man.py
 ARGS ?= config.json
 
+DIST = dist
+
 
 VENV := .venv
 VENV_STATE_PROD := $(VENV)/.install
@@ -36,7 +38,16 @@ run: install
 	@$(UV) run python $(MAIN) $(ARGS)
 
 build: install
+	rm -rf $(DIST)/
 	$(UV) run pyinstaller --onefile --windowed $(MAIN)
+	mkdir $(DIST)/pacman
+	cp -r assets $(DIST)/pacman
+	cp README.md $(DIST)/pacman
+	cp config.json $(DIST)/pacman
+	mv $(DIST)/pac-man $(DIST)/pacman
+	cd $(DIST); zip -r pac-man.zip pacman/
+	rm -rf $(DIST)/pacman
+
 
 $(UV_LOCK): $(PYPROJECT_TOML)
 	@$(UV) lock
@@ -55,7 +66,7 @@ cache-clean:
 	$(FIND_CACHES) -exec rm -rf {} + 1>/dev/null
 
 clean: cache-clean
-	rm -rf dist/ build/ $(VENV) *.spec
+	rm -rf $(DIST) build/ $(VENV) *.spec
 
 debug: install-dev
 	$(UV) run python -m pdb $(MAIN) $(ARGS)
