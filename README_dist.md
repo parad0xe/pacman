@@ -32,14 +32,14 @@ The game relies on a JSON configuration file (by default `config.json`), managed
 
 **Structure and Default Values:**
 - `score_file` (string): Path to the JSON file storing highscores (default: `"scores.json"`).
-- `life` (integer): Initial number of lives (default: `3`, min: 1).
+- `life` (integer): Initial number of lives (default: `3`, min: 1, max: 10).
 - `width` (integer): Width of the generated maze (default: `15`, min: 10, max: 20).
 - `height` (integer): Height of the generated maze (default: `15`, min: 10, max: 20).
 - `seed` (integer): Random seed for the first maze generation. Set to `-1` for a random seed (default: `-1`, min: -1).
-- `time` (integer): Time limit in seconds for a level (default: `90`, min: 1).
-- `pacgum_points` (integer): Points awarded per regular pacgum (default: `10`, min: 0).
-- `super_pacgum_points` (integer): Points awarded per super pacgum (default: `50`, min: 0).
-- `ghost_points` (integer): Points awarded for eating a ghost in SUPER state (default: `250`, min: 0).
+- `time` (integer): Time limit in seconds for a level (default: `90`, min: 1, max: 3600).
+- `pacgum_points` (integer): Points awarded per regular pacgum (default: `10`, min: 0, max: 2000).
+- `super_pacgum_points` (integer): Points awarded per super pacgum (default: `50`, min: 0, max: 4000).
+- `ghost_points` (integer): Points awarded for eating a ghost in SUPER state (default: `250`, min: 0, max: 8000).
 
 If a key is missing or invalid, the game automatically falls back to these default values, ignores unknown keys, and logs a warning to the console.
 
