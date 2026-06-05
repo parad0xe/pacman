@@ -5,6 +5,7 @@ from typing import Optional
 
 from mazegenerator import mazegenerator
 
+from src.exceptions.base import PacmanError
 from src.models.config import Config
 from src.event import Event
 from src.game.ghost import Ghost
@@ -77,7 +78,12 @@ class Game:
             return
 
         print("generating maze ...")
-        self.mazegenerator.generate(seed)
+
+        try:
+            self.mazegenerator.generate(seed)
+        except Exception:
+            raise PacmanError("Could not generate a maze, stopping.")
+
         print("maze done generating")
 
         self.stage = Stage(
