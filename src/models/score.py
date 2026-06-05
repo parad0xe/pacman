@@ -3,6 +3,11 @@ from pathlib import Path
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from src.exceptions.schema import SchemaValidationError
+from src.exceptions.storage import (
+    StorageError,
+    StorageFileNotFoundError,
+    StorageFilePermissionError,
+)
 from src.utils.file import file_load_json, file_write_json
 
 MAX_HIGHSCORES = 10
@@ -77,7 +82,16 @@ def load_highscores(file_path: str | Path) -> Highscores:
     if not file_path.is_file():
         return Highscores()
 
-    data = file_load_json(Path(file_path), expected_root=dict)
+    try:
+        data = file_load_json(Path(file_path), expected_root=dict)
+    except StorageError as e:
+        raise e
+    except Exception:
+        print(
+            f"[WARN] Highscores file '{file_path}' is corrupt. "
+            "Regenerating new empty highscores file..."
+        )
+        return Highscores()
 
     try:
         highscores = Highscores(**data)
