@@ -22,8 +22,8 @@ class Score(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    pseudo: str
-    score: int
+    pseudo: str = Field(min_length=1, max_length=10)
+    score: int = Field(ge=0)
 
 
 class Highscores(BaseModel):
@@ -94,6 +94,12 @@ def load_highscores(file_path: str | Path) -> Highscores:
     try:
         highscores = Highscores(**data)
     except ValidationError as e:
-        raise SchemaValidationError(e, context=f"load highscores: {file_path}")
+        print(SchemaValidationError(e))
+        print(
+            f"[WARN] Highscores file '{file_path}' "
+            "is corrupt by invalid values. "
+            "Regenerating new empty highscores file..."
+        )
+        return Highscores()
 
     return highscores
