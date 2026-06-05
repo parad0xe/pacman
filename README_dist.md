@@ -23,6 +23,7 @@ To run the game, extract the archive and execute the provided binary from your t
 
 **On Linux / macOS:**
 ```bash
+chmod +x ./pac-man
 ./pac-man <config_file>
 ```
 
