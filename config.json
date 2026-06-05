@@ -1,11 +1,11 @@
 {
     "score_file": "scores.json",
-    #"life": 3,
+    "life": 3,
     "width": 15,
     "height": 15,
     "seed": -1,
-    "time": 1200,
+    "time": 120,
     "pacgum_points": 10,
-    "super_pacgum_points": 5000,
+    "super_pacgum_points": 50,
     "ghost_points": 250
 }
