@@ -74,7 +74,6 @@ class WinOverlay(VBox):
             highscore = max(
                 self.highscores.scores or [],
                 key=lambda x: x.score,
-                default=Score(pseudo="", score=0),
             )
             if score > highscore.score:
                 new_highscore_text = Text(

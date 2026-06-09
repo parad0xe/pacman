@@ -166,7 +166,7 @@ class PacmanView(View):
 
         if self.is_key_pressed(pr.KeyboardKey.KEY_ZERO):
             self.goto_view("menu")
-        elif pr.is_key_pressed(pr.KeyboardKey.KEY_I):
+        elif self.is_key_pressed(pr.KeyboardKey.KEY_I):
             self._on_toggle_instruction()
 
         if not self.game:

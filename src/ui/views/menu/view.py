@@ -194,11 +194,11 @@ class MenuView(View):
 
         super().on_update(dt)
 
-        if pr.is_key_pressed(pr.KeyboardKey.KEY_M):
+        if self.is_key_pressed(pr.KeyboardKey.KEY_M):
             self.goto_view("game")
-        elif pr.is_key_pressed(pr.KeyboardKey.KEY_H):
+        elif self.is_key_pressed(pr.KeyboardKey.KEY_H):
             self.goto_view("highscores")
-        elif pr.is_key_pressed(pr.KeyboardKey.KEY_I):
+        elif self.is_key_pressed(pr.KeyboardKey.KEY_I):
             self._toggle_instruction()
 
         if not self.game:
